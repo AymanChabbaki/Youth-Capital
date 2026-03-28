@@ -1,0 +1,22 @@
+packages:
+  "framer-motion": "For page transitions and micro-interactions"
+  "lucide-react": "For beautiful consistent iconography"
+  "date-fns": "For formatting event and post dates"
+  "react-hook-form": "For robust form state management"
+  "@hookform/resolvers": "For zod validation integration"
+  "zod": "For schema validation in forms"
+  "clsx": "For conditional class names"
+  "tailwind-merge": "For merging tailwind classes efficiently"
+
+images:
+  - path: "artifacts/youth-capitalcore/public/images/hero-bg.png"
+    description: "Dark navy architectural abstract background with subtle glowing gold lines and modern geometric patterns conveying authoritative government and dynamic youth. Deep moody shadows, cinematic lighting."
+    aspect_ratio: "16:9"
+  - path: "artifacts/youth-capitalcore/public/images/parliament.png"
+    description: "Stylized modern illustration of a government parliament building with youthful dynamic energy. Monochromatic navy blue with bright gold accents."
+    aspect_ratio: "16:9"
+
+notes:
+  - API Client hooks are imported from @workspace/api-client-react
+  - React wouter is used for routing
+  - Global Language context manages LTR/RTL switching based on EN/AR

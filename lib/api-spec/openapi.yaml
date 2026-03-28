@@ -1,22 +1,41 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Youth CapitalCore API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: auth
+    description: Authentication
+  - name: users
+    description: User management
+  - name: roles
+    description: Role applications
+  - name: community
+    description: Community forums & posts
+  - name: polls
+    description: Voting polls
+  - name: press
+    description: News & press releases
+  - name: events
+    description: Events & calendar
+  - name: support
+    description: Support tickets
+  - name: crises
+    description: Crisis scenarios
+  - name: stats
+    description: Platform statistics
+
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,6 +43,614 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /auth/register:
+    post:
+      operationId: register
+      tags: [auth]
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterRequest"
+      responses:
+        "201":
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "409":
+          description: Email already exists
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/login:
+    post:
+      operationId: login
+      tags: [auth]
+      summary: Login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+      responses:
+        "200":
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "401":
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/logout:
+    post:
+      operationId: logout
+      tags: [auth]
+      summary: Logout
+      responses:
+        "200":
+          description: Logged out
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /auth/me:
+    get:
+      operationId: getMe
+      tags: [auth]
+      summary: Get current user
+      responses:
+        "200":
+          description: Current user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /users:
+    get:
+      operationId: getUsers
+      tags: [users]
+      summary: List all users (admin only)
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          schema:
+            type: integer
+        - name: role
+          in: query
+          schema:
+            type: string
+        - name: status
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of users
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserListResponse"
+
+  /users/{id}:
+    get:
+      operationId: getUser
+      tags: [users]
+      summary: Get user by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: User details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+    patch:
+      operationId: updateUser
+      tags: [users]
+      summary: Update user profile
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateUserRequest"
+      responses:
+        "200":
+          description: Updated user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+    delete:
+      operationId: deleteUser
+      tags: [users]
+      summary: Delete (ban) user (admin only)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: User deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /roles/applications:
+    get:
+      operationId: getRoleApplications
+      tags: [roles]
+      summary: Get all role applications (admin only)
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [pending, approved, rejected]
+      responses:
+        "200":
+          description: List of applications
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RoleApplicationListResponse"
+    post:
+      operationId: submitRoleApplication
+      tags: [roles]
+      summary: Submit a role application
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RoleApplicationRequest"
+      responses:
+        "201":
+          description: Application submitted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RoleApplication"
+
+  /roles/applications/{id}:
+    patch:
+      operationId: updateRoleApplication
+      tags: [roles]
+      summary: Approve/reject application (admin only)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateRoleApplicationRequest"
+      responses:
+        "200":
+          description: Application updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RoleApplication"
+
+  /community/forums:
+    get:
+      operationId: getForums
+      tags: [community]
+      summary: List community forums
+      responses:
+        "200":
+          description: List of forums
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ForumListResponse"
+
+  /community/forums/{forumId}/posts:
+    get:
+      operationId: getForumPosts
+      tags: [community]
+      summary: Get posts in a forum
+      parameters:
+        - name: forumId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Posts list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PostListResponse"
+    post:
+      operationId: createPost
+      tags: [community]
+      summary: Create a post in a forum
+      parameters:
+        - name: forumId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePostRequest"
+      responses:
+        "201":
+          description: Post created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Post"
+
+  /community/posts/{id}:
+    delete:
+      operationId: deletePost
+      tags: [community]
+      summary: Delete a post (admin or author)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Post deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /community/posts/{postId}/replies:
+    get:
+      operationId: getPostReplies
+      tags: [community]
+      summary: Get replies to a post
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Replies list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PostListResponse"
+    post:
+      operationId: createReply
+      tags: [community]
+      summary: Reply to a post
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePostRequest"
+      responses:
+        "201":
+          description: Reply created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Post"
+
+  /polls:
+    get:
+      operationId: getPolls
+      tags: [polls]
+      summary: List active polls
+      responses:
+        "200":
+          description: List of polls
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PollListResponse"
+    post:
+      operationId: createPoll
+      tags: [polls]
+      summary: Create a poll (admin only)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePollRequest"
+      responses:
+        "201":
+          description: Poll created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Poll"
+
+  /polls/{id}/vote:
+    post:
+      operationId: castVote
+      tags: [polls]
+      summary: Cast a vote on a poll
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CastVoteRequest"
+      responses:
+        "200":
+          description: Vote cast
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Poll"
+
+  /press:
+    get:
+      operationId: getArticles
+      tags: [press]
+      summary: List news articles
+      parameters:
+        - name: type
+          in: query
+          schema:
+            type: string
+            enum: [simulation, platform]
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Articles list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ArticleListResponse"
+    post:
+      operationId: createArticle
+      tags: [press]
+      summary: Create a news article (admin only)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateArticleRequest"
+      responses:
+        "201":
+          description: Article created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Article"
+
+  /press/{id}:
+    get:
+      operationId: getArticle
+      tags: [press]
+      summary: Get a single article
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Article details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Article"
+
+  /events:
+    get:
+      operationId: getEvents
+      tags: [events]
+      summary: List events
+      parameters:
+        - name: upcoming
+          in: query
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: Events list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EventListResponse"
+    post:
+      operationId: createEvent
+      tags: [events]
+      summary: Create an event (admin only)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateEventRequest"
+      responses:
+        "201":
+          description: Event created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Event"
+
+  /support/tickets:
+    get:
+      operationId: getSupportTickets
+      tags: [support]
+      summary: List support tickets
+      responses:
+        "200":
+          description: Tickets list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TicketListResponse"
+    post:
+      operationId: createSupportTicket
+      tags: [support]
+      summary: Submit a support ticket
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTicketRequest"
+      responses:
+        "201":
+          description: Ticket created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SupportTicket"
+
+  /support/tickets/{id}:
+    patch:
+      operationId: updateSupportTicket
+      tags: [support]
+      summary: Update ticket status (admin only)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateTicketRequest"
+      responses:
+        "200":
+          description: Ticket updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SupportTicket"
+
+  /crises:
+    get:
+      operationId: getCrises
+      tags: [crises]
+      summary: List crisis scenarios
+      responses:
+        "200":
+          description: Crises list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CrisisListResponse"
+    post:
+      operationId: triggerCrisis
+      tags: [crises]
+      summary: Trigger a crisis scenario (admin only)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCrisisRequest"
+      responses:
+        "201":
+          description: Crisis triggered
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Crisis"
+
+  /stats:
+    get:
+      operationId: getPlatformStats
+      tags: [stats]
+      summary: Get platform statistics
+      responses:
+        "200":
+          description: Platform stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlatformStats"
+
 components:
   schemas:
     HealthStatus:
@@ -31,6 +658,642 @@ components:
       properties:
         status:
           type: string
-      required:
-        - status
+      required: [status]
 
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+      required: [error]
+
+    SuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+      required: [success]
+
+    RegisterRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 8
+        fullName:
+          type: string
+        fullNameAr:
+          type: string
+        languagePreference:
+          type: string
+          enum: [en, ar]
+          default: en
+      required: [email, password, fullName]
+
+    LoginRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+      required: [email, password]
+
+    AuthResponse:
+      type: object
+      properties:
+        user:
+          $ref: "#/components/schemas/User"
+        token:
+          type: string
+      required: [user]
+
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        email:
+          type: string
+        fullName:
+          type: string
+        fullNameAr:
+          type: string
+        role:
+          type: string
+          enum: [user, admin]
+        simulationRole:
+          type: string
+          nullable: true
+        region:
+          type: string
+          nullable: true
+        languagePreference:
+          type: string
+          enum: [en, ar]
+        bio:
+          type: string
+          nullable: true
+        status:
+          type: string
+          enum: [active, banned]
+        applicationStatus:
+          type: string
+          enum: [none, pending, approved, rejected]
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+      required: [id, email, fullName, role, languagePreference, status]
+
+    UserListResponse:
+      type: object
+      properties:
+        users:
+          type: array
+          items:
+            $ref: "#/components/schemas/User"
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+      required: [users, total]
+
+    UpdateUserRequest:
+      type: object
+      properties:
+        fullName:
+          type: string
+        fullNameAr:
+          type: string
+        languagePreference:
+          type: string
+          enum: [en, ar]
+        bio:
+          type: string
+        region:
+          type: string
+
+    RoleApplicationRequest:
+      type: object
+      properties:
+        preferredRole:
+          type: string
+          enum: [minister, mp, local_council, diaspora_rep]
+        region:
+          type: string
+        ministryPreference:
+          type: string
+          nullable: true
+        parliamentHouse:
+          type: string
+          enum: [house_of_representatives, house_of_councillors]
+          nullable: true
+        motivation:
+          type: string
+        languagePreference:
+          type: string
+          enum: [en, ar]
+      required: [preferredRole, region, motivation]
+
+    UpdateRoleApplicationRequest:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [approved, rejected]
+        assignedRole:
+          type: string
+          nullable: true
+        adminNote:
+          type: string
+          nullable: true
+      required: [status]
+
+    RoleApplication:
+      type: object
+      properties:
+        id:
+          type: integer
+        userId:
+          type: integer
+        user:
+          $ref: "#/components/schemas/User"
+        preferredRole:
+          type: string
+        region:
+          type: string
+        ministryPreference:
+          type: string
+          nullable: true
+        parliamentHouse:
+          type: string
+          nullable: true
+        motivation:
+          type: string
+        status:
+          type: string
+          enum: [pending, approved, rejected]
+        assignedRole:
+          type: string
+          nullable: true
+        adminNote:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+      required: [id, userId, preferredRole, region, motivation, status]
+
+    RoleApplicationListResponse:
+      type: object
+      properties:
+        applications:
+          type: array
+          items:
+            $ref: "#/components/schemas/RoleApplication"
+        total:
+          type: integer
+      required: [applications, total]
+
+    Forum:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        nameAr:
+          type: string
+        description:
+          type: string
+        descriptionAr:
+          type: string
+        category:
+          type: string
+          enum: [parliament, ministry, regional, general]
+        postCount:
+          type: integer
+        lastActivityAt:
+          type: string
+          format: date-time
+          nullable: true
+      required: [id, name, nameAr, category, postCount]
+
+    ForumListResponse:
+      type: object
+      properties:
+        forums:
+          type: array
+          items:
+            $ref: "#/components/schemas/Forum"
+      required: [forums]
+
+    Post:
+      type: object
+      properties:
+        id:
+          type: integer
+        forumId:
+          type: integer
+        parentId:
+          type: integer
+          nullable: true
+        author:
+          $ref: "#/components/schemas/User"
+        title:
+          type: string
+          nullable: true
+        content:
+          type: string
+        replyCount:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required: [id, forumId, author, content, replyCount, createdAt, updatedAt]
+
+    PostListResponse:
+      type: object
+      properties:
+        posts:
+          type: array
+          items:
+            $ref: "#/components/schemas/Post"
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+      required: [posts, total]
+
+    CreatePostRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          nullable: true
+        content:
+          type: string
+      required: [content]
+
+    Poll:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        titleAr:
+          type: string
+        description:
+          type: string
+          nullable: true
+        options:
+          type: array
+          items:
+            $ref: "#/components/schemas/PollOption"
+        totalVotes:
+          type: integer
+        status:
+          type: string
+          enum: [active, closed]
+        userVote:
+          type: string
+          nullable: true
+        endsAt:
+          type: string
+          format: date-time
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+      required: [id, title, titleAr, options, totalVotes, status, createdAt]
+
+    PollOption:
+      type: object
+      properties:
+        id:
+          type: string
+        label:
+          type: string
+        labelAr:
+          type: string
+        votes:
+          type: integer
+        percentage:
+          type: number
+      required: [id, label, labelAr, votes, percentage]
+
+    PollListResponse:
+      type: object
+      properties:
+        polls:
+          type: array
+          items:
+            $ref: "#/components/schemas/Poll"
+      required: [polls]
+
+    CreatePollRequest:
+      type: object
+      properties:
+        title:
+          type: string
+        titleAr:
+          type: string
+        description:
+          type: string
+          nullable: true
+        options:
+          type: array
+          items:
+            type: object
+            properties:
+              label:
+                type: string
+              labelAr:
+                type: string
+            required: [label, labelAr]
+        endsAt:
+          type: string
+          format: date-time
+          nullable: true
+      required: [title, titleAr, options]
+
+    CastVoteRequest:
+      type: object
+      properties:
+        optionId:
+          type: string
+      required: [optionId]
+
+    Article:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        titleAr:
+          type: string
+        content:
+          type: string
+        contentAr:
+          type: string
+        type:
+          type: string
+          enum: [simulation, platform]
+        author:
+          $ref: "#/components/schemas/User"
+        thumbnailUrl:
+          type: string
+          nullable: true
+        publishedAt:
+          type: string
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+      required: [id, title, titleAr, content, contentAr, type, author, publishedAt, createdAt]
+
+    ArticleListResponse:
+      type: object
+      properties:
+        articles:
+          type: array
+          items:
+            $ref: "#/components/schemas/Article"
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+      required: [articles, total]
+
+    CreateArticleRequest:
+      type: object
+      properties:
+        title:
+          type: string
+        titleAr:
+          type: string
+        content:
+          type: string
+        contentAr:
+          type: string
+        type:
+          type: string
+          enum: [simulation, platform]
+        thumbnailUrl:
+          type: string
+          nullable: true
+      required: [title, titleAr, content, contentAr, type]
+
+    Event:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        titleAr:
+          type: string
+        description:
+          type: string
+        descriptionAr:
+          type: string
+        startAt:
+          type: string
+          format: date-time
+        endAt:
+          type: string
+          format: date-time
+          nullable: true
+        meetingUrl:
+          type: string
+          nullable: true
+        type:
+          type: string
+          enum: [live_session, vote, summit, workshop]
+        createdAt:
+          type: string
+          format: date-time
+      required: [id, title, titleAr, description, descriptionAr, startAt, type, createdAt]
+
+    EventListResponse:
+      type: object
+      properties:
+        events:
+          type: array
+          items:
+            $ref: "#/components/schemas/Event"
+      required: [events]
+
+    CreateEventRequest:
+      type: object
+      properties:
+        title:
+          type: string
+        titleAr:
+          type: string
+        description:
+          type: string
+        descriptionAr:
+          type: string
+        startAt:
+          type: string
+          format: date-time
+        endAt:
+          type: string
+          format: date-time
+          nullable: true
+        meetingUrl:
+          type: string
+          nullable: true
+        type:
+          type: string
+          enum: [live_session, vote, summit, workshop]
+      required: [title, titleAr, description, descriptionAr, startAt, type]
+
+    SupportTicket:
+      type: object
+      properties:
+        id:
+          type: integer
+        userId:
+          type: integer
+        user:
+          $ref: "#/components/schemas/User"
+        subject:
+          type: string
+        message:
+          type: string
+        status:
+          type: string
+          enum: [open, in_progress, resolved, closed]
+        adminResponse:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required: [id, userId, user, subject, message, status, createdAt, updatedAt]
+
+    TicketListResponse:
+      type: object
+      properties:
+        tickets:
+          type: array
+          items:
+            $ref: "#/components/schemas/SupportTicket"
+        total:
+          type: integer
+      required: [tickets, total]
+
+    CreateTicketRequest:
+      type: object
+      properties:
+        subject:
+          type: string
+        message:
+          type: string
+        category:
+          type: string
+          enum: [technical, rules, account, other]
+      required: [subject, message]
+
+    UpdateTicketRequest:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [open, in_progress, resolved, closed]
+        adminResponse:
+          type: string
+          nullable: true
+      required: [status]
+
+    Crisis:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        titleAr:
+          type: string
+        description:
+          type: string
+        descriptionAr:
+          type: string
+        severity:
+          type: string
+          enum: [low, medium, high, critical]
+        isActive:
+          type: boolean
+        createdBy:
+          $ref: "#/components/schemas/User"
+        createdAt:
+          type: string
+          format: date-time
+      required: [id, title, titleAr, description, descriptionAr, severity, isActive, createdBy, createdAt]
+
+    CrisisListResponse:
+      type: object
+      properties:
+        crises:
+          type: array
+          items:
+            $ref: "#/components/schemas/Crisis"
+      required: [crises]
+
+    CreateCrisisRequest:
+      type: object
+      properties:
+        title:
+          type: string
+        titleAr:
+          type: string
+        description:
+          type: string
+        descriptionAr:
+          type: string
+        severity:
+          type: string
+          enum: [low, medium, high, critical]
+      required: [title, titleAr, description, descriptionAr, severity]
+
+    PlatformStats:
+      type: object
+      properties:
+        activeMinistries:
+          type: integer
+        billsPassed:
+          type: integer
+        activeMembers:
+          type: integer
+        totalForumPosts:
+          type: integer
+        activeCrises:
+          type: integer
+        upcomingEvents:
+          type: integer
+      required: [activeMinistries, billsPassed, activeMembers, totalForumPosts, activeCrises, upcomingEvents]
