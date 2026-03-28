@@ -16,6 +16,9 @@ import Press from "@/pages/press";
 import Events from "@/pages/events";
 import Support from "@/pages/support";
 import Admin from "@/pages/admin";
+import About from "@/pages/about";
+import Rules from "@/pages/rules";
+import Privacy from "@/pages/privacy";
 import NotFound from "@/pages/not-found";
 
 const queryClient = new QueryClient();
@@ -33,6 +36,9 @@ function Router() {
         <Route path="/events" component={Events} />
         <Route path="/support" component={Support} />
         <Route path="/admin" component={Admin} />
+        <Route path="/about" component={About} />
+        <Route path="/rules" component={Rules} />
+        <Route path="/privacy" component={Privacy} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
