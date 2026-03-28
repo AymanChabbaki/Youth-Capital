@@ -25,9 +25,9 @@ export default function Login() {
 
   const onSubmit = async (data: z.infer<typeof loginSchema>) => {
     try {
-      await loginMutation.mutateAsync({ data });
+      const result = await loginMutation.mutateAsync({ data });
       await queryClient.invalidateQueries();
-      window.location.href = "/dashboard";
+      window.location.href = (result as any)?.user?.role === "admin" ? "/admin" : "/dashboard";
     } catch (error: any) {
       toast({
         title: t("Login Failed", "فشل تسجيل الدخول"),
