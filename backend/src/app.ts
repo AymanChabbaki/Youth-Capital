@@ -39,6 +39,14 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(optionalAuth);
 
+app.get("/", (req, res) => {
+  res.json({
+    status: "alive",
+    message: "Simulation Governing API is active and resilient.",
+    timestamp: new Date().toISOString(),
+  });
+});
+
 app.use("/api", router);
 
 export default app;
