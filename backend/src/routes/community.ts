@@ -51,7 +51,7 @@ router.get("/forums", async (req, res) => {
       })
     );
     res.json({ forums: forumsWithCounts });
-  } catch (err) {
+  } catch (err: any) {
     req.log.error({ err }, "Get forums error");
     res.status(500).json({ error: "Internal", message: "Server error" });
   }
@@ -59,7 +59,8 @@ router.get("/forums", async (req, res) => {
 
 router.get("/forums/:forumId/posts", async (req, res) => {
   try {
-    const forumId = parseInt(req.params.forumId);
+    const targetForumIdString = String(req.params.forumId);
+    const forumId = parseInt(targetForumIdString);
     const currentUser = (req as any).user;
     const page = parseInt(String(req.query.page || "1"));
     const limit = parseInt(String(req.query.limit || "20"));
@@ -119,7 +120,7 @@ router.get("/forums/:forumId/posts", async (req, res) => {
       .where(and(...whereClauses));
       
     res.json({ posts: withDetails, total: total || 0, page, limit });
-  } catch (err) {
+  } catch (err: any) {
     req.log.error({ err }, "Get forum posts error");
     res.status(500).json({ error: "Internal", message: "Server error" });
   }
@@ -127,7 +128,8 @@ router.get("/forums/:forumId/posts", async (req, res) => {
 
 router.post("/forums/:forumId/posts", requireAuth, async (req, res) => {
   try {
-    const forumId = parseInt(req.params.forumId);
+    const targetForumIdString = String(req.params.forumId);
+    const forumId = parseInt(targetForumIdString);
     const currentUser = (req as any).user;
     const { title, content } = req.body;
     if (!content) {
@@ -150,7 +152,8 @@ router.post("/forums/:forumId/posts", requireAuth, async (req, res) => {
 router.delete("/posts/:id", requireAuth, async (req, res) => {
   try {
     const currentUser = (req as any).user;
-    const [post] = await db.select().from(postsTable).where(eq(postsTable.id, parseInt(req.params.id)));
+    const targetIdString = String(req.params.id);
+    const [post] = await db.select().from(postsTable).where(eq(postsTable.id, parseInt(targetIdString)));
     if (!post) {
       res.status(404).json({ error: "NotFound", message: "Post not found" });
       return;
@@ -161,7 +164,7 @@ router.delete("/posts/:id", requireAuth, async (req, res) => {
     }
     await db.delete(postsTable).where(eq(postsTable.id, post.id));
     res.json({ success: true, message: "Post deleted" });
-  } catch (err) {
+  } catch (err: any) {
     req.log.error({ err }, "Delete post error");
     res.status(500).json({ error: "Internal", message: "Server error" });
   }
@@ -169,7 +172,8 @@ router.delete("/posts/:id", requireAuth, async (req, res) => {
 
 router.get("/posts/:postId/replies", async (req, res) => {
   try {
-    const postId = parseInt(req.params.postId);
+    const targetPostIdString = String(req.params.postId);
+    const postId = parseInt(targetPostIdString);
     const currentUser = (req as any).user;
     const replies = await db
       .select()
@@ -184,7 +188,7 @@ router.get("/posts/:postId/replies", async (req, res) => {
       })
     );
     res.json({ posts: withDetails, total: withDetails.length });
-  } catch (err) {
+  } catch (err: any) {
     req.log.error({ err }, "Get replies error");
     res.status(500).json({ error: "Internal", message: "Server error" });
   }
@@ -192,7 +196,8 @@ router.get("/posts/:postId/replies", async (req, res) => {
 
 router.post("/posts/:postId/replies", requireAuth, async (req, res) => {
   try {
-    const postId = parseInt(req.params.postId);
+    const targetPostIdString = String(req.params.postId);
+    const postId = parseInt(targetPostIdString);
     const currentUser = (req as any).user;
     const [parentPost] = await db.select().from(postsTable).where(eq(postsTable.id, postId));
     if (!parentPost) {
@@ -211,7 +216,7 @@ router.post("/posts/:postId/replies", requireAuth, async (req, res) => {
       content,
     }).returning();
     res.status(201).json({ ...reply, author: safeUser(currentUser), likesCount: 0, isLiked: false, replyCount: 0 });
-  } catch (err) {
+  } catch (err: any) {
     req.log.error({ err }, "Create reply error");
     res.status(500).json({ error: "Internal", message: "Server error" });
   }
@@ -219,7 +224,8 @@ router.post("/posts/:postId/replies", requireAuth, async (req, res) => {
 
 router.post("/posts/:id/like", requireAuth, async (req, res) => {
   try {
-    const postId = parseInt(req.params.id);
+    const targetIdString = String(req.params.id);
+    const postId = parseInt(targetIdString);
     const currentUser = (req as any).user;
     const [existing] = await db
       .select()
@@ -231,7 +237,7 @@ router.post("/posts/:id/like", requireAuth, async (req, res) => {
     }
     await db.insert(postLikesTable).values({ postId, userId: currentUser.id });
     res.json({ success: true, message: "Post liked" });
-  } catch (err) {
+  } catch (err: any) {
     req.log.error({ err }, "Like post error");
     res.status(500).json({ error: "Internal", message: "Server error" });
   }
@@ -239,13 +245,14 @@ router.post("/posts/:id/like", requireAuth, async (req, res) => {
 
 router.delete("/posts/:id/like", requireAuth, async (req, res) => {
   try {
-    const postId = parseInt(req.params.id);
+    const targetIdString = String(req.params.id);
+    const postId = parseInt(targetIdString);
     const currentUser = (req as any).user;
     await db
       .delete(postLikesTable)
       .where(and(eq(postLikesTable.postId, postId), eq(postLikesTable.userId, currentUser.id)));
     res.json({ success: true, message: "Post unliked" });
-  } catch (err) {
+  } catch (err: any) {
     req.log.error({ err }, "Unlike post error");
     res.status(500).json({ error: "Internal", message: "Server error" });
   }
