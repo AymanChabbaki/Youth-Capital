@@ -1,0 +1,14 @@
+# Vercel Serverless Function Isolation
+# Prevent Vercel from unintentionally compiling internal source as standalone functions
+
+src/
+dist/
+node_modules/
+*.mjs
+*.sql
+*.md
+.env*
+.gitignore
+
+# Ensure only the dedicated serverless bridge is treated as an entry point
+!api/
