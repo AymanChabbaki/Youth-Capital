@@ -17,7 +17,7 @@ router.get("/applications", requireAuth, requireAdmin, async (req, res) => {
       })
     );
     res.json({ applications: withUsers, total: withUsers.length });
-  } catch (err) {
+  } catch (err: any) {
     req.log.error({ err }, "Get applications error");
     res.status(500).json({ error: "Internal", message: "Server error" });
   }
@@ -43,7 +43,7 @@ router.post("/applications", requireAuth, async (req, res) => {
     await db.update(usersTable).set({ applicationStatus: "pending" }).where(eq(usersTable.id, currentUser.id));
     const [user] = await db.select().from(usersTable).where(eq(usersTable.id, currentUser.id));
     res.status(201).json({ ...app, user: safeUser(user) });
-  } catch (err) {
+  } catch (err: any) {
     req.log.error({ err }, "Submit application error");
     res.status(500).json({ error: "Internal", message: "Server error" });
   }
@@ -55,10 +55,11 @@ router.patch("/applications/:id", requireAuth, requireAdmin, async (req, res) =>
     const updates: any = { status };
     if (assignedRole !== undefined) updates.assignedRole = assignedRole;
     if (adminNote !== undefined) updates.adminNote = adminNote;
+    const targetIdString = String(req.params.id);
     const [app] = await db
       .update(roleApplicationsTable)
       .set(updates)
-      .where(eq(roleApplicationsTable.id, parseInt(req.params.id)))
+      .where(eq(roleApplicationsTable.id, parseInt(targetIdString)))
       .returning();
     if (status === "approved") {
       await db
@@ -73,7 +74,7 @@ router.patch("/applications/:id", requireAuth, requireAdmin, async (req, res) =>
     }
     const [user] = await db.select().from(usersTable).where(eq(usersTable.id, app.userId));
     res.json({ ...app, user: safeUser(user) });
-  } catch (err) {
+  } catch (err: any) {
     req.log.error({ err }, "Update application error");
     res.status(500).json({ error: "Internal", message: "Server error" });
   }
