@@ -7,8 +7,9 @@
     "node": "22.x"
   },
   "scripts": {
-    "dev": "npm run build && npm run start",
-    "build": "node ./build.mjs",
+    "dev": "npm run build:local && npm run start",
+    "build": "tsc -p tsconfig.json --noEmit",
+    "build:local": "node ./build.mjs",
     "start": "node --env-file=../.env --enable-source-maps ./dist/index.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
