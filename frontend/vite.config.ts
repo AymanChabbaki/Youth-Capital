@@ -23,6 +23,20 @@ export default defineConfig({
   build: {
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
+    sourcemap: false,
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes("node_modules")) {
+            if (id.includes("lucide")) return "lucide";
+            if (id.includes("recharts")) return "recharts";
+            if (id.includes("radix")) return "radix";
+            if (id.includes("framer-motion")) return "motion";
+            return "vendor";
+          }
+        },
+      },
+    },
   },
   server: {
     port,
