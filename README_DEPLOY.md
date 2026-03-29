@@ -5,10 +5,8 @@ This guide details how to correctly and professionally host the **Youth Capital*
 ## 1. Backend Deployment (API)
 
 ### Setup
-- **Root Directory**: `.` (Project Root)
-- **Build Command**: `pnpm build --filter @workspace/api-server` (or `npm run build -w @workspace/api-server`)
-- **Output Directory**: `backend/dist`
-- **Framework Preset**: `Other`
+- **Root Directory**: `backend` (Ensure "Include Root Directory in Build" is enabled in Vercel settings if using workspaces)
+- **Framework Preset**: `Other` (or `Next.js`)
 - **Node.js Version**: `22.x` or higher
 
 ### Environment Variables
