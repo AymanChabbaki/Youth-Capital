@@ -11,7 +11,7 @@ router.get("/", async (req, res) => {
     const [{ activeCrises }] = await db.select({ activeCrises: sql<number>`count(*)::int` }).from(crisesTable).where(eq(crisesTable.isActive, true));
     const now = new Date();
     const allEvents = await db.select().from(eventsTable);
-    const upcomingEvents = allEvents.filter((e) => e.startAt > now).length;
+    const upcomingEvents = allEvents.filter((e: any) => e.startAt > now).length;
     res.json({
       activeMinistries: 22,
       billsPassed: 47,
@@ -20,7 +20,7 @@ router.get("/", async (req, res) => {
       activeCrises: activeCrises || 0,
       upcomingEvents: upcomingEvents || 0,
     });
-  } catch (err) {
+  } catch (err: any) {
     req.log.error({ err }, "Get stats error");
     res.status(500).json({ error: "Internal", message: "Server error" });
   }
