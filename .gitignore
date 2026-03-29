@@ -27,6 +27,7 @@ packages/*/dist
 .env.local
 .env.*.local
 frontend/.env
+frontend/.env.production
 backend/.env
 packages/*/.env
 
