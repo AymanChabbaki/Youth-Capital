@@ -13,4 +13,8 @@ if (!process.env.DATABASE_URL) {
 export const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 export const db = drizzle(pool, { schema });
 
-export * from "./schema";
+// Explicitly re-export core identifiers to resolve Node16/ESM deep-reexport failures
+export { usersTable, userRoleEnum, userStatusEnum, languagePreferenceEnum, applicationStatusEnum, insertUserSchema, type User, type InsertUser } from "./schema/users.js";
+
+// Keep global export for local convenience (IDE visibility)
+export * from "./schema/index.js";
