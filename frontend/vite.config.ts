@@ -24,10 +24,13 @@ export default defineConfig({
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
     sourcemap: false,
+    chunkSizeWarningLimit: 1000,
     rollupOptions: {
       output: {
         manualChunks(id) {
           if (id.includes("node_modules")) {
+            if (id.includes("zod")) return "zod";
+            if (id.includes("date-fns")) return "date-fns";
             if (id.includes("lucide")) return "lucide";
             if (id.includes("recharts")) return "recharts";
             if (id.includes("radix")) return "radix";
