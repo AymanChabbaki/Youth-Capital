@@ -20,6 +20,7 @@ export const usersTable = pgTable("users", {
   languagePreference: languagePreferenceEnum("language_preference").notNull().default("en"),
   status: userStatusEnum("status").notNull().default("active"),
   applicationStatus: applicationStatusEnum("application_status").notNull().default("none"),
+  avatarUrl: text("avatar_url"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 

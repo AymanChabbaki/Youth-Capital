@@ -78,9 +78,23 @@ function Navbar() {
             {isAuthenticated ? (
               <div className="flex items-center gap-3">
                 <Link href={isAdmin ? "/admin" : "/dashboard"}>
-                  <Button variant="outline" size="sm" className="gap-2">
-                    <UserIcon className="w-4 h-4" />
+                  <Button variant="outline" size="sm" className="gap-2 border-primary/20 hover:bg-primary/5">
+                    <UserIcon className="w-4 h-4 text-primary" />
                     {isAdmin ? t("Admin", "الإدارة") : t("Dashboard", "لوحة التحكم")}
+                  </Button>
+                </Link>
+                <Link href="/profile">
+                  <Button variant="ghost" size="sm" className="gap-2 font-bold hover:bg-slate-100">
+                    {user?.avatarUrl ? (
+                      <div className="w-6 h-6 rounded-lg overflow-hidden border border-slate-200">
+                        <img src={user.avatarUrl} className="w-full h-full object-cover" />
+                      </div>
+                    ) : (
+                      <div className="w-6 h-6 rounded-lg bg-primary/10 flex items-center justify-center text-primary text-[10px] font-black">
+                        {user?.fullName.charAt(0)}
+                      </div>
+                    )}
+                    {t("Profile", "الملف الشخصي")}
                   </Button>
                 </Link>
                 <Button variant="ghost" size="icon" onClick={handleLogout} title={t("Logout", "تسجيل خروج")}>
@@ -141,9 +155,25 @@ function Navbar() {
               {isAuthenticated ? (
                 <>
                   <Link href={isAdmin ? "/admin" : "/dashboard"} onClick={() => setIsMobileMenuOpen(false)}>
-                    <Button variant="outline" className="w-full justify-start gap-2">
-                      <UserIcon className="w-4 h-4" />
+                    <Button variant="outline" className="w-full justify-start gap-3">
+                      <div className="w-6 h-6 rounded-lg bg-primary/10 flex items-center justify-center text-primary text-[10px] font-black">
+                        <UserIcon className="w-4 h-4" />
+                      </div>
                       {isAdmin ? t("Admin", "الإدارة") : t("Dashboard", "لوحة التحكم")}
+                    </Button>
+                  </Link>
+                  <Link href="/profile" onClick={() => setIsMobileMenuOpen(false)}>
+                    <Button variant="outline" className="w-full justify-start gap-3">
+                      {user?.avatarUrl ? (
+                        <div className="w-6 h-6 rounded-lg overflow-hidden border border-slate-200">
+                          <img src={user.avatarUrl} className="w-full h-full object-cover" />
+                        </div>
+                      ) : (
+                        <div className="w-6 h-6 rounded-lg bg-primary/10 flex items-center justify-center text-primary text-[10px] font-black">
+                           {user?.fullName.charAt(0)}
+                        </div>
+                      )}
+                      {t("Profile", "الملف الشخصي")}
                     </Button>
                   </Link>
                   <Button variant="danger" className="w-full justify-start gap-2" onClick={handleLogout}>

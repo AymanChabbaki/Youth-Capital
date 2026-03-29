@@ -5,14 +5,17 @@ import {
   useGetRoleApplications, useUpdateRoleApplication,
   useGetUsers, useTriggerCrisis, useGetPlatformStats,
   useGetCrises, useGetArticles, useGetEvents,
+  useDeleteUser, useLogout,
+  customFetch
 } from "@workspace/api-client-react";
 import { Badge, Button, Input, Textarea, Select } from "@/components/ui-custom";
-import { Redirect } from "wouter";
+import { Redirect, Link, useLocation } from "wouter";
 import {
   Shield, Users, FileCheck, AlertTriangle, LayoutDashboard,
   TrendingUp, MessageSquare, Calendar, Newspaper, Activity,
   CheckCircle, Clock, XCircle, Search, ChevronRight, Zap,
   Globe, BarChart3, PieChart as PieChartIcon, UserCheck, Siren,
+  MapPin, Landmark, LogOut, Plus, Edit, Trash2,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
@@ -88,11 +91,90 @@ export default function Admin() {
   const { data: eventsData } = useGetEvents();
 
   const updateAppMutation = useUpdateRoleApplication();
+  const deleteUserMutation = useDeleteUser();
   const triggerCrisisMutation = useTriggerCrisis();
   const [crisisForm, setCrisisForm] = useState({ title: "", titleAr: "", description: "", descriptionAr: "", severity: "high" });
 
+  // Press & Events CRUD State
+  const [editingArticle, setEditingArticle] = useState<any>(null);
+  const [editingEvent, setEditingEvent] = useState<any>(null);
+  const [isArticleModalOpen, setIsArticleModalOpen] = useState(false);
+  const [isEventModalOpen, setIsEventModalOpen] = useState(false);
+
+  const handleSaveArticle = async (data: any) => {
+    try {
+      if (editingArticle) {
+        await customFetch(`/api/press/${editingArticle.id}`, { method: "PATCH", body: JSON.stringify(data), headers: { "Content-Type": "application/json" } });
+        toast({ title: t("Article Updated", "تم تحديث المقال") });
+      } else {
+        await customFetch(`/api/press`, { method: "POST", body: JSON.stringify(data), headers: { "Content-Type": "application/json" } });
+        toast({ title: t("Article Created", "تم إنشاء المقال") });
+      }
+      setIsArticleModalOpen(false);
+      setEditingArticle(null);
+      queryClient.invalidateQueries({ queryKey: ["/api/press"] });
+    } catch (error) {
+      toast({ title: t("Action Failed", "فشلت العملية"), variant: "destructive" });
+    }
+  };
+
+  const handleDeleteArticle = async (id: number) => {
+    if (!window.confirm(t("Delete this article?", "حذف هذا المقال؟"))) return;
+    try {
+      await customFetch(`/api/press/${id}`, { method: "DELETE" });
+      toast({ title: t("Article Deleted", "تم حذف المقال") });
+      queryClient.invalidateQueries({ queryKey: ["/api/press"] });
+    } catch (error) {
+      toast({ title: t("Deletion Failed", "فشل الحذف"), variant: "destructive" });
+    }
+  };
+
+  const handleSaveEvent = async (data: any) => {
+    try {
+      if (editingEvent) {
+        await customFetch(`/api/events/${editingEvent.id}`, { method: "PATCH", body: JSON.stringify(data), headers: { "Content-Type": "application/json" } });
+        toast({ title: t("Event Updated", "تم تحديث الفعالية") });
+      } else {
+        await customFetch(`/api/events`, { method: "POST", body: JSON.stringify(data), headers: { "Content-Type": "application/json" } });
+        toast({ title: t("Event Created", "تم إنشاء الفعالية") });
+      }
+      setIsEventModalOpen(false);
+      setEditingEvent(null);
+      queryClient.invalidateQueries({ queryKey: ["/api/events"] });
+    } catch (error) {
+      toast({ title: t("Action Failed", "فشلت العملية"), variant: "destructive" });
+    }
+  };
+
+  const handleDeleteEvent = async (id: number) => {
+    if (!window.confirm(t("Delete this event?", "حذف هذه الفعالية؟"))) return;
+    try {
+      await customFetch(`/api/events/${id}`, { method: "DELETE" });
+      toast({ title: t("Event Deleted", "تم حذف الفعالية") });
+      queryClient.invalidateQueries({ queryKey: ["/api/events"] });
+    } catch (error) {
+      toast({ title: t("Deletion Failed", "فشل الحذف"), variant: "destructive" });
+    }
+  };
+
   if (isLoading) return null;
   if (!isAdmin) return <Redirect to="/" />;
+
+  const handleBan = async (id: number, name: string) => {
+    if (!window.confirm(t(`Are you sure you want to ban ${name}?`, `هل أنت متأكد أنك تريد حظر ${name}؟`))) return;
+    
+    try {
+      await deleteUserMutation.mutateAsync({ id });
+      toast({ title: t("User Banned", "تم حظر المستخدم"), variant: "destructive" });
+      queryClient.invalidateQueries();
+    } catch (error: any) {
+      toast({ 
+        title: t("Ban Failed", "فشل الحظر"), 
+        description: error?.message || t("Could not complete the suspension.", "تعذر إكمال التعليق."),
+        variant: "destructive" 
+      });
+    }
+  };
 
   const handleApprove = async (id: number, role: string) => {
     await updateAppMutation.mutateAsync({ id, data: { status: "approved", assignedRole: role } });
@@ -137,8 +219,17 @@ export default function Admin() {
     { id: "users", icon: Users, label: t("Users", "المستخدمون") },
     { id: "applications", icon: FileCheck, label: t("Applications", "الطلبات") },
     { id: "crises", icon: AlertTriangle, label: t("Crises", "الأزمات") },
-    { id: "content", icon: Newspaper, label: t("Content", "المحتوى") },
+    { id: "press", icon: Newspaper, label: t("Press Office", "مكتب الصحافة") },
+    { id: "events", icon: Calendar, label: t("Events Calendar", "جدول الفعاليات") },
   ];
+
+  const logoutMutation = useLogout();
+  const [, setLocation] = useLocation();
+
+  const handleLogout = async () => {
+    await logoutMutation.mutateAsync();
+    setLocation("/login");
+  };
 
   return (
     <div className="min-h-screen flex bg-secondary/20">
@@ -146,15 +237,20 @@ export default function Admin() {
       {/* Sidebar */}
       <aside className="w-64 flex-shrink-0 bg-navy-dark flex flex-col min-h-screen sticky top-0 h-screen overflow-y-auto">
         <div className="p-6 border-b border-white/10">
-          <div className="flex items-center gap-3 mb-1">
-            <div className="w-10 h-10 rounded-xl bg-gold flex items-center justify-center shadow-lg shadow-gold/30">
-              <Shield className="w-5 h-5 text-navy-dark" />
-            </div>
-            <div>
-              <div className="text-white font-display font-bold text-sm">Admin Panel</div>
-              <div className="text-white/40 text-xs">Youth CapitalCore</div>
-            </div>
-          </div>
+          <Link href="/" className="flex items-center gap-3 mb-6 group">
+            <img 
+              src="/youth_capital_logo_dark.svg" 
+              alt="Youth Capital" 
+              className="h-10 w-auto group-hover:scale-105 transition-transform" 
+            />
+          </Link>
+          
+          <Link href="/">
+            <button className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-white/70 text-xs font-bold hover:bg-white/10 hover:text-white transition-all uppercase tracking-widest">
+              <Globe className="w-3.5 h-3.5" />
+              {t("Back to Website", "العودة للموقع")}
+            </button>
+          </Link>
         </div>
 
         <div className="p-4 border-b border-white/10">
@@ -181,11 +277,19 @@ export default function Admin() {
           ))}
         </nav>
 
-        <div className="p-4 border-t border-white/10">
+        <div className="p-4 border-t border-white/10 space-y-2">
           <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/5 text-white/50 text-xs">
             <Activity className="w-3 h-3 text-green-400" />
             <span className="text-green-400 font-semibold">{t("System Online", "النظام يعمل")}</span>
           </div>
+          
+          <button 
+            onClick={handleLogout}
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-rose hover:bg-rose/10 transition-all border border-transparent hover:border-rose/20 mt-2"
+          >
+            <LogOut className="w-5 h-5 flex-shrink-0" />
+            {t("Logout Session", "تسجيل الخروج")}
+          </button>
         </div>
       </aside>
 
@@ -438,9 +542,13 @@ export default function Admin() {
                           <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${u.role === "admin" ? "bg-gold/20 text-gold" : "bg-secondary text-muted-foreground"
                             }`}>{u.role}</span>
                         </td>
-                        <td className="px-6 py-4">
-                          <button className="text-xs font-semibold text-rose hover:underline">
-                            {t("Ban", "حظر")}
+                        <td className="px-6 py-4 text-right">
+                          <button 
+                            onClick={() => handleBan(u.id, u.fullName)}
+                            disabled={deleteUserMutation.isPending || u.id === user?.id}
+                            className="text-xs font-black text-rose hover:bg-rose/10 px-3 py-1.5 rounded-lg transition-all disabled:opacity-30 uppercase tracking-wider"
+                          >
+                            {deleteUserMutation.isPending ? t("Suspending...", "جار الحظر...") : t("Ban Citizen", "حظر مواطن")}
                           </button>
                         </td>
                       </tr>
@@ -493,9 +601,42 @@ export default function Admin() {
                         </span>
                       </div>
                     </div>
-                    <div className="bg-secondary/40 p-4 rounded-xl mb-5 border border-border">
-                      <p className="text-xs font-bold text-muted-foreground uppercase tracking-wide mb-2">{t("Motivation Statement", "بيان الدوافع")}</p>
-                      <p className="text-sm text-foreground italic">"{app.motivation}"</p>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                      <div className="bg-secondary/40 p-4 rounded-xl border border-border">
+                        <div className="flex items-center gap-2 mb-2">
+                          <MapPin className="w-4 h-4 text-primary" />
+                          <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t("Civic Region", "الجهة المدنية")}</span>
+                        </div>
+                        <p className="text-sm font-bold text-slate-900">{app.region}</p>
+                      </div>
+
+                      {app.preferredRole === "minister" && (
+                        <div className="bg-secondary/40 p-4 rounded-xl border border-border">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Shield className="w-4 h-4 text-primary" />
+                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t("Ministry Choice", "الوزارة المختارة")}</span>
+                          </div>
+                          <p className="text-sm font-bold text-slate-900">{app.ministryPreference || t("Not Specific", "غير محدد")}</p>
+                        </div>
+                      )}
+
+                      {app.preferredRole === "mp" && (
+                        <div className="bg-secondary/40 p-4 rounded-xl border border-border">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Landmark className="w-4 h-4 text-primary" />
+                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t("Chamber", "الغرفة")}</span>
+                          </div>
+                          <p className="text-sm font-bold text-slate-900 capitalize">{app.parliamentHouse?.replace(/_/g, " ") || t("Not Specific", "غير محدد")}</p>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="bg-secondary/40 p-6 rounded-[24px] mb-8 border-2 border-slate-100">
+                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                        <MessageSquare className="w-3 h-3" />
+                        {t("Motivation Statement", "بيان الدوافع")}
+                      </p>
+                      <p className="text-sm text-slate-600 italic font-medium leading-relaxed">"{app.motivation}"</p>
                     </div>
                     <div className="flex justify-end gap-3">
                       <button
@@ -586,43 +727,275 @@ export default function Admin() {
             </div>
           )}
 
-          {/* ── CONTENT ── */}
-          {activeTab === "content" && (
+          {/* ── PRESS OFFICE ── */}
+          {activeTab === "press" && (
             <div className="space-y-6">
-              <div className="grid md:grid-cols-2 gap-6">
-                <div className="bg-card border border-border rounded-2xl p-6">
-                  <h3 className="font-bold text-lg flex items-center gap-2 mb-4">
-                    <Newspaper className="w-5 h-5 text-primary" /> {t("Press Articles", "المقالات الصحفية")}
-                  </h3>
-                  <div className="space-y-3">
-                    {((articlesData as any)?.articles || []).map((a: any) => (
-                      <div key={a.id} className="flex items-start gap-3 p-3 rounded-xl hover:bg-secondary/30 transition-colors">
-                        <div className={`w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${a.isPublished ? "bg-green-400" : "bg-yellow-400"}`} />
-                        <div>
-                          <p className="text-sm font-semibold">{a.title}</p>
-                          <p className="text-xs text-muted-foreground">{a.category} · {a.isPublished ? t("Published", "منشور") : t("Draft", "مسودة")}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                <div className="bg-card border border-border rounded-2xl p-6">
-                  <h3 className="font-bold text-lg flex items-center gap-2 mb-4">
-                    <Calendar className="w-5 h-5 text-primary" /> {t("Events", "الفعاليات")}
-                  </h3>
-                  <div className="space-y-3">
-                    {((eventsData as any)?.events || []).map((e: any) => (
-                      <div key={e.id} className="flex items-start gap-3 p-3 rounded-xl hover:bg-secondary/30 transition-colors">
-                        <div className="w-2 h-2 rounded-full mt-1.5 flex-shrink-0 bg-primary" />
-                        <div>
-                          <p className="text-sm font-semibold">{e.title}</p>
-                          <p className="text-xs text-muted-foreground">{e.eventType} · {new Date(e.startAt).toLocaleDateString()}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+              <div className="flex items-center justify-between">
+                <h2 className="text-xl font-bold flex items-center gap-2">
+                  <Newspaper className="w-5 h-5 text-primary" />
+                  {t("Press Office Management", "إدارة مكتب الصحافة")}
+                </h2>
+                <button
+                  onClick={() => { setEditingArticle(null); setIsArticleModalOpen(true); }}
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-white text-sm font-bold hover:bg-primary/90 transition-all shadow-lg shadow-primary/20"
+                >
+                  <Plus className="w-4 h-4" />
+                  {t("New Article", "مقال جديد")}
+                </button>
               </div>
+
+              <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-sm">
+                <table className="w-full text-left text-sm">
+                  <thead className="bg-secondary/40">
+                    <tr>
+                      <th className="px-6 py-3 font-semibold text-muted-foreground">{t("Article", "المقال")}</th>
+                      <th className="px-6 py-3 font-semibold text-muted-foreground">{t("Category/Type", "الفئة/النوع")}</th>
+                      <th className="px-6 py-3 font-semibold text-muted-foreground">{t("Published", "تاريخ النشر")}</th>
+                      <th className="px-6 py-3 font-semibold text-muted-foreground text-right">{t("Actions", "إجراءات")}</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border">
+                    {((articlesData as any)?.articles || []).map((a: any) => (
+                      <tr key={a.id} className="hover:bg-secondary/20 transition-colors group">
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-3">
+                            {a.thumbnailUrl && <img src={a.thumbnailUrl} alt="" className="w-10 h-10 rounded-lg object-cover" />}
+                            <span className="font-semibold text-foreground group-hover:text-primary transition-colors">{a.title}</span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <Badge variant="outline" className="bg-primary/5 text-primary border-primary/10">
+                            {a.type}
+                          </Badge>
+                        </td>
+                        <td className="px-6 py-4 text-muted-foreground">
+                          {new Date(a.publishedAt).toLocaleDateString()}
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                          <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button 
+                              onClick={() => { setEditingArticle(a); setIsArticleModalOpen(true); }}
+                              className="p-1.5 rounded-lg hover:bg-primary/10 text-primary transition-colors"
+                            >
+                              <Edit className="w-4 h-4" />
+                            </button>
+                            <button 
+                              onClick={() => handleDeleteArticle(a.id)}
+                              className="p-1.5 rounded-lg hover:bg-rose/10 text-rose transition-colors"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Article Modal */}
+              {isArticleModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-navy-dark/60 backdrop-blur-sm animate-in fade-in duration-200">
+                  <div className="bg-background border border-border rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl p-8 animate-in zoom-in-95 duration-200">
+                    <h3 className="text-2xl font-bold mb-6 flex items-center gap-3">
+                      <Newspaper className="w-6 h-6 text-primary" />
+                      {editingArticle ? t("Edit Article", "تعديل المقال") : t("Publish New Article", "نشر مقال جديد")}
+                    </h3>
+                    <form onSubmit={(e) => {
+                      e.preventDefault();
+                      const formData = new FormData(e.currentTarget);
+                      const data = Object.fromEntries(formData.entries());
+                      handleSaveArticle(data);
+                    }} className="space-y-6">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <label className="text-xs font-black text-slate-400 uppercase tracking-widest">{t("Title (English)", "العنوان (إنجليزي)")}</label>
+                          <Input name="title" defaultValue={editingArticle?.title} required className="rounded-xl border-slate-200" />
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-xs font-black text-slate-400 uppercase tracking-widest">{t("Title (Arabic)", "العنوان (عربي)")}</label>
+                          <Input name="titleAr" defaultValue={editingArticle?.titleAr} required dir="rtl" className="rounded-xl border-slate-200" />
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <label className="text-xs font-black text-slate-400 uppercase tracking-widest">{t("Article Type", "نوع المقال")}</label>
+                          <Select name="type" defaultValue={editingArticle?.type || "news"} className="rounded-xl border-slate-200">
+                            <option value="news">{t("News", "أخبار")}</option>
+                            <option value="announcement">{t("Announcement", "إعلان")}</option>
+                            <option value="decree">{t("Official Decree", "مرسوم رسمي")}</option>
+                            <option value="report">{t("Insight Report", "تقرير")}</option>
+                          </Select>
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-xs font-black text-slate-400 uppercase tracking-widest">{t("Thumbnail URL", "رابط الصورة")}</label>
+                          <Input name="thumbnailUrl" defaultValue={editingArticle?.thumbnailUrl} placeholder="https://..." className="rounded-xl border-slate-200" />
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-xs font-black text-slate-400 uppercase tracking-widest">{t("Content (English)", "المحتوى (إنجليزي)")}</label>
+                        <Textarea name="content" defaultValue={editingArticle?.content} required className="h-40 rounded-2xl border-slate-200" />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-xs font-black text-slate-400 uppercase tracking-widest">{t("Content (Arabic)", "المحتوى (عربي)")}</label>
+                        <Textarea name="contentAr" defaultValue={editingArticle?.contentAr} required dir="rtl" className="h-40 rounded-2xl border-slate-200" />
+                      </div>
+                      <div className="flex gap-3 pt-4">
+                        <Button type="button" variant="outline" onClick={() => setIsArticleModalOpen(false)} className="flex-1 rounded-xl h-12">{t("Cancel", "إلغاء")}</Button>
+                        <Button type="submit" className="flex-1 rounded-xl h-12 bg-primary hover:bg-primary/90 text-white font-bold">{t("Publish Article", "نشر المقال")}</Button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ── EVENTS CALENDAR ── */}
+          {activeTab === "events" && (
+            <div className="space-y-6">
+              <div className="flex items-center justify-between">
+                <h2 className="text-xl font-bold flex items-center gap-2">
+                  <Calendar className="w-5 h-5 text-primary" />
+                  {t("Civic Calendar Management", "إدارة الجدول المدني")}
+                </h2>
+                <button
+                  onClick={() => { setEditingEvent(null); setIsEventModalOpen(true); }}
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-white text-sm font-bold hover:bg-primary/90 transition-all shadow-lg shadow-primary/20"
+                >
+                  <Plus className="w-4 h-4" />
+                  {t("Schedule Event", "جدولة فعالية")}
+                </button>
+              </div>
+
+              <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-sm">
+                <table className="w-full text-left text-sm">
+                  <thead className="bg-secondary/40">
+                    <tr>
+                      <th className="px-6 py-3 font-semibold text-muted-foreground">{t("Event", "الفعالية")}</th>
+                      <th className="px-6 py-3 font-semibold text-muted-foreground">{t("Type", "النوع")}</th>
+                      <th className="px-6 py-3 font-semibold text-muted-foreground">{t("Timeline", "الجدول الزمني")}</th>
+                      <th className="px-6 py-3 font-semibold text-muted-foreground text-right">{t("Actions", "إجراءات")}</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border">
+                    {((eventsData as any)?.events || []).map((e: any) => (
+                      <tr key={e.id} className="hover:bg-secondary/20 transition-colors group">
+                        <td className="px-6 py-4">
+                          <div>
+                            <span className="font-semibold text-foreground group-hover:text-primary transition-colors">{e.title}</span>
+                            <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">{e.description}</p>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <Badge variant="outline" className="text-[10px] font-black uppercase tracking-tighter">
+                            {e.type}
+                          </Badge>
+                        </td>
+                        <td className="px-6 py-4 text-muted-foreground">
+                          <div className="flex items-center gap-2">
+                            <Clock className="w-3.5 h-3.5" />
+                            {new Date(e.startAt).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' })}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                          <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button 
+                              onClick={() => { setEditingEvent(e); setIsEventModalOpen(true); }}
+                              className="p-1.5 rounded-lg hover:bg-primary/10 text-primary transition-colors"
+                            >
+                              <Edit className="w-4 h-4" />
+                            </button>
+                            <button 
+                              onClick={() => handleDeleteEvent(e.id)}
+                              className="p-1.5 rounded-lg hover:bg-rose/10 text-rose transition-colors"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Event Modal */}
+              {isEventModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-navy-dark/60 backdrop-blur-sm animate-in fade-in duration-200">
+                  <div className="bg-background border border-border rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl p-8 animate-in zoom-in-95 duration-200">
+                    <h3 className="text-2xl font-bold mb-6 flex items-center gap-3">
+                      <Calendar className="w-6 h-6 text-primary" />
+                      {editingEvent ? t("Reschedule Event", "تعديل الفعالية") : t("Schedule New Activity", "جدولة نشاط جديد")}
+                    </h3>
+                    <form onSubmit={(e) => {
+                      e.preventDefault();
+                      const formData = new FormData(e.currentTarget);
+                      const data = Object.fromEntries(formData.entries());
+                      handleSaveEvent(data);
+                    }} className="space-y-6">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <label className="text-xs font-black text-slate-400 uppercase tracking-widest">{t("Event Name (English)", "اسم الفعالية (إنجليزي)")}</label>
+                          <Input name="title" defaultValue={editingEvent?.title} required className="rounded-xl border-slate-200" />
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-xs font-black text-slate-400 uppercase tracking-widest">{t("Event Name (Arabic)", "اسم الفعالية (عربي)")}</label>
+                          <Input name="titleAr" defaultValue={editingEvent?.titleAr} required dir="rtl" className="rounded-xl border-slate-200" />
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <label className="text-xs font-black text-slate-400 uppercase tracking-widest">{t("Activity Type", "نوع النشاط")}</label>
+                          <Select name="type" defaultValue={editingEvent?.type || "meeting"} className="rounded-xl border-slate-200">
+                            <option value="meeting">{t("Legislative Meeting", "اجتماع تشريعي")}</option>
+                            <option value="workshop">{t("Civic Workshop", "ورشة عمل")}</option>
+                            <option value="conference">{t("Simulation Conference", "مؤتمر")}</option>
+                            <option value="election">{t("Election Phase", "مرحلة انتخابية")}</option>
+                          </Select>
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-xs font-black text-slate-400 uppercase tracking-widest">{t("Meeting URL", "رابط الاجتماع")}</label>
+                          <Input name="meetingUrl" defaultValue={editingEvent?.meetingUrl} placeholder="https://zoom.us/..." className="rounded-xl border-slate-200" />
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <label className="text-xs font-black text-slate-400 uppercase tracking-widest">{t("Start Time", "وقت البدء")}</label>
+                          <Input 
+                            name="startAt" 
+                            type="datetime-local" 
+                            defaultValue={editingEvent?.startAt ? new Date(editingEvent.startAt).toISOString().slice(0, 16) : ""} 
+                            required 
+                            className="rounded-xl border-slate-200" 
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-xs font-black text-slate-400 uppercase tracking-widest">{t("End Time (Optional)", "وقت الانتهاء (اختياري)")}</label>
+                          <Input 
+                            name="endAt" 
+                            type="datetime-local" 
+                            defaultValue={editingEvent?.endAt ? new Date(editingEvent.endAt).toISOString().slice(0, 16) : ""} 
+                            className="rounded-xl border-slate-200" 
+                          />
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-xs font-black text-slate-400 uppercase tracking-widest">{t("Description (English)", "الوصف (إنجليزي)")}</label>
+                        <Textarea name="description" defaultValue={editingEvent?.description} required className="h-24 rounded-2xl border-slate-200" />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-xs font-black text-slate-400 uppercase tracking-widest">{t("Description (Arabic)", "الوصف (عربي)")}</label>
+                        <Textarea name="descriptionAr" defaultValue={editingEvent?.descriptionAr} required dir="rtl" className="h-24 rounded-2xl border-slate-200" />
+                      </div>
+                      <div className="flex gap-3 pt-4">
+                        <Button type="button" variant="outline" onClick={() => setIsEventModalOpen(false)} className="flex-1 rounded-xl h-12">{t("Cancel", "إلغاء")}</Button>
+                        <Button type="submit" className="flex-1 rounded-xl h-12 bg-primary hover:bg-primary/90 text-white font-bold">{t("Schedule Event", "جدولة الفعالية")}</Button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 

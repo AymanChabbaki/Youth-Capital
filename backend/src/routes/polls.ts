@@ -30,6 +30,18 @@ async function formatPoll(poll: any, userId?: number) {
   };
 }
 
+router.get("/", async (req, res) => {
+  try {
+    const polls = await db.select().from(pollsTable);
+    const currentUser = (req as any).user;
+    const formatted = await Promise.all(polls.map((p) => formatPoll(p, currentUser?.id)));
+    res.json({ polls: formatted });
+  } catch (err) {
+    req.log.error({ err }, "Get polls error");
+    res.status(500).json({ error: "Internal", message: "Server error" });
+  }
+});
+
 router.get("/:id", async (req, res) => {
   try {
     const pollId = parseInt(req.params.id as string);
