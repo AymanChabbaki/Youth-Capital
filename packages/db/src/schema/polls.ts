@@ -1,7 +1,7 @@
 import { pgTable, text, serial, timestamp, pgEnum, integer, real } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
-import { usersTable } from "./users";
+import { usersTable } from "./users.js";
 
 export const pollStatusEnum = pgEnum("poll_status", ["active", "closed"]);
 

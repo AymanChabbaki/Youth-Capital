@@ -1,7 +1,7 @@
 import { pgTable, text, serial, timestamp, pgEnum, integer } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
-import { usersTable } from "./users";
+import { usersTable } from "./users.js";
 
 export const ticketStatusEnum = pgEnum("ticket_status", ["open", "in_progress", "resolved", "closed"]);
 export const ticketCategoryEnum = pgEnum("ticket_category", ["technical", "rules", "account", "other"]);

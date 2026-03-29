@@ -1,7 +1,7 @@
 import { pgTable, text, serial, timestamp, pgEnum, integer } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
-import { usersTable } from "./users";
+import { usersTable } from "./users.js";
 
 export const forumCategoryEnum = pgEnum("forum_category", ["parliament", "ministry", "regional", "general"]);
 
