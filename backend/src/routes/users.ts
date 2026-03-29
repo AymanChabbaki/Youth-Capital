@@ -13,7 +13,7 @@ router.get("/", requireAuth, requireAdmin, async (req, res) => {
     const users = await db.select().from(usersTable).limit(limit).offset(offset);
     const total = await db.select().from(usersTable);
     res.json({ users: users.map(safeUser), total: total.length, page, limit });
-  } catch (err) {
+  } catch (err: any) {
     req.log.error({ err }, "Get users error");
     res.status(500).json({ error: "Internal", message: "Server error" });
   }
@@ -28,7 +28,7 @@ router.get("/:id", requireAuth, async (req, res) => {
       return;
     }
     res.json(safeUser(user));
-  } catch (err) {
+  } catch (err: any) {
     req.log.error({ err }, "Get user error");
     res.status(500).json({ error: "Internal", message: "Server error" });
   }
@@ -53,7 +53,7 @@ router.patch("/:id", requireAuth, async (req, res) => {
     if (req.body.avatarUrl !== undefined) updates.avatarUrl = req.body.avatarUrl;
     const [updated] = await db.update(usersTable).set(updates).where(eq(usersTable.id, targetId)).returning();
     res.json(safeUser(updated));
-  } catch (err) {
+  } catch (err: any) {
     req.log.error({ err }, "Update user error");
     res.status(500).json({ error: "Internal", message: "Server error" });
   }
@@ -64,7 +64,7 @@ router.delete("/:id", requireAuth, requireAdmin, async (req, res) => {
     const targetIdString = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
     await db.update(usersTable).set({ status: "banned" }).where(eq(usersTable.id, parseInt(targetIdString)));
     res.json({ success: true, message: "User banned" });
-  } catch (err) {
+  } catch (err: any) {
     req.log.error({ err }, "Delete user error");
     res.status(500).json({ error: "Internal", message: "Server error" });
   }

@@ -15,13 +15,13 @@ router.get("/tickets", requireAuth, async (req, res) => {
       tickets = await db.select().from(supportTicketsTable).where(eq(supportTicketsTable.userId, currentUser.id));
     }
     const withUsers = await Promise.all(
-      tickets.map(async (t) => {
+      tickets.map(async (t: any) => {
         const [user] = await db.select().from(usersTable).where(eq(usersTable.id, t.userId));
         return { ...t, user: safeUser(user) };
       })
     );
     res.json({ tickets: withUsers, total: withUsers.length });
-  } catch (err) {
+  } catch (err: any) {
     req.log.error({ err }, "Get tickets error");
     res.status(500).json({ error: "Internal", message: "Server error" });
   }
@@ -38,7 +38,7 @@ router.post("/tickets", requireAuth, async (req, res) => {
       category: category || "other",
     }).returning();
     res.status(201).json({ ...ticket, user: safeUser(currentUser) });
-  } catch (err) {
+  } catch (err: any) {
     req.log.error({ err }, "Create ticket error");
     res.status(500).json({ error: "Internal", message: "Server error" });
   }
@@ -47,14 +47,15 @@ router.post("/tickets", requireAuth, async (req, res) => {
 router.patch("/tickets/:id", requireAuth, requireAdmin, async (req, res) => {
   try {
     const { status, adminResponse } = req.body;
+    const targetIdString = String(req.params.id);
     const [ticket] = await db
       .update(supportTicketsTable)
       .set({ status, adminResponse: adminResponse || null, updatedAt: new Date() })
-      .where(eq(supportTicketsTable.id, parseInt(req.params.id)))
+      .where(eq(supportTicketsTable.id, parseInt(targetIdString)))
       .returning();
     const [user] = await db.select().from(usersTable).where(eq(usersTable.id, ticket.userId));
     res.json({ ...ticket, user: safeUser(user) });
-  } catch (err) {
+  } catch (err: any) {
     req.log.error({ err }, "Update ticket error");
     res.status(500).json({ error: "Internal", message: "Server error" });
   }
