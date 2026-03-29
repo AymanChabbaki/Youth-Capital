@@ -172,8 +172,8 @@ async function seed() {
         publishedAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
       },
       {
-        title: "Welcome to Youth CapitalCore — Platform Launch Announcement",
-        titleAr: "مرحباً بكم في Youth CapitalCore — إعلان إطلاق المنصة",
+        title: "Welcome to Youth CapitalCore : Platform Launch Announcement",
+        titleAr: "مرحباً بكم في Youth CapitalCore : إعلان إطلاق المنصة",
         content:
           "We are thrilled to announce the official launch of Youth CapitalCore, Morocco's first digital civic governance simulation platform for youth. Youth CapitalCore gives young Moroccans, diaspora members, and youth across the Arab and African world the tools to simulate real government functions, debate policies, vote on legislation, and develop authentic leadership skills. Apply today for your role in one of 22 simulated ministries, regional councils, or parliamentary houses. The platform operates in both Arabic and English, with full RTL support for Arabic speakers.",
         contentAr:
@@ -192,8 +192,8 @@ async function seed() {
     .insert(eventsTable)
     .values([
       {
-        title: "Annual Budget Vote — Live Session",
-        titleAr: "التصويت على الميزانية السنوية — جلسة مباشرة",
+        title: "Annual Budget Vote : Live Session",
+        titleAr: "التصويت على الميزانية السنوية : جلسة مباشرة",
         description: "The simulated Parliament will convene to vote on the Annual National Budget. Ministers of Finance and Economy will present their allocations, followed by debate and final vote.",
         descriptionAr: "سيجتمع البرلمان الاصطناعي للتصويت على الميزانية الوطنية السنوية. سيقدم وزيرا المالية والاقتصاد مخصصاتهما، يعقبها نقاش وتصويت نهائي.",
         startAt: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
@@ -266,8 +266,8 @@ async function seed() {
     .insert(crisesTable)
     .values([
       {
-        title: "Water Scarcity Emergency — Southern Regions",
-        titleAr: "حالة طوارئ شُح المياه — المناطق الجنوبية",
+        title: "Water Scarcity Emergency : Southern Regions",
+        titleAr: "حالة طوارئ شُح المياه : المناطق الجنوبية",
         description: "Severe drought conditions have been declared in the Drâa-Tafilalet and Souss-Massa regions. Ministers must coordinate emergency water distribution, agricultural support, and public communication within 72 hours.",
         descriptionAr: "أُعلنت حالة جفاف حادة في جهتي درعة-تافيلالت وسوس-ماسة. يجب على الوزراء تنسيق توزيع المياه الطارئة ودعم الزراعة والتواصل العام خلال 72 ساعة.",
         severity: "high",

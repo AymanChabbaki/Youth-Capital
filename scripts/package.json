@@ -4,15 +4,16 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "hello": "tsx ./src/hello.ts",
-    "seed": "tsx ./src/seed.ts",
+    "hello": "tsx --env-file=../.env ./src/hello.ts",
+    "seed": "tsx --env-file=../.env ./src/seed.ts",
+    "db-setup": "tsx --env-file=../.env ./src/db-setup.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@workspace/db": "workspace:*"
+    "@workspace/db": "*"
   },
   "devDependencies": {
-    "@types/node": "catalog:",
-    "tsx": "catalog:"
+    "@types/node": "^25.3.3",
+    "tsx": "^4.21.0"
   }
 }
