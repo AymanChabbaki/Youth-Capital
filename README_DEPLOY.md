@@ -5,9 +5,11 @@ This guide details how to correctly and professionally host the **Youth Capital*
 ## 1. Backend Deployment (API)
 
 ### Setup
-- **Root Directory**: `backend`
-- **Framework Preset**: `Next.js` (or `Other`)
-- **Node.js Version**: `20.x` or higher
+- **Root Directory**: `.` (Project Root)
+- **Build Command**: `pnpm build --filter @workspace/api-server` (or `npm run build -w @workspace/api-server`)
+- **Output Directory**: `backend/dist`
+- **Framework Preset**: `Other`
+- **Node.js Version**: `22.x` or higher
 
 ### Environment Variables
 Set these in the Vercel Project Settings:
@@ -24,9 +26,9 @@ Set these in the Vercel Project Settings:
 ## 2. Frontend Deployment (Civic Portals)
 
 ### Setup
-- **Root Directory**: `frontend`
-- **Build Command**: `npm run build`
-- **Output Directory**: `dist`
+- **Root Directory**: `.` (Project Root)
+- **Build Command**: `pnpm build --filter @workspace/frontend` (or `npm run build -w @workspace/frontend`)
+- **Output Directory**: `frontend/dist`
 - **Framework Preset**: `Vite`
 
 ### Environment Variables
