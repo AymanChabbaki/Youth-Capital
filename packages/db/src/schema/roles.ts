@@ -1,7 +1,7 @@
 import { pgTable, text, serial, timestamp, pgEnum, integer } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
-import { usersTable } from "./users";
+import { usersTable } from "./users.js";
 
 export const roleApplicationStatusEnum = pgEnum("role_application_status", ["pending", "approved", "rejected"]);
 export const preferredRoleEnum = pgEnum("preferred_role", ["minister", "mp", "local_council", "diaspora_rep"]);
