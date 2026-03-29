@@ -86,6 +86,7 @@ export interface User {
   bio?: string | null;
   status: UserStatus;
   applicationStatus?: UserApplicationStatus;
+  avatarUrl?: string | null;
   createdAt?: string;
 }
 
@@ -115,6 +116,7 @@ export interface UpdateUserRequest {
   languagePreference?: UpdateUserRequestLanguagePreference;
   bio?: string;
   region?: string;
+  avatarUrl?: string;
 }
 
 export type RoleApplicationRequestPreferredRole =

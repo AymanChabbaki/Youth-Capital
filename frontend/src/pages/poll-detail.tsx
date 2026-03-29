@@ -32,7 +32,7 @@ export default function PollDetail() {
 
   const pollId = params?.id ? parseInt(params.id) : null;
 
-  const { data: poll, isLoading, refetch } = useQuery<Poll>({
+  const { data: poll, isLoading, error, refetch } = useQuery<Poll>({
     queryKey: [`/api/polls/${pollId}`],
     queryFn: () => customFetch<Poll>(`/api/polls/${pollId}`),
     enabled: !!pollId
@@ -60,10 +60,29 @@ export default function PollDetail() {
     }
   };
 
-  if (isLoading || !poll) {
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  if (error || !poll) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] px-4 text-center">
+        <div className="w-20 h-20 bg-destructive/10 text-destructive rounded-full flex items-center justify-center mb-6">
+          <Info className="w-10 h-10" />
+        </div>
+        <h2 className="text-3xl font-display font-bold mb-4">
+          {t("Consultation Not Found", "الاستشارة غير موجودة")}
+        </h2>
+        <p className="text-muted-foreground mb-8 max-w-md">
+          {t("The consultation session you are looking for may have been archived or moved.", "جلسة الاستشارة التي تبحث عنها قد تم أرشفتها أو نقلها.")}
+        </p>
+        <Link href="/polls">
+          <Button variant="outline">{t("Return to Agenda", "العودة إلى الأجندة")}</Button>
+        </Link>
       </div>
     );
   }

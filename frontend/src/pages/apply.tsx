@@ -7,8 +7,24 @@ import { Button, Input, Select, Textarea, Label, Card } from "@/components/ui-cu
 import { motion, AnimatePresence } from "framer-motion";
 import { useRegister, useSubmitRoleApplication } from "@workspace/api-client-react";
 import { useToast } from "@/hooks/use-toast";
-import { CheckCircle2 } from "lucide-react";
+import { CheckCircle2, Fingerprint, Globe } from "lucide-react";
 import { Link } from "wouter";
+
+const MOROCCAN_REGIONS = [
+  "Tanger-Tétouan-Al Hoceïma",
+  "L'Oriental",
+  "Fès-Meknès",
+  "Rabat-Salé-Kénitra",
+  "Béni Mellal-Khénifra",
+  "Casablanca-Settat",
+  "Marrakech-Safi",
+  "Drâa-Tafilalet",
+  "Souss-Massa",
+  "Guelmim-Oued Noun",
+  "Laâyoune-Sakia El Hamra",
+  "Dakhla-Oued Ed-Dahab",
+  "Moroccan Diaspora / الجالية المغربية",
+];
 
 const applySchema = z.object({
   fullName: z.string().min(2, "Full name is required"),
@@ -29,6 +45,8 @@ export default function Apply() {
   const [step, setStep] = useState(1);
   const [isSuccess, setIsSuccess] = useState(false);
   const { toast } = useToast();
+  
+  const discordLink = import.meta.env.VITE_DISCORD_LINK || "https://discord.gg/example";
 
   const registerMutation = useRegister();
   const applyMutation = useSubmitRoleApplication();
@@ -86,20 +104,45 @@ export default function Apply() {
   if (isSuccess) {
     return (
       <div className="min-h-screen pt-24 pb-12 px-4 flex items-center justify-center bg-secondary/30">
-        <Card className="w-full max-w-md p-8 text-center">
+        <Card className="w-full max-w-lg p-10 text-center rounded-[40px] shadow-2xl shadow-slate-200">
           <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="flex justify-center mb-6">
-            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center">
-              <CheckCircle2 className="w-10 h-10 text-green-600" />
+            <div className="w-24 h-24 bg-green-100 rounded-3xl flex items-center justify-center shadow-lg shadow-green-100">
+              <CheckCircle2 className="w-12 h-12 text-green-600" />
             </div>
           </motion.div>
-          <h2 className="text-2xl font-display font-bold text-foreground mb-4">
-            {t("Application Submitted!", "تم تقديم الطلب بنجاح!")}
+          <h2 className="text-3xl font-display font-black text-slate-900 mb-4 tracking-tight">
+            {t("Application Transmitted!", "تم إرسال طلبك!")}
           </h2>
-          <p className="text-muted-foreground mb-8">
-            {t("Your application is now under review by the Platform Managers. You will be notified via email once a decision is made.", "طلبك الآن قيد المراجعة من قبل مديري المنصة. سيتم إعلامك عبر البريد الإلكتروني بمجرد اتخاذ قرار.")}
+          <p className="text-slate-500 font-bold mb-8 leading-relaxed">
+            {t("Your civic record has been successfully queued for review by the platform overseers.", "تم وضع سجلك المدني بنجاح في قائمة الانتظار للمراجعة من قبل مشرفي المنصة.")}
           </p>
+          
+          <motion.div 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="bg-primary/5 border-2 border-primary/20 p-8 rounded-[32px] text-left mb-10 relative overflow-hidden group hover:border-primary/40 transition-all shadow-xl shadow-primary/5"
+          >
+            <div className="absolute top-0 right-0 w-24 h-24 bg-primary/10 blur-[40px] -mr-12 -mt-12" />
+            <div className="flex items-center gap-4 mb-4">
+               <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center text-primary">
+                  <Fingerprint className="w-5 h-5" />
+               </div>
+               <h4 className="font-black text-slate-900 uppercase tracking-widest text-xs">{t("Mandatory Next Step", "الخطوة التالية الإلزامية")}</h4>
+            </div>
+            <p className="text-sm font-bold text-slate-600 leading-relaxed mb-6">
+               {t("To finalize your candidacy, you MUST join our Discord server and complete the verification form pinned in #onboarding.", "لإكمال ترشيحك، يجب أن تنضم إلى خادم Discord الخاص بنا وتكمل نموذج التحقق المثبت في #onboarding.")}
+            </p>
+            <a href={discordLink} target="_blank" rel="noopener noreferrer">
+               <Button variant="primary" className="w-full h-14 rounded-2xl gap-3 shadow-lg shadow-primary/20 text-md font-black">
+                  <Globe className="w-5 h-5" />
+                  {t("Join Official Discord", "انضم إلى Discord الرسمي")}
+               </Button>
+            </a>
+          </motion.div>
+
           <Link href="/login">
-            <Button variant="primary" className="w-full">{t("Go to Login", "الذهاب لتسجيل الدخول")}</Button>
+            <Button variant="ghost" className="w-full font-bold text-slate-400 hover:text-primary transition-colors">{t("Proceed to Login", "المتابعة لتسجيل الدخول")}</Button>
           </Link>
         </Card>
       </div>
@@ -172,7 +215,12 @@ export default function Apply() {
                   </div>
                   <div>
                     <Label>{t("Region", "الجهة / المنطقة")}</Label>
-                    <Input {...form.register("region")} placeholder="e.g. Casablanca-Settat" error={form.formState.errors.region?.message} />
+                    <Select {...form.register("region")} error={form.formState.errors.region?.message}>
+                      <option value="">{t("Select a Region", "اختر جهة")}</option>
+                      {MOROCCAN_REGIONS.map(region => (
+                        <option key={region} value={region}>{region}</option>
+                      ))}
+                    </Select>
                   </div>
                   {form.watch("preferredRole") === "mp" && (
                     <div>

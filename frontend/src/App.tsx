@@ -13,6 +13,8 @@ import Login from "@/pages/login";
 import Dashboard from "@/pages/dashboard";
 import Community from "@/pages/community";
 import Press from "@/pages/press";
+import ArticleDetail from "@/pages/article-detail";
+import Profile from "@/pages/profile";
 import Events from "@/pages/events";
 import Support from "@/pages/support";
 import Admin from "@/pages/admin";
@@ -27,25 +29,34 @@ const queryClient = new QueryClient();
 
 function Router() {
   return (
-    <Layout>
-      <Switch>
-        <Route path="/" component={Home} />
-        <Route path="/apply" component={Apply} />
-        <Route path="/login" component={Login} />
-        <Route path="/dashboard" component={Dashboard} />
-        <Route path="/community" component={Community} />
-        <Route path="/press" component={Press} />
-        <Route path="/events" component={Events} />
-        <Route path="/support" component={Support} />
-        <Route path="/admin" component={Admin} />
-        <Route path="/polls" component={Polls} />
-        <Route path="/polls/:id" component={PollDetail} />
-        <Route path="/about" component={About} />
-        <Route path="/rules" component={Rules} />
-        <Route path="/privacy" component={Privacy} />
-        <Route component={NotFound} />
-      </Switch>
-    </Layout>
+    <Switch>
+      {/* Admin routes without the global layout shell */}
+      <Route path="/admin" component={Admin} />
+      
+      {/* Standard routes with the global layout (Navbar/Footer) */}
+      <Route>
+        <Layout>
+          <Switch>
+            <Route path="/" component={Home} />
+            <Route path="/apply" component={Apply} />
+            <Route path="/login" component={Login} />
+            <Route path="/dashboard" component={Dashboard} />
+            <Route path="/community" component={Community} />
+            <Route path="/profile" component={Profile} />
+            <Route path="/press" component={Press} />
+            <Route path="/press/:id" component={ArticleDetail} />
+            <Route path="/events" component={Events} />
+            <Route path="/support" component={Support} />
+            <Route path="/polls" component={Polls} />
+            <Route path="/polls/:id" component={PollDetail} />
+            <Route path="/about" component={About} />
+            <Route path="/rules" component={Rules} />
+            <Route path="/privacy" component={Privacy} />
+            <Route component={NotFound} />
+          </Switch>
+        </Layout>
+      </Route>
+    </Switch>
   );
 }
 

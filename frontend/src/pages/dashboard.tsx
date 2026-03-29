@@ -2,7 +2,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useLanguage } from "@/hooks/use-language";
 import { Card, Badge, Button } from "@/components/ui-custom";
 import { useGetCrises, useGetPolls } from "@workspace/api-client-react";
-import { AlertTriangle, Vote, MessageSquare, Calendar } from "lucide-react";
+import { AlertTriangle, Vote, MessageSquare, Calendar, User as UserIcon } from "lucide-react";
 import { Link, Redirect } from "wouter";
 
 export default function Dashboard() {
@@ -109,6 +109,15 @@ export default function Dashboard() {
                 <Calendar className="w-8 h-8 text-accent mb-4 group-hover:scale-110 transition-transform" />
                 <h3 className="font-bold text-lg mb-1">{t("Upcoming Sessions", "الجلسات القادمة")}</h3>
                 <p className="text-sm text-muted-foreground">{t("View schedule and join live", "شاهد الجدول وانضم للبث")}</p>
+              </Card>
+            </Link>
+            <Link href="/profile" className="block">
+              <Card className="p-6 bg-primary/5 hover:bg-primary/10 border-primary/20 transition-all cursor-pointer group rounded-[28px] shadow-lg shadow-primary/5">
+                <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary mb-4 group-hover:scale-110 transition-transform">
+                   <UserIcon className="w-6 h-6" />
+                </div>
+                <h3 className="font-black text-lg mb-1">{t("Civic Identity", "الهوية المدنية")}</h3>
+                <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">{t("Manage Profile & Media", "إدارة الملف الشخصي والوسائط")}</p>
               </Card>
             </Link>
           </div>

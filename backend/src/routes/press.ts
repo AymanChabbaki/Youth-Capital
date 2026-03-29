@@ -51,6 +51,54 @@ router.post("/", requireAuth, requireAdmin, async (req, res) => {
   }
 });
 
+router.patch("/:id", requireAuth, requireAdmin, async (req, res) => {
+  try {
+    const { title, titleAr, content, contentAr, type, thumbnailUrl } = req.body;
+    const updates: any = {};
+    if (title !== undefined) updates.title = title;
+    if (titleAr !== undefined) updates.titleAr = titleAr;
+    if (content !== undefined) updates.content = content;
+    if (contentAr !== undefined) updates.contentAr = contentAr;
+    if (type !== undefined) updates.type = type;
+    if (thumbnailUrl !== undefined) updates.thumbnailUrl = thumbnailUrl;
+
+    const articleId = parseInt(Array.isArray(req.params.id) ? req.params.id[0] : req.params.id);
+    const [updated] = await db
+      .update(articlesTable)
+      .set(updates)
+      .where(eq(articlesTable.id, articleId))
+      .returning();
+
+    if (!updated) {
+      res.status(404).json({ error: "NotFound", message: "Article not found" });
+      return;
+    }
+    res.json(updated);
+  } catch (err) {
+    req.log.error({ err }, "Update article error");
+    res.status(500).json({ error: "Internal", message: "Server error" });
+  }
+});
+
+router.delete("/:id", requireAuth, requireAdmin, async (req, res) => {
+  try {
+    const articleId = parseInt(Array.isArray(req.params.id) ? req.params.id[0] : req.params.id);
+    const [deleted] = await db
+      .delete(articlesTable)
+      .where(eq(articlesTable.id, articleId))
+      .returning();
+
+    if (!deleted) {
+      res.status(404).json({ error: "NotFound", message: "Article not found" });
+      return;
+    }
+    res.json({ success: true, message: "Article deleted" });
+  } catch (err) {
+    req.log.error({ err }, "Delete article error");
+    res.status(500).json({ error: "Internal", message: "Server error" });
+  }
+});
+
 router.get("/:id", async (req, res) => {
   try {
     const [article] = await db.select().from(articlesTable).where(eq(articlesTable.id, parseInt(req.params.id)));

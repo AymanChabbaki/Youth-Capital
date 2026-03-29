@@ -21,7 +21,8 @@ router.get("/", requireAuth, requireAdmin, async (req, res) => {
 
 router.get("/:id", requireAuth, async (req, res) => {
   try {
-    const [user] = await db.select().from(usersTable).where(eq(usersTable.id, parseInt(req.params.id)));
+    const targetIdString = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+    const [user] = await db.select().from(usersTable).where(eq(usersTable.id, parseInt(targetIdString)));
     if (!user) {
       res.status(404).json({ error: "NotFound", message: "User not found" });
       return;
@@ -35,7 +36,8 @@ router.get("/:id", requireAuth, async (req, res) => {
 
 router.patch("/:id", requireAuth, async (req, res) => {
   try {
-    const targetId = parseInt(req.params.id);
+    const targetIdString = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+    const targetId = parseInt(targetIdString);
     const currentUser = (req as any).user;
     if (currentUser.role !== "admin" && currentUser.id !== targetId) {
       res.status(403).json({ error: "Forbidden", message: "Cannot edit another user's profile" });
@@ -48,6 +50,7 @@ router.patch("/:id", requireAuth, async (req, res) => {
     if (languagePreference !== undefined) updates.languagePreference = languagePreference;
     if (bio !== undefined) updates.bio = bio;
     if (region !== undefined) updates.region = region;
+    if (req.body.avatarUrl !== undefined) updates.avatarUrl = req.body.avatarUrl;
     const [updated] = await db.update(usersTable).set(updates).where(eq(usersTable.id, targetId)).returning();
     res.json(safeUser(updated));
   } catch (err) {
@@ -58,7 +61,8 @@ router.patch("/:id", requireAuth, async (req, res) => {
 
 router.delete("/:id", requireAuth, requireAdmin, async (req, res) => {
   try {
-    await db.update(usersTable).set({ status: "banned" }).where(eq(usersTable.id, parseInt(req.params.id)));
+    const targetIdString = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+    await db.update(usersTable).set({ status: "banned" }).where(eq(usersTable.id, parseInt(targetIdString)));
     res.json({ success: true, message: "User banned" });
   } catch (err) {
     req.log.error({ err }, "Delete user error");
