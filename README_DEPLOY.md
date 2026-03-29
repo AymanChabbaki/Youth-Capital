@@ -8,7 +8,7 @@ This guide details how to correctly and professionally host the **Youth Capital*
 - **Root Directory**: `backend` (Ensure "Include Root Directory in Build" is enabled in Vercel settings if using workspaces)
 - **Framework Preset**: `Other` (or `Next.js`)
 - **Node.js Version**: `22.x` or higher
-
+ 
 ### Environment Variables
 Set these in the Vercel Project Settings:
 - `DATABASE_URL`: Your professional PostgreSQL junction string.
