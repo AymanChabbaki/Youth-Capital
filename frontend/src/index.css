@@ -1,56 +1,17 @@
-@import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@400;600;700;800&family=Cinzel:wght@500;700;800&family=Inter:wght@400;500;600;700&display=swap');
-@import "tailwindcss";
+@layer theme {
+  :root {
+    /* Fluid Spacing Scale (min: 4px, max: 8px) */
+    --spacing-xs: clamp(0.25rem, 0.2vw + 0.2rem, 0.5rem);
+    --spacing-sm: clamp(0.5rem, 0.4vw + 0.4rem, 1rem);
+    --spacing-md: clamp(1rem, 0.8vw + 0.8rem, 2rem);
+    --spacing-lg: clamp(2rem, 1.6vw + 1.6rem, 4rem);
+    --spacing-xl: clamp(4rem, 3.2vw + 3.2rem, 8rem);
 
-@theme inline {
-  --font-display-en: 'Cinzel', serif;
-  --font-display-ar: 'Amiri', serif;
-  --font-body-en: 'Inter', sans-serif;
-  --font-body-ar: 'Cairo', sans-serif;
-
-  /* Brand Colors from Spec */
-  --color-navy: hsl(221 47% 20%);
-  --color-navy-dark: hsl(216 51% 10%);
-  --color-charcoal: hsl(240 21% 15%);
-  --color-gold: hsl(44 55% 54%);
-  --color-gold-pale: hsl(47 71% 78%);
-  --color-rose: hsl(350 83% 42%);
-  --color-white: hsl(37 33% 94%);
-  --color-ice-blue: hsl(216 43% 94%);
-  --color-slate: hsl(225 11% 58%);
-
-  /* System Mappings */
-  --color-background: var(--color-white);
-  --color-foreground: var(--color-navy-dark);
-  --color-card: hsl(0 0% 100%);
-  --color-card-foreground: var(--color-charcoal);
-  --color-primary: var(--color-navy);
-  --color-primary-foreground: var(--color-white);
-  --color-secondary: var(--color-ice-blue);
-  --color-secondary-foreground: var(--color-navy);
-  --color-accent: var(--color-gold);
-  --color-accent-foreground: hsl(0 0% 100%);
-  --color-destructive: var(--color-rose);
-  --color-destructive-foreground: hsl(0 0% 100%);
-  --color-muted: var(--color-slate);
-  --color-muted-foreground: var(--color-charcoal);
-  --color-border: hsl(216 20% 85%);
-  --color-ring: var(--color-gold);
-}
-
-.dark {
-  --color-background: var(--color-navy-dark);
-  --color-foreground: var(--color-white);
-  --color-card: var(--color-charcoal);
-  --color-card-foreground: var(--color-white);
-  --color-primary: var(--color-gold);
-  --color-primary-foreground: var(--color-navy-dark);
-  --color-secondary: hsl(221 47% 20%); /* Navy */
-  --color-secondary-foreground: var(--color-white);
-  --color-accent: var(--color-gold);
-  --color-accent-foreground: var(--color-navy-dark);
-  --color-border: hsl(240 21% 25%);
-  --color-muted: hsl(240 21% 25%);
-  --color-muted-foreground: var(--color-slate);
+    /* Glassmorphism Presets */
+    --glass-blur: 16px;
+    --glass-opacity: 0.7;
+    --glass-border: rgba(255, 255, 255, 0.1);
+  }
 }
 
 @layer base {
@@ -60,6 +21,8 @@
   
   html {
     scroll-behavior: smooth;
+    /* Fluid Typography: 14px -> 18px */
+    font-size: clamp(0.875rem, 0.25vw + 0.825rem, 1.125rem);
   }
 
   body {
@@ -96,6 +59,12 @@
     text-wrap: balance;
   }
   .glass-panel {
-    @apply bg-white/70 dark:bg-charcoal/70 backdrop-blur-xl border border-white/20 dark:border-white/10 shadow-xl;
+    @apply bg-white/70 dark:bg-navy-dark/70 backdrop-blur-xl border border-white/20 dark:border-white/10 shadow-xl;
+  }
+  .glass-card {
+    @apply bg-white/40 dark:bg-charcoal/40 backdrop-blur-[12px] border border-white/20 dark:border-white/10 shadow-lg;
+  }
+  .glass-nav {
+    @apply bg-background/[var(--glass-opacity)] backdrop-blur-[var(--glass-blur)] border-b border-white/10 shadow-sm;
   }
 }
