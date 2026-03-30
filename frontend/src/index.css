@@ -1,121 +1,104 @@
+@import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@400;600;700;800&family=Cinzel:wght@500;700;800&family=Inter:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
 
-@theme {
-  /* Site Theme Variables - Mapping shadcn/ui patterns to v4 */
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-destructive: var(--destructive);
-  --color-destructive-foreground: var(--destructive-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-popover: var(--popover);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  
-  /* Palette Colors */
-  --color-gold: #D4AF37;
-  --color-charcoal: #1E1E2E;
-  --color-navy-dark: #0A0A1A;
+@theme inline {
+  --font-display-en: 'Cinzel', serif;
+  --font-display-ar: 'Amiri', serif;
+  --font-body-en: 'Inter', sans-serif;
+  --font-body-ar: 'Cairo', sans-serif;
 
-  /* Spacing Tokens (Fluid Scale) */
-  --spacing-xs: clamp(0.25rem, 0.2vw + 0.2rem, 0.5rem);
-  --spacing-sm: clamp(0.5rem, 0.4vw + 0.4rem, 1rem);
-  --spacing-md: clamp(1rem, 0.8vw + 0.8rem, 2rem);
-  --spacing-lg: clamp(2rem, 1.6vw + 1.6rem, 4rem);
-  --spacing-xl: clamp(4rem, 3.2vw + 3.2rem, 8rem);
+  /* Brand Colors from Spec */
+  --color-navy: hsl(221 47% 20%);
+  --color-navy-dark: hsl(216 51% 10%);
+  --color-charcoal: hsl(240 21% 15%);
+  --color-gold: hsl(44 55% 54%);
+  --color-gold-pale: hsl(47 71% 78%);
+  --color-rose: hsl(350 83% 42%);
+  --color-white: hsl(37 33% 94%);
+  --color-ice-blue: hsl(216 43% 94%);
+  --color-slate: hsl(225 11% 58%);
 
-  /* Animation Presets */
-  --animate-accordion-down: accordion-down 0.2s ease-out;
-  --animate-accordion-up: accordion-up 0.2s ease-out;
+  /* System Mappings */
+  --color-background: var(--color-white);
+  --color-foreground: var(--color-navy-dark);
+  --color-card: hsl(0 0% 100%);
+  --color-card-foreground: var(--color-charcoal);
+  --color-primary: var(--color-navy);
+  --color-primary-foreground: var(--color-white);
+  --color-secondary: var(--color-ice-blue);
+  --color-secondary-foreground: var(--color-navy);
+  --color-accent: var(--color-gold);
+  --color-accent-foreground: hsl(0 0% 100%);
+  --color-destructive: var(--color-rose);
+  --color-destructive-foreground: hsl(0 0% 100%);
+  --color-muted: var(--color-slate);
+  --color-muted-foreground: var(--color-charcoal);
+  --color-border: hsl(216 20% 85%);
+  --color-ring: var(--color-gold);
+}
 
-  @keyframes accordion-down {
-    from { height: 0; }
-    to { height: var(--radix-accordion-content-height); }
-  }
-  @keyframes accordion-up {
-    from { height: var(--radix-accordion-content-height); }
-    to { height: 0; }
-  }
+.dark {
+  --color-background: var(--color-navy-dark);
+  --color-foreground: var(--color-white);
+  --color-card: var(--color-charcoal);
+  --color-card-foreground: var(--color-white);
+  --color-primary: var(--color-gold);
+  --color-primary-foreground: var(--color-navy-dark);
+  --color-secondary: hsl(221 47% 20%);
+  /* Navy */
+  --color-secondary-foreground: var(--color-white);
+  --color-accent: var(--color-gold);
+  --color-accent-foreground: var(--color-navy-dark);
+  --color-border: hsl(240 21% 25%);
+  --color-muted: hsl(240 21% 25%);
+  --color-muted-foreground: var(--color-slate);
 }
 
 @layer base {
-  :root {
-    --background: #ffffff;
-    --foreground: #0A0A1A;
-    --card: #ffffff;
-    --card-foreground: #0A0A1A;
-    --popover: #ffffff;
-    --popover-foreground: #0A0A1A;
-    --primary: #0A0A1A;
-    --primary-foreground: #ffffff;
-    --secondary: #f4f4f5;
-    --secondary-foreground: #1e1e2e;
-    --muted: #f4f4f5;
-    --muted-foreground: #71717a;
-    --accent: #D4AF37;
-    --accent-foreground: #ffffff;
-    --destructive: #ef4444;
-    --destructive-foreground: #ffffff;
-    --border: #e4e4e7;
-    --input: #e4e4e7;
-    --ring: #1E1E2E;
-    --radius: 0.5rem;
-  }
-
-  .dark {
-    --background: #0A0A1A;
-    --foreground: #ffffff;
-    --card: #1E1E2E;
-    --card-foreground: #ffffff;
-    --popover: #0A0A1A;
-    --popover-foreground: #ffffff;
-    --primary: #ffffff;
-    --primary-foreground: #0A0A1A;
-    --secondary: #1E1E2E;
-    --secondary-foreground: #ffffff;
-    --muted: #1E1E2E;
-    --muted-foreground: #a1a1aa;
-    --accent: #D4AF37;
-    --accent-foreground: #0A0A1A;
-    --destructive: #7f1d1d;
-    --destructive-foreground: #ffffff;
-    --border: #1E1E2E;
-    --input: #1E1E2E;
-    --ring: #D4AF37;
-  }
-
   * {
-    @apply border-border;
+    border-color: var(--color-border);
   }
-  
+
   html {
     scroll-behavior: smooth;
-    /* Fluid Typography: 14px -> 18px */
-    font-size: clamp(0.875rem, 0.25vw + 0.825rem, 1.125rem);
   }
 
   body {
     @apply bg-background text-foreground antialiased;
   }
 
-  /* Glassmorphism Classes */
+  /* Font handling based on language direction */
+  html[dir="ltr"] {
+    font-family: var(--font-body-en);
+  }
+
+  html[dir="rtl"] {
+    font-family: var(--font-body-ar);
+  }
+
+  html[dir="ltr"] h1,
+  html[dir="ltr"] h2,
+  html[dir="ltr"] h3,
+  html[dir="ltr"] h4,
+  html[dir="ltr"] .font-display {
+    font-family: var(--font-display-en);
+  }
+
+  html[dir="rtl"] h1,
+  html[dir="rtl"] h2,
+  html[dir="rtl"] h3,
+  html[dir="rtl"] h4,
+  html[dir="rtl"] .font-display {
+    font-family: var(--font-display-ar);
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
   .glass-panel {
-    @apply bg-white/70 dark:bg-navy-dark/70 backdrop-blur-xl border border-white/20 dark:border-white/10 shadow-xl;
-  }
-  .glass-card {
-    @apply bg-white/40 dark:bg-charcoal/40 backdrop-blur-[12px] border border-white/20 dark:border-white/10 shadow-lg;
-  }
-  .glass-nav {
-    @apply bg-background/70 backdrop-blur-md border-b border-white/10 shadow-sm;
+    @apply bg-white/70 dark:bg-charcoal/70 backdrop-blur-xl border border-white/20 dark:border-white/10 shadow-xl;
   }
 }
