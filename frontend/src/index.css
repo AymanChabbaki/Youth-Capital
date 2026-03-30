@@ -1,20 +1,99 @@
-@layer theme {
-  :root {
-    /* Fluid Spacing Scale (min: 4px, max: 8px) */
-    --spacing-xs: clamp(0.25rem, 0.2vw + 0.2rem, 0.5rem);
-    --spacing-sm: clamp(0.5rem, 0.4vw + 0.4rem, 1rem);
-    --spacing-md: clamp(1rem, 0.8vw + 0.8rem, 2rem);
-    --spacing-lg: clamp(2rem, 1.6vw + 1.6rem, 4rem);
-    --spacing-xl: clamp(4rem, 3.2vw + 3.2rem, 8rem);
+@import "tailwindcss";
 
-    /* Glassmorphism Presets */
-    --glass-blur: 16px;
-    --glass-opacity: 0.7;
-    --glass-border: rgba(255, 255, 255, 0.1);
+@theme {
+  /* Site Theme Variables - Mapping shadcn/ui patterns to v4 */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  
+  /* Palette Colors */
+  --color-gold: #D4AF37;
+  --color-charcoal: #1E1E2E;
+  --color-navy-dark: #0A0A1A;
+
+  /* Spacing Tokens (Fluid Scale) */
+  --spacing-xs: clamp(0.25rem, 0.2vw + 0.2rem, 0.5rem);
+  --spacing-sm: clamp(0.5rem, 0.4vw + 0.4rem, 1rem);
+  --spacing-md: clamp(1rem, 0.8vw + 0.8rem, 2rem);
+  --spacing-lg: clamp(2rem, 1.6vw + 1.6rem, 4rem);
+  --spacing-xl: clamp(4rem, 3.2vw + 3.2rem, 8rem);
+
+  /* Animation Presets */
+  --animate-accordion-down: accordion-down 0.2s ease-out;
+  --animate-accordion-up: accordion-up 0.2s ease-out;
+
+  @keyframes accordion-down {
+    from { height: 0; }
+    to { height: var(--radix-accordion-content-height); }
+  }
+  @keyframes accordion-up {
+    from { height: var(--radix-accordion-content-height); }
+    to { height: 0; }
   }
 }
 
 @layer base {
+  :root {
+    --background: #ffffff;
+    --foreground: #0A0A1A;
+    --card: #ffffff;
+    --card-foreground: #0A0A1A;
+    --popover: #ffffff;
+    --popover-foreground: #0A0A1A;
+    --primary: #0A0A1A;
+    --primary-foreground: #ffffff;
+    --secondary: #f4f4f5;
+    --secondary-foreground: #1e1e2e;
+    --muted: #f4f4f5;
+    --muted-foreground: #71717a;
+    --accent: #D4AF37;
+    --accent-foreground: #ffffff;
+    --destructive: #ef4444;
+    --destructive-foreground: #ffffff;
+    --border: #e4e4e7;
+    --input: #e4e4e7;
+    --ring: #1E1E2E;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: #0A0A1A;
+    --foreground: #ffffff;
+    --card: #1E1E2E;
+    --card-foreground: #ffffff;
+    --popover: #0A0A1A;
+    --popover-foreground: #ffffff;
+    --primary: #ffffff;
+    --primary-foreground: #0A0A1A;
+    --secondary: #1E1E2E;
+    --secondary-foreground: #ffffff;
+    --muted: #1E1E2E;
+    --muted-foreground: #a1a1aa;
+    --accent: #D4AF37;
+    --accent-foreground: #0A0A1A;
+    --destructive: #7f1d1d;
+    --destructive-foreground: #ffffff;
+    --border: #1E1E2E;
+    --input: #1E1E2E;
+    --ring: #D4AF37;
+  }
+
   * {
     @apply border-border;
   }
@@ -29,35 +108,7 @@
     @apply bg-background text-foreground antialiased;
   }
 
-  /* Font handling based on language direction */
-  html[dir="ltr"] {
-    font-family: var(--font-body-en);
-  }
-  html[dir="rtl"] {
-    font-family: var(--font-body-ar);
-  }
-
-  html[dir="ltr"] h1, 
-  html[dir="ltr"] h2, 
-  html[dir="ltr"] h3, 
-  html[dir="ltr"] h4,
-  html[dir="ltr"] .font-display {
-    font-family: var(--font-display-en);
-  }
-
-  html[dir="rtl"] h1, 
-  html[dir="rtl"] h2, 
-  html[dir="rtl"] h3, 
-  html[dir="rtl"] h4,
-  html[dir="rtl"] .font-display {
-    font-family: var(--font-display-ar);
-  }
-}
-
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
+  /* Glassmorphism Classes */
   .glass-panel {
     @apply bg-white/70 dark:bg-navy-dark/70 backdrop-blur-xl border border-white/20 dark:border-white/10 shadow-xl;
   }
@@ -65,6 +116,6 @@
     @apply bg-white/40 dark:bg-charcoal/40 backdrop-blur-[12px] border border-white/20 dark:border-white/10 shadow-lg;
   }
   .glass-nav {
-    @apply bg-background/[var(--glass-opacity)] backdrop-blur-[var(--glass-blur)] border-b border-white/10 shadow-sm;
+    @apply bg-background/70 backdrop-blur-md border-b border-white/10 shadow-sm;
   }
 }
