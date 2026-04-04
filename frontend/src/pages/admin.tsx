@@ -101,6 +101,9 @@ export default function Admin() {
   const [isArticleModalOpen, setIsArticleModalOpen] = useState(false);
   const [isEventModalOpen, setIsEventModalOpen] = useState(false);
 
+  const logoutMutation = useLogout();
+  const [, setLocation] = useLocation();
+
   const handleSaveArticle = async (data: any) => {
     try {
       if (editingArticle) {
@@ -223,8 +226,6 @@ export default function Admin() {
     { id: "events", icon: Calendar, label: t("Events Calendar", "جدول الفعاليات") },
   ];
 
-  const logoutMutation = useLogout();
-  const [, setLocation] = useLocation();
 
   const handleLogout = async () => {
     await logoutMutation.mutateAsync();
