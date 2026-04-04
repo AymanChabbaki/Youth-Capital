@@ -74,7 +74,7 @@ export default function Community() {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<"newest" | "popular">("newest");
 
-  const { data: forumsData } = useGetForums({ query: { enabled: isAuthenticated } } as any);
+  const { data: forumsData } = useGetForums({ query: { enabled: !authLoading && isAuthenticated } } as any);
   const { data: postsData, refetch: refetchPosts, isLoading: isLoadingPosts } = useGetForumPosts(
     selectedForumId || 0, 
     { search: searchQuery, sort: sortBy } as any, 

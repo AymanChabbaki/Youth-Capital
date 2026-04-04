@@ -8,8 +8,8 @@ import { Link, Redirect } from "wouter";
 export default function Dashboard() {
   const { user, isAuthenticated, isLoading } = useAuth();
   const { t, isAr } = useLanguage();
-  const { data: crisesData } = useGetCrises({ query: { enabled: isAuthenticated } } as any);
-  const { data: pollsData } = useGetPolls({ query: { enabled: isAuthenticated } } as any);
+  const { data: crisesData } = useGetCrises({ query: { enabled: !isLoading && isAuthenticated } } as any);
+  const { data: pollsData } = useGetPolls({ query: { enabled: !isLoading && isAuthenticated } } as any);
 
   if (isLoading) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
   if (!isAuthenticated) return <Redirect to="/login" />;
