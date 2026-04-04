@@ -10,6 +10,13 @@ function hashPassword(password: string): string {
   return crypto.createHash("sha256").update(password + "ycc_salt_2024").digest("hex");
 }
 
+const COOKIE_OPTIONS = {
+  httpOnly: true,
+  maxAge: 7 * 24 * 60 * 60 * 1000,
+  sameSite: "none" as const,
+  secure: true, // Required for sameSite: "none"
+};
+
 router.post("/register", async (req, res) => {
   try {
     const { email, password, fullName, fullNameAr, languagePreference } = req.body;
@@ -30,8 +37,9 @@ router.post("/register", async (req, res) => {
       fullNameAr: fullNameAr || null,
       languagePreference: languagePreference || "en",
     }).returning();
-    const token = createSession(user.id);
-    res.cookie("session", token, { httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000, sameSite: "lax" });
+    
+    const token = await createSession(user.id);
+    res.cookie("session", token, COOKIE_OPTIONS);
     res.status(201).json({ user: safeUser(user), token });
   } catch (err) {
     req.log.error({ err }, "Register error");
@@ -55,8 +63,9 @@ router.post("/login", async (req, res) => {
       res.status(403).json({ error: "Forbidden", message: "Account is banned" });
       return;
     }
-    const token = createSession(user.id);
-    res.cookie("session", token, { httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000, sameSite: "lax" });
+    
+    const token = await createSession(user.id);
+    res.cookie("session", token, COOKIE_OPTIONS);
     res.json({ user: safeUser(user), token });
   } catch (err) {
     req.log.error({ err }, "Login error");
@@ -64,10 +73,10 @@ router.post("/login", async (req, res) => {
   }
 });
 
-router.post("/logout", (req, res) => {
+router.post("/logout", async (req, res) => {
   const token = req.cookies?.session || req.headers["x-session-token"];
-  if (token) destroySession(String(token));
-  res.clearCookie("session");
+  if (token) await destroySession(String(token));
+  res.clearCookie("session", COOKIE_OPTIONS);
   res.json({ success: true, message: "Logged out" });
 });
 
