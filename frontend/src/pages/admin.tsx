@@ -83,12 +83,12 @@ export default function Admin() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: appsData, refetch: refetchApps } = useGetRoleApplications({ status: "pending" });
-  const { data: usersData } = useGetUsers();
-  const { data: statsData } = useGetPlatformStats();
-  const { data: crisesData } = useGetCrises();
-  const { data: articlesData } = useGetArticles();
-  const { data: eventsData } = useGetEvents();
+  const { data: appsData, refetch: refetchApps } = useGetRoleApplications({ status: "pending" }, { query: { enabled: isAdmin } } as any);
+  const { data: usersData } = useGetUsers({ query: { enabled: isAdmin } } as any);
+  const { data: statsData } = useGetPlatformStats({ query: { enabled: isAdmin } } as any);
+  const { data: crisesData } = useGetCrises({ query: { enabled: isAdmin } } as any);
+  const { data: articlesData } = useGetArticles({ query: { enabled: isAdmin } } as any);
+  const { data: eventsData } = useGetEvents({ query: { enabled: isAdmin } } as any);
 
   const updateAppMutation = useUpdateRoleApplication();
   const deleteUserMutation = useDeleteUser();
