@@ -18,8 +18,8 @@
     }
   },
   "scripts": {
-    "push": "tsx --env-file=../../.env ./node_modules/drizzle-kit/bin.js push --config ./drizzle.config.ts",
-    "push-force": "tsx --env-file=../../.env ./node_modules/drizzle-kit/bin.js push --force --config ./drizzle.config.ts"
+    "push": "tsx --env-file=../../.env ../../node_modules/drizzle-kit/bin.cjs push --config ./drizzle.config.ts",
+    "push-force": "tsx --env-file=../../.env ../../node_modules/drizzle-kit/bin.cjs push --force --config ./drizzle.config.ts"
   },
   "dependencies": {
     "drizzle-orm": "^0.45.1",
