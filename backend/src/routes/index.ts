@@ -10,6 +10,7 @@ import eventsRouter from "./events.js";
 import supportRouter from "./support.js";
 import crisesRouter from "./crises.js";
 import statsRouter from "./stats.js";
+import chatRouter from "./chat.js";
 
 const router: IRouter = Router();
 
@@ -24,5 +25,6 @@ router.use("/events", eventsRouter);
 router.use("/support", supportRouter);
 router.use("/crises", crisesRouter);
 router.use("/stats", statsRouter);
+router.use("/chat", chatRouter);
 
 export default router;
