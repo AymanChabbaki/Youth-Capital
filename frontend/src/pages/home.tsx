@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLanguage } from "@/hooks/use-language";
 import { Button, Card } from "@/components/ui-custom";
 import { Link } from "wouter";
 import { useGetPlatformStats, useGetForums, useGetArticles, useGetPolls } from "@workspace/api-client-react";
-import { Users, FileText, Landmark, ShieldAlert, ArrowRight, Gavel, Briefcase, AlertCircle, Target, Zap } from "lucide-react";
+import { Users, FileText, Landmark, ShieldAlert, ArrowRight, Gavel, Briefcase, AlertCircle, Target, Zap, ArrowUp } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function Home() {
@@ -15,6 +15,19 @@ export default function Home() {
   const discordLink = import.meta.env.VITE_DISCORD_LINK || "https://discord.gg/example";
   const [activeFeature, setActiveFeature] = useState(1);
   const [activeCommunity, setActiveCommunity] = useState(1);
+  const [showScrollTop, setShowScrollTop] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowScrollTop(window.scrollY > 400);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   return (
     <div className="w-full flex flex-col">
@@ -837,6 +850,17 @@ export default function Home() {
           )}
         </div>
       </section>
+
+      {/* Scroll to Top Button */}
+      {showScrollTop && (
+        <button
+          onClick={scrollToTop}
+          className="fixed bottom-24 left-6 md:bottom-8 md:left-8 z-50 p-3 rounded-full bg-primary/80 hover:bg-primary text-white border border-white/10 backdrop-blur-md shadow-2xl hover:scale-110 active:scale-95 transition-all duration-300 animate-in fade-in zoom-in-95 flex items-center justify-center"
+          title={t("Scroll to Top", "الرجوع للأعلى")}
+        >
+          <ArrowUp className="w-5 h-5" />
+        </button>
+      )}
     </div>
   );
 }
