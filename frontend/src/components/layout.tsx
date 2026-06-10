@@ -67,9 +67,7 @@ function Navbar() {
 
   return (
     <header 
-      className={`sticky top-0 z-50 w-full transition-all duration-300 ${
-        isScrolled ? "glass-nav py-2" : "bg-transparent py-4"
-      }`}
+      className="relative z-50 w-full bg-background border-b border-border/30 py-2"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
@@ -536,7 +534,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
   
   return (
-    <div className="min-h-screen flex flex-col bg-background selection:bg-accent selection:text-accent-foreground overflow-x-hidden">
+    <div className="min-h-screen flex flex-col bg-background selection:bg-accent selection:text-accent-foreground">
       <Navbar />
       <main className="flex-1 w-full relative">
         <AnimatePresence mode="wait">
