@@ -32,7 +32,7 @@ import {
   Search
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
-import { Redirect, Link } from "wouter";
+import { Redirect, Link, useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
 
@@ -64,7 +64,19 @@ export default function Community() {
   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
   const { t, isAr } = useLanguage();
   const { toast } = useToast();
+  const [location] = useLocation();
   const [selectedForumId, setSelectedForumId] = useState<number | null>(null);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const forumParam = params.get("forum");
+    if (forumParam) {
+      const parsedId = parseInt(forumParam);
+      if (!isNaN(parsedId)) {
+        setSelectedForumId(parsedId);
+      }
+    }
+  }, [location]);
   const [activePostId, setActivePostId] = useState<number | null>(null);
   const [isComposing, setIsComposing] = useState(false);
   const [newPostTitle, setNewPostTitle] = useState("");

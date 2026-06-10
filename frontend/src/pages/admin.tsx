@@ -4,7 +4,7 @@ import { useLanguage } from "@/hooks/use-language";
 import {
   useGetRoleApplications, useUpdateRoleApplication,
   useGetUsers, useTriggerCrisis, useGetPlatformStats,
-  useGetCrises, useGetArticles, useGetEvents,
+  useGetCrises, useGetArticles, useGetEvents, useGetPolls,
   useDeleteUser, useLogout,
   customFetch
 } from "@workspace/api-client-react";
@@ -89,6 +89,7 @@ export default function Admin() {
   const { data: crisesData } = useGetCrises({ query: { enabled: !isLoading && isAdmin } } as any);
   const { data: articlesData } = useGetArticles({ query: { enabled: !isLoading && isAdmin } } as any);
   const { data: eventsData } = useGetEvents({ query: { enabled: !isLoading && isAdmin } } as any);
+  const { data: pollsData } = useGetPolls({ query: { enabled: !isLoading && isAdmin } } as any);
 
   const updateAppMutation = useUpdateRoleApplication();
   const deleteUserMutation = useDeleteUser();
@@ -98,8 +99,10 @@ export default function Admin() {
   // Press & Events CRUD State
   const [editingArticle, setEditingArticle] = useState<any>(null);
   const [editingEvent, setEditingEvent] = useState<any>(null);
+  const [editingPoll, setEditingPoll] = useState<any>(null);
   const [isArticleModalOpen, setIsArticleModalOpen] = useState(false);
   const [isEventModalOpen, setIsEventModalOpen] = useState(false);
+  const [isPollModalOpen, setIsPollModalOpen] = useState(false);
 
   const logoutMutation = useLogout();
   const [, setLocation] = useLocation();
@@ -155,6 +158,63 @@ export default function Admin() {
       await customFetch(`/api/events/${id}`, { method: "DELETE" });
       toast({ title: t("Event Deleted", "تم حذف الفعالية") });
       queryClient.invalidateQueries({ queryKey: ["/api/events"] });
+    } catch (error) {
+      toast({ title: t("Deletion Failed", "فشل الحذف"), variant: "destructive" });
+    }
+  };
+
+  const handleSavePoll = async (data: any) => {
+    try {
+      if (editingPoll) {
+        const payload = {
+          title: data.title,
+          titleAr: data.titleAr,
+          description: data.description,
+          endsAt: data.endsAt ? new Date(data.endsAt).toISOString() : null,
+        };
+        await customFetch(`/api/polls/${editingPoll.id}`, {
+          method: "PATCH",
+          body: JSON.stringify(payload),
+          headers: { "Content-Type": "application/json" }
+        });
+        toast({ title: t("Poll Updated", "تم تحديث الاستطلاع") });
+      } else {
+        const optionLabels = [
+          { label: data.opt1_label, labelAr: data.opt1_labelAr },
+          { label: data.opt2_label, labelAr: data.opt2_labelAr },
+        ];
+        if (data.opt3_label) optionLabels.push({ label: data.opt3_label, labelAr: data.opt3_labelAr });
+        if (data.opt4_label) optionLabels.push({ label: data.opt4_label, labelAr: data.opt4_labelAr });
+
+        const payload = {
+          title: data.title,
+          titleAr: data.titleAr,
+          description: data.description,
+          endsAt: data.endsAt ? new Date(data.endsAt).toISOString() : null,
+          options: optionLabels
+        };
+
+        await customFetch(`/api/polls`, {
+          method: "POST",
+          body: JSON.stringify(payload),
+          headers: { "Content-Type": "application/json" }
+        });
+        toast({ title: t("Poll Created", "تم إنشاء الاستطلاع") });
+      }
+      setIsPollModalOpen(false);
+      setEditingPoll(null);
+      queryClient.invalidateQueries({ queryKey: ["/api/polls"] });
+    } catch (error) {
+      toast({ title: t("Action Failed", "فشلت العملية"), variant: "destructive" });
+    }
+  };
+
+  const handleDeletePoll = async (id: number) => {
+    if (!window.confirm(t("Delete this poll?", "حذف هذا الاستطلاع؟"))) return;
+    try {
+      await customFetch(`/api/polls/${id}`, { method: "DELETE" });
+      toast({ title: t("Poll Deleted", "تم حذف الاستطلاع") });
+      queryClient.invalidateQueries({ queryKey: ["/api/polls"] });
     } catch (error) {
       toast({ title: t("Deletion Failed", "فشل الحذف"), variant: "destructive" });
     }
@@ -224,6 +284,7 @@ export default function Admin() {
     { id: "crises", icon: AlertTriangle, label: t("Crises", "الأزمات") },
     { id: "press", icon: Newspaper, label: t("Press Office", "مكتب الصحافة") },
     { id: "events", icon: Calendar, label: t("Events Calendar", "جدول الفعاليات") },
+    { id: "polls", icon: BarChart3, label: t("Polls Management", "إدارة الاستطلاعات") },
   ];
 
 
@@ -992,6 +1053,194 @@ export default function Admin() {
                       <div className="flex gap-3 pt-4">
                         <Button type="button" variant="outline" onClick={() => setIsEventModalOpen(false)} className="flex-1 rounded-xl h-12">{t("Cancel", "إلغاء")}</Button>
                         <Button type="submit" className="flex-1 rounded-xl h-12 bg-primary hover:bg-primary/90 text-white font-bold">{t("Schedule Event", "جدولة الفعالية")}</Button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ── POLLS MANAGEMENT ── */}
+          {activeTab === "polls" && (
+            <div className="space-y-6">
+              <div className="flex items-center justify-between">
+                <h2 className="text-xl font-bold flex items-center gap-2">
+                  <BarChart3 className="w-5 h-5 text-primary" />
+                  {t("Polls Management", "إدارة الاستطلاعات")}
+                </h2>
+                <button
+                  onClick={() => { setEditingPoll(null); setIsPollModalOpen(true); }}
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-white text-sm font-bold hover:bg-primary/90 transition-all shadow-lg shadow-primary/20"
+                >
+                  <Plus className="w-4 h-4" />
+                  {t("Create Poll", "إنشاء استطلاع")}
+                </button>
+              </div>
+
+              <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-sm">
+                <table className="w-full text-left text-sm">
+                  <thead className="bg-secondary/40">
+                    <tr>
+                      <th className="px-6 py-3 font-semibold text-muted-foreground">{t("Poll Question", "السؤال")}</th>
+                      <th className="px-6 py-3 font-semibold text-muted-foreground">{t("Status", "الحالة")}</th>
+                      <th className="px-6 py-3 font-semibold text-muted-foreground">{t("Total Votes", "إجمالي الأصوات")}</th>
+                      <th className="px-6 py-3 font-semibold text-muted-foreground">{t("Ends At", "ينتهي في")}</th>
+                      <th className="px-6 py-3 font-semibold text-muted-foreground text-right">{t("Actions", "إجراءات")}</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border">
+                    {((pollsData as any)?.polls || []).map((p: any) => (
+                      <tr key={p.id} className="hover:bg-secondary/20 transition-colors group">
+                        <td className="px-6 py-4">
+                          <div>
+                            <span className="font-semibold text-foreground group-hover:text-primary transition-colors">
+                              {t(p.title, p.titleAr)}
+                            </span>
+                            {p.description && (
+                              <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">{p.description}</p>
+                            )}
+                            <div className="mt-1.5 flex flex-wrap gap-1.5">
+                              {p.options?.map((opt: any) => (
+                                <Badge key={opt.id} variant="outline" className="text-[10px] py-0 px-1.5 font-medium">
+                                  {t(opt.label, opt.labelAr)} ({opt.votes || 0} - {opt.percentage || 0}%)
+                                </Badge>
+                              ))}
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <Badge variant={p.status === "active" ? "gold" : "outline"} className="text-[10px] font-black uppercase tracking-tighter">
+                            {p.status === "active" ? t("Active", "نشط") : t("Closed", "مغلق")}
+                          </Badge>
+                        </td>
+                        <td className="px-6 py-4 font-medium text-muted-foreground">
+                          {p.totalVotes || 0}
+                        </td>
+                        <td className="px-6 py-4 text-muted-foreground">
+                          <div className="flex items-center gap-2">
+                            <Clock className="w-3.5 h-3.5" />
+                            {p.endsAt ? new Date(p.endsAt).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' }) : t("Never", "لا ينتهي")}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                          <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button 
+                              onClick={() => { setEditingPoll(p); setIsPollModalOpen(true); }}
+                              className="p-1.5 rounded-lg hover:bg-primary/10 text-primary transition-colors"
+                            >
+                              <Edit className="w-4 h-4" />
+                            </button>
+                            <button 
+                              onClick={() => handleDeletePoll(p.id)}
+                              className="p-1.5 rounded-lg hover:bg-rose/10 text-rose transition-colors"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Poll Modal */}
+              {isPollModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-navy-dark/60 backdrop-blur-sm animate-in fade-in duration-200">
+                  <div className="bg-background border border-border rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl p-8 animate-in zoom-in-95 duration-200">
+                    <h3 className="text-2xl font-bold mb-6 flex items-center gap-3">
+                      <BarChart3 className="w-6 h-6 text-primary" />
+                      {editingPoll ? t("Edit Poll", "تعديل الاستطلاع") : t("Create New Poll", "إنشاء استطلاع جديد")}
+                    </h3>
+                    <form onSubmit={(e) => {
+                      e.preventDefault();
+                      const formData = new FormData(e.currentTarget);
+                      const data = Object.fromEntries(formData.entries());
+                      handleSavePoll(data);
+                    }} className="space-y-6">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <label className="text-xs font-black text-slate-400 uppercase tracking-widest">{t("Poll Question (English)", "سؤال الاستطلاع (إنجليزي)")}</label>
+                          <Input name="title" defaultValue={editingPoll?.title} required className="rounded-xl border-slate-200" />
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-xs font-black text-slate-400 uppercase tracking-widest">{t("Poll Question (Arabic)", "سؤال الاستطلاع (عربي)")}</label>
+                          <Input name="titleAr" defaultValue={editingPoll?.titleAr} required dir="rtl" className="rounded-xl border-slate-200" />
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-xs font-black text-slate-400 uppercase tracking-widest">{t("Description (English)", "الوصف (إنجليزي)")}</label>
+                        <Textarea name="description" defaultValue={editingPoll?.description || ""} className="h-20 rounded-2xl border-slate-200" />
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-xs font-black text-slate-400 uppercase tracking-widest">{t("End Time", "وقت الانتهاء")}</label>
+                        <Input 
+                          name="endsAt" 
+                          type="datetime-local" 
+                          defaultValue={editingPoll?.endsAt ? new Date(editingPoll.endsAt).toISOString().slice(0, 16) : ""} 
+                          className="rounded-xl border-slate-200" 
+                        />
+                      </div>
+
+                      {!editingPoll ? (
+                        <div className="space-y-4 pt-4 border-t border-border">
+                          <h4 className="text-sm font-bold text-foreground">{t("Poll Options (Minimum 2, Maximum 4)", "خيارات الاستطلاع (الحد الأدنى 2، الأقصى 4)")}</h4>
+                          <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                              <label className="text-xs font-black text-slate-400 uppercase tracking-widest">{t("Option 1 (English)", "الخيار 1 (إنجليزي)")}</label>
+                              <Input name="opt1_label" required className="rounded-xl border-slate-200" />
+                            </div>
+                            <div className="space-y-2">
+                              <label className="text-xs font-black text-slate-400 uppercase tracking-widest">{t("Option 1 (Arabic)", "الخيار 1 (عربي)")}</label>
+                              <Input name="opt1_labelAr" required dir="rtl" className="rounded-xl border-slate-200" />
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                              <label className="text-xs font-black text-slate-400 uppercase tracking-widest">{t("Option 2 (English)", "الخيار 2 (إنجليزي)")}</label>
+                              <Input name="opt2_label" required className="rounded-xl border-slate-200" />
+                            </div>
+                            <div className="space-y-2">
+                              <label className="text-xs font-black text-slate-400 uppercase tracking-widest">{t("Option 2 (Arabic)", "الخيار 2 (عربي)")}</label>
+                              <Input name="opt2_labelAr" required dir="rtl" className="rounded-xl border-slate-200" />
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                              <label className="text-xs font-black text-slate-400 uppercase tracking-widest">{t("Option 3 (English - Optional)", "الخيار 3 (إنجليزي - اختياري)")}</label>
+                              <Input name="opt3_label" className="rounded-xl border-slate-200" />
+                            </div>
+                            <div className="space-y-2">
+                              <label className="text-xs font-black text-slate-400 uppercase tracking-widest">{t("Option 3 (Arabic - Optional)", "الخيار 3 (عربي - اختياري)")}</label>
+                              <Input name="opt3_labelAr" dir="rtl" className="rounded-xl border-slate-200" />
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                              <label className="text-xs font-black text-slate-400 uppercase tracking-widest">{t("Option 4 (English - Optional)", "الخيار 4 (إنجليزي - اختياري)")}</label>
+                              <Input name="opt4_label" className="rounded-xl border-slate-200" />
+                            </div>
+                            <div className="space-y-2">
+                              <label className="text-xs font-black text-slate-400 uppercase tracking-widest">{t("Option 4 (Arabic - Optional)", "الخيار 4 (عربي - اختياري)")}</label>
+                              <Input name="opt4_labelAr" dir="rtl" className="rounded-xl border-slate-200" />
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="bg-secondary/20 p-4 rounded-xl space-y-2 text-xs text-muted-foreground">
+                          <p>{t("Note: Option editing is disabled as votes may have already been cast. Delete and recreate the poll if options need changes.", "ملاحظة: تعديل الخيارات معطل لأن الأصوات قد تكون قد سجلت بالفعل. يرجى حذف الاستطلاع وإعادة إنشائه إذا كانت الخيارات بحاجة لتعديل.")}</p>
+                        </div>
+                      )}
+
+                      <div className="flex gap-3 pt-4">
+                        <Button type="button" variant="outline" onClick={() => setIsPollModalOpen(false)} className="flex-1 rounded-xl h-12">{t("Cancel", "إلغاء")}</Button>
+                        <Button type="submit" className="flex-1 rounded-xl h-12 bg-primary hover:bg-primary/90 text-white font-bold">{editingPoll ? t("Update Poll", "تحديث الاستطلاع") : t("Create Poll", "إنشاء استطلاع")}</Button>
                       </div>
                     </form>
                   </div>

@@ -121,4 +121,47 @@ router.post("/:id/vote", requireAuth, async (req, res) => {
   }
 });
 
+router.patch("/:id", requireAuth, requireAdmin, async (req, res) => {
+  try {
+    const pollId = parseInt(req.params.id as string);
+    const { title, titleAr, description, endsAt } = req.body;
+    const [updated] = await db
+      .update(pollsTable)
+      .set({
+        title,
+        titleAr,
+        description: description !== undefined ? (description || null) : undefined,
+        endsAt: endsAt !== undefined ? (endsAt ? new Date(endsAt) : null) : undefined,
+      })
+      .where(eq(pollsTable.id, pollId))
+      .returning();
+    if (!updated) {
+      res.status(404).json({ error: "NotFound", message: "Poll not found" });
+      return;
+    }
+    const formatted = await formatPoll(updated, (req as any).user.id);
+    res.json(formatted);
+  } catch (err) {
+    req.log.error({ err }, "Update poll error");
+    res.status(500).json({ error: "Internal", message: "Server error" });
+  }
+});
+
+router.delete("/:id", requireAuth, requireAdmin, async (req, res) => {
+  try {
+    const pollId = parseInt(req.params.id as string);
+    await db.delete(pollVotesTable).where(eq(pollVotesTable.pollId, pollId));
+    await db.delete(pollOptionsTable).where(eq(pollOptionsTable.pollId, pollId));
+    const [deleted] = await db.delete(pollsTable).where(eq(pollsTable.id, pollId)).returning();
+    if (!deleted) {
+      res.status(404).json({ error: "NotFound", message: "Poll not found" });
+      return;
+    }
+    res.json({ success: true, message: "Poll deleted" });
+  } catch (err) {
+    req.log.error({ err }, "Delete poll error");
+    res.status(500).json({ error: "Internal", message: "Server error" });
+  }
+});
+
 export default router;
