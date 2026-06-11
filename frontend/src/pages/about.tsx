@@ -215,21 +215,24 @@ export default function About() {
       </section>
 
       {/* Team - Organic Tree Diagram with leaves, roots & pixel-perfect CSS alignments */}
-      <section className="py-28 px-4 bg-background relative overflow-hidden">
+      <section className="py-28 px-4 bg-background relative overflow-visible">
         
-        {/* Glow ambient background effects */}
-        <div className="absolute top-1/4 left-1/4 w-[400px] h-[400px] bg-gold/5 dark:bg-gold/10 rounded-full blur-[120px] pointer-events-none" />
-        <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-blue-500/5 dark:bg-blue-500/10 rounded-full blur-[120px] pointer-events-none" />
+        {/* Glow ambient background effects and floating elements wrapped to clip horizontal overflow while maintaining scroll sticky */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          {/* Glow ambient background effects */}
+          <div className="absolute top-1/4 left-1/4 w-[400px] h-[400px] bg-gold/5 dark:bg-gold/10 rounded-full blur-[120px]" />
+          <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-blue-500/5 dark:bg-blue-500/10 rounded-full blur-[120px]" />
 
-        {/* High-tech matrix line details */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#00000003_1px,transparent_1px),linear-gradient(to_bottom,#00000003_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,#ffffff02_1px,transparent_1px),linear-gradient(to_bottom,#ffffff02_1px,transparent_1px)] bg-[size:32px_32px] opacity-40 pointer-events-none" />
+          {/* High-tech matrix line details */}
+          <div className="absolute inset-0 bg-[linear-gradient(to_right,#00000003_1px,transparent_1px),linear-gradient(to_bottom,#00000003_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,#ffffff02_1px,transparent_1px),linear-gradient(to_bottom,#ffffff02_1px,transparent_1px)] bg-[size:32px_32px] opacity-40" />
 
-        {/* Floating background leaves */}
-        <div className="absolute top-1/3 left-10 text-emerald-500/10 dark:text-emerald-500/5 rotate-12 pointer-events-none animate-bounce" style={{ animationDuration: "6s" }}>
-          <LeafIcon className="w-20 h-20" />
-        </div>
-        <div className="absolute bottom-1/3 right-10 text-emerald-500/10 dark:text-emerald-500/5 -rotate-45 pointer-events-none animate-bounce" style={{ animationDuration: "8s" }}>
-          <LeafIcon className="w-24 h-24" />
+          {/* Floating background leaves */}
+          <div className="absolute top-1/3 left-10 text-emerald-500/10 dark:text-emerald-500/5 rotate-12 animate-bounce" style={{ animationDuration: "6s" }}>
+            <LeafIcon className="w-20 h-20" />
+          </div>
+          <div className="absolute bottom-1/3 right-10 text-emerald-500/10 dark:text-emerald-500/5 -rotate-45 animate-bounce" style={{ animationDuration: "8s" }}>
+            <LeafIcon className="w-24 h-24" />
+          </div>
         </div>
 
         <div className="max-w-7xl mx-auto relative z-10">
