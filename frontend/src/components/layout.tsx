@@ -49,6 +49,7 @@ function Navbar() {
 
   const navLinks = [
     { href: "/", label: t("Home", "الرئيسية") },
+    { href: "/about", label: t("About Us", "من نحن") },
     { href: "/polls", label: t("Polls", "تصويتات") },
     { href: "/community", label: t("Community", "المجتمع"), protected: true },
     { href: "/press", label: t("Press", "الأخبار") },

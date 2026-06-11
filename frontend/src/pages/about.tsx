@@ -215,7 +215,7 @@ export default function About() {
       </section>
 
       {/* Team - Organic Tree Diagram with leaves, roots & pixel-perfect CSS alignments */}
-      <section className="py-28 px-4 bg-background relative overflow-visible">
+      <section className="py-28 px-4 bg-background relative overflow-hidden">
         
         {/* Glow ambient background effects */}
         <div className="absolute top-1/4 left-1/4 w-[400px] h-[400px] bg-gold/5 dark:bg-gold/10 rounded-full blur-[120px] pointer-events-none" />
@@ -253,15 +253,19 @@ export default function About() {
                 "اضغط على أي عقدة لعرض تفاصيل الملف الشخصي واكتشاف مسؤولياتهم."
               )}
             </p>
+            {/* Mobile tap hint */}
+            <div className="lg:hidden flex items-center justify-center gap-2 text-xs text-amber-500/80 font-bold mt-4 animate-pulse">
+              <span>{isAr ? "اضغط على أي عضو لعرض التفاصيل الكاملة" : "Tap on any member to view details"}</span>
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 relative min-h-[700px]">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 relative min-h-[500px]">
             
             {/* Left/Center: Organic Tree Graph (Spans 8 cols) */}
-            <div className="lg:col-span-8 relative flex flex-col items-center">
+            <div className="lg:col-span-8 w-full relative h-auto overflow-visible flex flex-col items-center">
               
-              {/* Tree Nodes Layout with Pixel-Perfect CSS alignments */}
-              <div className="w-full relative z-10 flex flex-col items-center">
+              {/* Tree Nodes Layout with responsive grid columns */}
+              <div className="w-full relative z-10 flex flex-col items-center py-4">
                 
                 {/* APEX LEVEL: President (The Crown of the Tree) */}
                 <div className="flex flex-col items-center w-full">
@@ -277,20 +281,20 @@ export default function About() {
                       <motion.div 
                         whileHover={{ scale: 1.06, y: -4 }}
                         onClick={() => setSelectedMember(m)}
-                        className="relative flex flex-col items-center bg-card border-2 border-gold rounded-2xl px-6 py-4 cursor-pointer shadow-xl transition-all duration-300 w-64 text-foreground z-10"
+                        className="relative flex flex-col items-center bg-card border-2 border-gold rounded-2xl px-5 py-4 cursor-pointer shadow-xl transition-all duration-300 w-56 text-foreground z-10"
                         style={{ boxShadow: `0 0 20px ${m.glowColor}` }}
                       >
                         <div className="absolute top-0 right-0 -mt-2.5 -mr-2 bg-gold text-navy-dark text-[9px] font-black tracking-widest px-2.5 py-0.5 rounded-full uppercase">
                           {t("PRESIDENT", "الرئيس")}
                         </div>
                         {/* Avatar container */}
-                        <TeamAvatar member={m} className="w-16 h-16 text-2xl" />
-                        <h4 className="font-display font-black text-lg mt-3">{t(m.nameEn, m.nameAr)}</h4>
-                        <p className="text-[10px] font-black tracking-widest text-gold uppercase mt-0.5">{t(m.roleEn, m.roleAr)}</p>
+                        <TeamAvatar member={m} className="w-14 h-14 text-xl" />
+                        <h4 className="font-display font-black text-base mt-2.5">{t(m.nameEn, m.nameAr)}</h4>
+                        <p className="text-[9px] font-black tracking-widest text-gold uppercase mt-0.5">{t(m.roleEn, m.roleAr)}</p>
                       </motion.div>
 
                       {/* Branch Trunk Downwards (Perfectly aligned center CSS line) */}
-                      <div className="w-0.5 h-12 bg-gradient-to-b from-gold to-border" />
+                      <div className="w-0.5 h-12 bg-gradient-to-b from-gold to-border hidden lg:block" />
                     </div>
                   ))}
                 </div>
@@ -298,19 +302,19 @@ export default function About() {
                 {/* EXECUTIVE LEVEL 2: VPs (Split branches) */}
                 <div className="w-full flex flex-col items-center">
                   {/* Left & Right branches horizontal bridge */}
-                  <div className="w-1/2 md:w-3/5 h-0.5 bg-border relative">
+                  <div className="w-1/2 h-0.5 bg-border relative hidden lg:block">
                     <div className="absolute left-0 w-0.5 h-6 bg-border" />
                     <div className="absolute right-0 w-0.5 h-6 bg-border" />
                   </div>
                   
                   {/* VP Nodes */}
-                  <div className="flex justify-between w-full md:w-4/5 pt-6 pb-8">
+                  <div className="grid grid-cols-2 w-full max-w-[340px] md:max-w-none md:w-4/5 justify-items-center pt-6 pb-8 gap-4">
                     {team.filter(m => m.tier === "executive" && m.roleEn !== "President").map((m) => (
-                      <div key={m.nameEn} className="flex flex-col items-center w-1/2 relative">
+                      <div key={m.nameEn} className="flex flex-col items-center w-full relative">
                         <motion.div 
                           whileHover={{ scale: 1.05, y: -4 }}
                           onClick={() => setSelectedMember(m)}
-                          className="relative flex flex-col items-center bg-card border border-gold/25 rounded-2xl px-5 py-4 cursor-pointer shadow-md transition-all duration-300 w-48 text-foreground z-10"
+                          className="relative flex flex-col items-center bg-card border border-gold/25 rounded-2xl px-4 py-3.5 cursor-pointer shadow-md transition-all duration-300 w-40 text-foreground z-10"
                           style={{ boxShadow: `0 0 12px ${m.glowColor}` }}
                         >
                           {/* Small Leaf icon attached to the VP pod */}
@@ -318,19 +322,19 @@ export default function About() {
                             <LeafIcon className="w-4 h-4 rotate-12" />
                           </div>
 
-                          <TeamAvatar member={m} className="w-14 h-14 text-lg" />
-                          <h4 className="font-display font-bold text-base mt-3">{t(m.nameEn, m.nameAr)}</h4>
-                          <p className="text-[9px] font-bold tracking-widest text-gold uppercase mt-0.5">{t(m.roleEn, m.roleAr)}</p>
+                          <TeamAvatar member={m} className="w-12 h-12 text-lg" />
+                          <h4 className="font-display font-bold text-sm mt-2.5">{t(m.nameEn, m.nameAr)}</h4>
+                          <p className="text-[8px] font-bold tracking-widest text-gold uppercase mt-0.5">{t(m.roleEn, m.roleAr)}</p>
                         </motion.div>
 
                         {/* Connection downward line */}
-                        <div className="w-0.5 h-8 bg-border" />
+                        <div className="w-0.5 h-8 bg-border hidden lg:block" />
                       </div>
                     ))}
                   </div>
 
                   {/* Horizontal Bridge to Central Admin Hub */}
-                  <div className="w-1/2 md:w-3/5 h-0.5 bg-border relative -mt-8">
+                  <div className="w-1/2 h-0.5 bg-border relative -mt-8 hidden lg:block">
                     {/* Centered pipeline going down */}
                     <div className="absolute left-1/2 transform -translate-x-1/2 w-0.5 h-8 bg-border" />
                   </div>
@@ -343,38 +347,38 @@ export default function About() {
                   </span>
 
                   {/* Horizontal Bridge for 4 columns */}
-                  <div className="w-4/5 h-0.5 bg-border relative">
+                  <div className="w-full h-0.5 bg-border relative hidden lg:block">
                     <div className="absolute left-[12.5%] w-0.5 h-6 bg-border" />
                     <div className="absolute left-[37.5%] w-0.5 h-6 bg-border" />
                     <div className="absolute left-[62.5%] w-0.5 h-6 bg-border" />
                     <div className="absolute left-[87.5%] w-0.5 h-6 bg-border" />
                   </div>
 
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-6 w-full pt-6 pb-8">
+                  <div className="grid grid-cols-2 lg:grid-cols-4 w-full justify-items-center gap-4 lg:gap-6 pt-6 pb-8">
                     {team.filter(m => m.tier === "admin").map((m) => (
                       <div key={m.nameEn} className="flex flex-col items-center relative">
                         <motion.div 
                           whileHover={{ scale: 1.05, y: -4 }}
                           onClick={() => setSelectedMember(m)}
-                          className="relative flex flex-col items-center bg-card border border-blue-500/20 rounded-2xl p-4 cursor-pointer shadow-sm transition-all duration-300 text-foreground w-40 z-10"
+                          className="relative flex flex-col items-center bg-card border border-blue-500/20 rounded-2xl p-3 cursor-pointer shadow-sm transition-all duration-300 text-foreground w-32 z-10"
                           style={{ boxShadow: `0 0 8px ${m.glowColor}` }}
                         >
                           <div className="absolute -top-1.5 -left-1.5 text-emerald-500">
                             <LeafIcon className="w-3.5 h-3.5 -rotate-12" />
                           </div>
 
-                          <TeamAvatar member={m} className="w-12 h-12 text-base" />
-                          <h4 className="font-bold text-sm mt-3">{t(m.nameEn, m.nameAr)}</h4>
-                          <p className="text-[9px] font-medium tracking-tight text-blue-500 dark:text-blue-400 uppercase mt-0.5">{t(m.roleEn, m.roleAr)}</p>
+                          <TeamAvatar member={m} className="w-10 h-10 text-base" />
+                          <h4 className="font-bold text-xs mt-2">{t(m.nameEn, m.nameAr)}</h4>
+                          <p className="text-[8px] font-medium tracking-tight text-blue-500 dark:text-blue-400 uppercase mt-0.5">{t(m.roleEn, m.roleAr)}</p>
                         </motion.div>
                         
-                        <div className="w-0.5 h-8 bg-border" />
+                        <div className="w-0.5 h-8 bg-border hidden lg:block" />
                       </div>
                     ))}
                   </div>
 
                   {/* Horizontal Bridge to Operations */}
-                  <div className="w-4/5 h-0.5 bg-border relative -mt-8">
+                  <div className="w-full h-0.5 bg-border relative -mt-8 hidden lg:block">
                     <div className="absolute left-1/2 transform -translate-x-1/2 w-0.5 h-8 bg-border" />
                   </div>
                 </div>
@@ -386,7 +390,7 @@ export default function About() {
                   </span>
 
                   {/* Horizontal Bridge for 5 columns */}
-                  <div className="w-[90%] h-0.5 bg-border relative">
+                  <div className="w-full h-0.5 bg-border relative hidden lg:block">
                     <div className="absolute left-[10%] w-0.5 h-6 bg-border" />
                     <div className="absolute left-[30%] w-0.5 h-6 bg-border" />
                     <div className="absolute left-[50%] w-0.5 h-6 bg-border" />
@@ -394,69 +398,69 @@ export default function About() {
                     <div className="absolute left-[90%] w-0.5 h-6 bg-border" />
                   </div>
 
-                  <div className="grid grid-cols-2 md:grid-cols-5 gap-4 w-full pt-6 pb-8">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 w-full justify-items-center gap-4 lg:gap-4 pt-6 pb-8">
                     {team.filter(m => m.tier === "ops").map((m) => (
                       <div key={m.nameEn} className="flex flex-col items-center relative">
                         <motion.div 
                           whileHover={{ scale: 1.05, y: -4 }}
                           onClick={() => setSelectedMember(m)}
-                          className="relative flex flex-col items-center bg-card border border-teal-500/20 rounded-2xl p-4 cursor-pointer shadow-sm transition-all duration-300 text-foreground w-32 z-10"
+                          className="relative flex flex-col items-center bg-card border border-teal-500/20 rounded-2xl p-2 md:p-4 cursor-pointer shadow-sm transition-all duration-300 text-foreground w-20 md:w-32 z-10"
                           style={{ boxShadow: `0 0 8px ${m.glowColor}` }}
                         >
                           <div className="absolute -top-1.5 -left-1.5 text-emerald-500/70">
-                            <LeafIcon className="w-3 h-3 rotate-45" />
+                            <LeafIcon className="w-2.5 h-2.5 rotate-45" />
                           </div>
 
-                          <TeamAvatar member={m} className="w-11 h-11 text-sm" />
-                          <h4 className="font-semibold text-xs mt-3">{t(m.nameEn, m.nameAr)}</h4>
-                          <p className="text-[8px] font-medium text-teal-600 dark:text-teal-300 uppercase tracking-tighter mt-1 text-center leading-none">{t(m.roleEn, m.roleAr)}</p>
+                          <TeamAvatar member={m} className="w-7 h-7 text-xs md:w-11 md:h-11 md:text-sm" />
+                          <h4 className="font-semibold text-[9px] md:text-xs mt-2 md:mt-3">{t(m.nameEn, m.nameAr)}</h4>
+                          <p className="text-[7px] md:text-[8px] font-medium text-teal-600 dark:text-teal-300 uppercase tracking-tighter mt-1 text-center leading-none">{t(m.roleEn, m.roleAr)}</p>
                         </motion.div>
                         
-                        <div className="w-0.5 h-8 bg-border" />
+                        <div className="w-0.5 h-6 bg-border hidden lg:block" />
                       </div>
                     ))}
                   </div>
 
                   {/* Horizontal Bridge to Advisors */}
-                  <div className="w-[90%] h-0.5 bg-border relative -mt-8">
-                    <div className="absolute left-1/2 transform -translate-x-1/2 w-0.5 h-8 bg-border" />
+                  <div className="w-full h-0.5 bg-border relative -mt-6 hidden lg:block">
+                    <div className="absolute left-1/2 transform -translate-x-1/2 w-0.5 h-6 bg-border" />
                   </div>
                 </div>
 
                 {/* TIER 5: General Advisors */}
-                <div className="w-full pt-8 flex flex-col items-center">
-                  <span className="px-3 py-1 bg-purple-500/10 text-purple-600 border border-purple-500/20 text-[9px] font-black uppercase tracking-widest rounded-full dark:text-purple-400 mb-6 z-10">
+                <div className="w-full pt-6 flex flex-col items-center">
+                  <span className="px-3 py-1 bg-purple-500/10 text-purple-600 border border-purple-500/20 text-[8px] font-black uppercase tracking-widest rounded-full dark:text-purple-400 mb-4 z-10">
                     {t("GENERAL ADVISORS", "المستشارون العامون")}
                   </span>
 
                   {/* Horizontal Bridge for 4 columns */}
-                  <div className="w-4/5 h-0.5 bg-border relative">
-                    <div className="absolute left-[12.5%] w-0.5 h-6 bg-border" />
-                    <div className="absolute left-[37.5%] w-0.5 h-6 bg-border" />
-                    <div className="absolute left-[62.5%] w-0.5 h-6 bg-border" />
-                    <div className="absolute left-[87.5%] w-0.5 h-6 bg-border" />
+                  <div className="w-full h-0.5 bg-border relative hidden lg:block">
+                    <div className="absolute left-[12.5%] w-0.5 h-4 bg-border" />
+                    <div className="absolute left-[37.5%] w-0.5 h-4 bg-border" />
+                    <div className="absolute left-[62.5%] w-0.5 h-4 bg-border" />
+                    <div className="absolute left-[87.5%] w-0.5 h-4 bg-border" />
                   </div>
 
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-6 w-full pt-6 pb-8">
+                  <div className="grid grid-cols-2 lg:grid-cols-4 w-full justify-items-center gap-4 lg:gap-6 pt-4 pb-6">
                     {team.filter(m => m.tier === "advisors").map((m) => (
                       <div key={m.nameEn} className="flex flex-col items-center relative">
                         <motion.div 
                           whileHover={{ scale: 1.05, y: -4 }}
                           onClick={() => setSelectedMember(m)}
-                          className="relative flex flex-col items-center bg-card border border-purple-500/20 rounded-2xl p-4 cursor-pointer shadow-sm transition-all duration-300 text-foreground w-36 z-10"
+                          className="relative flex flex-col items-center bg-card border border-purple-500/20 rounded-2xl p-3 md:p-4 cursor-pointer shadow-sm transition-all duration-300 text-foreground w-28 md:w-36 z-10"
                           style={{ boxShadow: `0 0 8px ${m.glowColor}` }}
                         >
                           <div className="absolute -top-1.5 -left-1.5 text-emerald-500/70">
                             <LeafIcon className="w-3.5 h-3.5 -rotate-45" />
                           </div>
 
-                          <TeamAvatar member={m} className="w-10 h-10 text-xs" />
-                          <h4 className="font-semibold text-xs mt-3">{t(m.nameEn, m.nameAr)}</h4>
-                          <p className="text-[8px] font-medium text-purple-600 dark:text-purple-300 uppercase mt-0.5">{t(m.roleEn, m.roleAr)}</p>
+                          <TeamAvatar member={m} className="w-8 h-8 text-xs md:w-10 md:h-10 md:text-xs" />
+                          <h4 className="font-semibold text-[10px] md:text-xs mt-2 md:mt-3">{t(m.nameEn, m.nameAr)}</h4>
+                          <p className="text-[7px] md:text-[8px] font-medium text-purple-600 dark:text-purple-300 uppercase mt-0.5">{t(m.roleEn, m.roleAr)}</p>
                         </motion.div>
                         
                         {/* Final trunk segment leading to the roots */}
-                        <div className="w-0.5 h-10 bg-gradient-to-b from-border to-emerald-500/40" />
+                        <div className="w-0.5 h-10 bg-gradient-to-b from-border to-emerald-500/40 hidden lg:block" />
                       </div>
                     ))}
                   </div>
@@ -465,7 +469,7 @@ export default function About() {
                 {/* THE RACINE (The Roots of the Tree) */}
                 <div className="w-full flex flex-col items-center -mt-8 pt-8">
                   {/* Roots visual merging hub */}
-                  <div className="w-4/5 h-0.5 bg-gradient-to-r from-transparent via-emerald-500/40 to-transparent relative mb-8">
+                  <div className="w-full h-0.5 bg-gradient-to-r from-transparent via-emerald-500/40 to-transparent relative mb-8 hidden lg:block">
                     
                     {/* Roots organic lines branching into the ground */}
                     <div className="absolute left-[20%] w-0.5 h-8 bg-gradient-to-b from-emerald-500/30 to-emerald-500/10 skew-x-12" />
@@ -498,7 +502,7 @@ export default function About() {
             </div>
 
             {/* Right: Dynamic Profile details panel (Spans 4 cols) */}
-            <div className="lg:col-span-4 text-foreground relative self-stretch">
+            <div className="hidden lg:block lg:col-span-4 text-foreground relative self-stretch">
               <AnimatePresence mode="wait">
                 {selectedMember ? (
                   <motion.div 
@@ -583,6 +587,77 @@ export default function About() {
             </div>
 
           </div>
+
+          {/* Mobile Profile Bottom Sheet Modal */}
+          <AnimatePresence>
+            {selectedMember && (
+              <div className="fixed inset-0 bg-background/80 backdrop-blur-md z-[100] flex items-end lg:hidden">
+                <motion.div
+                  initial={{ y: "100%" }}
+                  animate={{ y: 0 }}
+                  exit={{ y: "100%" }}
+                  transition={{ type: "spring", damping: 25, stiffness: 200 }}
+                  className="bg-card border-t border-border w-full max-h-[85vh] rounded-t-3xl p-6 pb-16 relative shadow-2xl text-foreground overflow-y-auto"
+                  style={{ borderTopColor: selectedMember.accent.includes("amber") ? "#C9A84C" : selectedMember.accent.includes("blue") ? "#3B82F6" : selectedMember.accent.includes("teal") ? "#10B981" : "#A855F7" }}
+                >
+                  {/* Close handler drag bar */}
+                  <div className="w-12 h-1.5 bg-muted/30 rounded-full mx-auto mb-6 cursor-pointer" onClick={() => setSelectedMember(null)} />
+                  
+                  {/* Close button */}
+                  <button 
+                    onClick={() => setSelectedMember(null)}
+                    className="absolute top-4 right-4 text-muted-foreground hover:text-foreground transition-colors p-1.5 rounded-full bg-secondary/20 hover:bg-secondary/40"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+
+                  {/* Meta info details */}
+                  <div className="flex flex-col items-center text-center mt-2">
+                    <div className="mb-4">
+                      <TeamAvatar member={selectedMember} className="w-24 h-24 text-3xl" />
+                    </div>
+                    
+                    <h3 className="text-2xl font-display font-black">{t(selectedMember.nameEn, selectedMember.nameAr)}</h3>
+                    <span className="text-xs font-bold text-gold uppercase tracking-widest mt-1 px-3 py-1 rounded-full bg-gold/15 border border-gold/10">
+                      {t(selectedMember.roleEn, selectedMember.roleAr)}
+                    </span>
+                    <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest mt-2">
+                      {t(selectedMember.tier.toUpperCase(), selectedMember.tier.toUpperCase())}
+                    </p>
+                  </div>
+
+                  <hr className="border-border my-6" />
+
+                  <div className="space-y-6">
+                    {/* Biography */}
+                    <div>
+                      <h5 className="text-xs font-black tracking-widest text-muted-foreground uppercase mb-2">
+                        {t("Biography", "السيرة الذاتية")}
+                      </h5>
+                      <p className="text-sm text-muted-foreground leading-relaxed text-left">
+                        {t(selectedMember.descEn, selectedMember.descAr)}
+                      </p>
+                    </div>
+
+                    {/* Missions / Key duties */}
+                    <div>
+                      <h5 className="text-xs font-black tracking-widest text-muted-foreground uppercase mb-3">
+                        {t("Key Responsibilities", "المسؤوليات الرئيسية")}
+                      </h5>
+                      <div className="space-y-2 mb-6">
+                        {(isAr ? selectedMember.missionsAr : selectedMember.missionsEn).map((mission: string, idx: number) => (
+                          <div key={idx} className="flex items-center gap-2 text-sm text-foreground/80">
+                            <ShieldCheck className="w-4 h-4 text-gold shrink-0" />
+                            <span>{mission}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              </div>
+            )}
+          </AnimatePresence>
 
         </div>
       </section>
