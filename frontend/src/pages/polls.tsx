@@ -64,12 +64,12 @@ export default function Polls() {
             className="flex items-center gap-4 mb-8"
           >
             <div className="w-12 h-px bg-gold/50" />
-            <span className="text-gold font-display font-medium uppercase tracking-[0.3em] text-sm">
+            <span className="text-gold font-display font-medium uppercase tracking-[0.2em] sm:tracking-[0.3em] text-xs sm:text-sm">
                {t("Civic Pulse Agency", "وكالة النبض المدني")}
             </span>
           </motion.div>
           
-          <h1 className="text-6xl md:text-8xl font-display font-bold text-white mb-8 leading-[1.1]">
+          <h1 className="text-4xl sm:text-6xl md:text-8xl font-display font-bold text-white mb-8 leading-[1.1]">
             {t("Direct ", "الديمقراطية ")}
             <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-gold to-white">
@@ -77,22 +77,22 @@ export default function Polls() {
             </span>
           </h1>
           
-          <div className="flex flex-wrap gap-12 mt-16">
+          <div className="flex flex-wrap gap-6 sm:gap-12 mt-12 sm:mt-16">
              <div className="space-y-1">
-                <p className="text-white/40 text-sm uppercase font-bold tracking-widest">{t("Live Sessions", "جلسات مباشرة")}</p>
-                <p className="text-4xl text-white font-display font-bold">{activePollsCount}</p>
+                <p className="text-white/40 text-xs sm:text-sm uppercase font-bold tracking-widest">{t("Live Sessions", "جلسات مباشرة")}</p>
+                <p className="text-3xl sm:text-4xl text-white font-display font-bold">{activePollsCount}</p>
              </div>
              <div className="space-y-1">
-                <p className="text-white/40 text-sm uppercase font-bold tracking-widest">{t("Community Impact", "أثر المجتمع")}</p>
-                <p className="text-4xl text-white font-display font-bold">{totalVotesAcrossAll.toLocaleString()}</p>
+                <p className="text-white/40 text-xs sm:text-sm uppercase font-bold tracking-widest">{t("Community Impact", "أثر المجتمع")}</p>
+                <p className="text-3xl sm:text-4xl text-white font-display font-bold">{totalVotesAcrossAll.toLocaleString()}</p>
              </div>
              <div className="space-y-1">
-                <p className="text-white/40 text-sm uppercase font-bold tracking-widest">{t("Quorum Status", "حالة النصاب")}</p>
+                <p className="text-white/40 text-xs sm:text-sm uppercase font-bold tracking-widest">{t("Quorum Status", "حالة النصاب")}</p>
                 <div className="flex items-center gap-3">
-                  <div className="w-24 h-2 bg-white/10 rounded-full overflow-hidden">
-                    <div className="h-full bg-gold w-3/4" />
-                  </div>
-                  <span className="text-gold font-bold">75%</span>
+                   <div className="w-24 h-2 bg-white/10 rounded-full overflow-hidden">
+                     <div className="h-full bg-gold w-3/4" />
+                   </div>
+                   <span className="text-gold font-bold">75%</span>
                 </div>
              </div>
           </div>
