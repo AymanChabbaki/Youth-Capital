@@ -26,19 +26,29 @@ const MOROCCAN_REGIONS = [
   "Moroccan Diaspora / الجالية المغربية",
 ];
 
-const applySchema = z.object({
+const getApplySchema = (step: number) => z.object({
   fullName: z.string().min(2, "Full name is required"),
   fullNameAr: z.string().optional(),
   email: z.string().email("Invalid email address"),
   password: z.string().min(8, "Password must be at least 8 characters"),
   preferredRole: z.enum(["minister", "mp", "local_council", "diaspora_rep"]),
-  region: z.string().min(1, "Region is required"),
+  region: step >= 2 ? z.string().min(1, "Region is required") : z.string().optional().or(z.literal('')),
   ministryPreference: z.string().optional(),
   parliamentHouse: z.enum(["house_of_representatives", "house_of_councillors"]).optional(),
-  motivation: z.string().min(50, "Please provide a detailed motivation (min 50 chars)"),
+  motivation: step >= 3 ? z.string().min(50, "Please provide a detailed motivation (min 50 chars)") : z.string().optional().or(z.literal('')),
 });
 
-type ApplyFormData = z.infer<typeof applySchema>;
+type ApplyFormData = {
+  fullName: string;
+  fullNameAr?: string;
+  email: string;
+  password: string;
+  preferredRole: "minister" | "mp" | "local_council" | "diaspora_rep";
+  region: string;
+  ministryPreference?: string;
+  parliamentHouse?: "house_of_representatives" | "house_of_councillors";
+  motivation: string;
+};
 
 export default function Apply() {
   const { t } = useLanguage();
@@ -52,7 +62,9 @@ export default function Apply() {
   const applyMutation = useSubmitRoleApplication();
 
   const form = useForm<ApplyFormData>({
-    resolver: zodResolver(applySchema),
+    resolver: (data, context, options) => {
+      return zodResolver(getApplySchema(step))(data, context, options);
+    },
     defaultValues: {
       fullName: "",
       fullNameAr: "",
