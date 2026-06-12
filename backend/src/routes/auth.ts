@@ -10,11 +10,12 @@ function hashPassword(password: string): string {
   return crypto.createHash("sha256").update(password + "ycc_salt_2024").digest("hex");
 }
 
+const isProd = process.env.NODE_ENV === "production";
 const COOKIE_OPTIONS = {
   httpOnly: true,
   maxAge: 7 * 24 * 60 * 60 * 1000,
-  sameSite: "none" as const,
-  secure: true, // Required for sameSite: "none"
+  sameSite: isProd ? ("none" as const) : ("lax" as const),
+  secure: isProd,
 };
 
 router.post("/register", async (req, res) => {
