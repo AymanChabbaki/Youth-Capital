@@ -54,7 +54,15 @@ export default function Apply() {
   const form = useForm<ApplyFormData>({
     resolver: zodResolver(applySchema),
     defaultValues: {
+      fullName: "",
+      fullNameAr: "",
+      email: "",
+      password: "",
       preferredRole: "mp",
+      region: "",
+      ministryPreference: "",
+      parliamentHouse: "house_of_representatives",
+      motivation: "",
     }
   });
 
@@ -135,7 +143,7 @@ export default function Apply() {
             </p>
             <a href={communityLink} target="_blank" rel="noopener noreferrer">
                <Button variant="primary" className="w-full h-14 rounded-2xl gap-3 shadow-lg shadow-primary/20 text-md font-black bg-[#25D366] hover:bg-[#1DA851] text-white border-none">
-                  <Globe className="w-5 h-5" />
+                  <img src="/images/whatsapp.png" alt="WhatsApp" className="w-5 h-5" />
                   {t("Join WhatsApp Community", "انضم إلى مجتمع واتساب")}
                </Button>
             </a>
