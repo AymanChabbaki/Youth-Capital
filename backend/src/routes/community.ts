@@ -1,5 +1,5 @@
 import { Router, type IRouter } from "express";
-import { db, forumsTable, postsTable, usersTable, postLikesTable } from "@workspace/db";
+import { db, forumsTable, postsTable, usersTable, postLikesTable, roleApplicationsTable } from "@workspace/db";
 import { eq, and, isNull, sql } from "drizzle-orm";
 import { requireAuth, safeUser } from "../lib/session.js";
 
@@ -30,7 +30,43 @@ async function getPostStats(postId: number, currentUserId?: number) {
 
 router.get("/forums", async (req, res) => {
   try {
-    const forums = await db.select().from(forumsTable);
+    const user = (req as any).user;
+    let forums = await db.select().from(forumsTable);
+
+    if (user && user.role !== "admin") {
+      let userRole = user.simulationRole;
+      let userRegion = user.region;
+
+      if (!userRole) {
+        const [app] = await db
+          .select()
+          .from(roleApplicationsTable)
+          .where(eq(roleApplicationsTable.userId, user.id))
+          .orderBy(sql`${roleApplicationsTable.createdAt} desc`)
+          .limit(1);
+        
+        if (app) {
+          userRole = app.preferredRole;
+          userRegion = app.region;
+        }
+      }
+
+      forums = forums.filter((f) => {
+        if (f.category === "general") return true;
+        if (userRole === "mp" && f.category === "parliament") return true;
+        if (userRole === "minister" && f.category === "ministry") return true;
+        if (userRole === "local_council" && f.category === "regional") {
+          if (userRegion) {
+            const regionKeyword = userRegion.split("-")[0].split(" ")[0];
+            return f.name.includes(userRegion) || f.name.includes(regionKeyword);
+          }
+          return true;
+        }
+        if (userRole === "diaspora_rep" && (f.category === "parliament" || f.category === "regional")) return true;
+        return false;
+      });
+    }
+
     const forumsWithCounts = await Promise.all(
       forums.map(async (forum) => {
         const [{ count }] = await db
