@@ -46,7 +46,7 @@ export default function Apply() {
   const [isSuccess, setIsSuccess] = useState(false);
   const { toast } = useToast();
   
-  const discordLink = import.meta.env.VITE_DISCORD_LINK || "https://discord.gg/example";
+  const communityLink = import.meta.env.VITE_COMMUNITY_LINK || "https://chat.whatsapp.com/LC5mqBrIPXdLJhK6cLJsmu";
 
   const registerMutation = useRegister();
   const applyMutation = useSubmitRoleApplication();
@@ -131,12 +131,12 @@ export default function Apply() {
                <h4 className="font-black text-slate-900 uppercase tracking-widest text-xs">{t("Mandatory Next Step", "الخطوة التالية الإلزامية")}</h4>
             </div>
             <p className="text-sm font-bold text-slate-600 leading-relaxed mb-6">
-               {t("To finalize your candidacy, you MUST join our Discord server and complete the verification form pinned in #onboarding.", "لإكمال ترشيحك، يجب أن تنضم إلى خادم Discord الخاص بنا وتكمل نموذج التحقق المثبت في #onboarding.")}
+               {t("To finalize your candidacy, you MUST join our WhatsApp community to stay updated.", "لإكمال ترشيحك، يجب أن تنضم إلى مجتمع الواتساب الخاص بنا للبقاء على اطلاع.")}
             </p>
-            <a href={discordLink} target="_blank" rel="noopener noreferrer">
-               <Button variant="primary" className="w-full h-14 rounded-2xl gap-3 shadow-lg shadow-primary/20 text-md font-black">
+            <a href={communityLink} target="_blank" rel="noopener noreferrer">
+               <Button variant="primary" className="w-full h-14 rounded-2xl gap-3 shadow-lg shadow-primary/20 text-md font-black bg-[#25D366] hover:bg-[#1DA851] text-white border-none">
                   <Globe className="w-5 h-5" />
-                  {t("Join Official Discord", "انضم إلى Discord الرسمي")}
+                  {t("Join WhatsApp Community", "انضم إلى مجتمع واتساب")}
                </Button>
             </a>
           </motion.div>
@@ -157,7 +157,7 @@ export default function Apply() {
             {t("Join the Simulation", "انضم إلى المحاكاة")}
           </h1>
           <p className="text-muted-foreground">
-            {t("Complete the form below to apply for a role in Youth CapitalCore.", "أكمل النموذج أدناه للتقدم لدور في شباب العاصمة.")}
+            {t("Complete the form below to apply for a role in Youth Capital.", "أكمل النموذج أدناه للتقدم لدور في شباب العاصمة.")}
           </p>
         </div>
 

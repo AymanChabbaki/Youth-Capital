@@ -3,7 +3,7 @@ import { useLanguage } from "@/hooks/use-language";
 import { Button, Card } from "@/components/ui-custom";
 import { Link } from "wouter";
 import { useGetPlatformStats, useGetForums, useGetArticles, useGetPolls } from "@workspace/api-client-react";
-import { Users, FileText, Landmark, ShieldAlert, ArrowRight, Gavel, Briefcase, AlertCircle, Target, Zap, ArrowUp } from "lucide-react";
+import { Users, FileText, Landmark, ShieldAlert, ArrowRight, Gavel, Briefcase, AlertCircle, Target, Zap, ArrowUp, MessageCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function Home() {
@@ -12,7 +12,7 @@ export default function Home() {
   const { data: forumsData } = useGetForums();
   const { data: articlesData } = useGetArticles();
   const { data: pollsData } = useGetPolls();
-  const discordLink = import.meta.env.VITE_DISCORD_LINK || "https://discord.gg/example";
+  const communityLink = import.meta.env.VITE_COMMUNITY_LINK || "https://chat.whatsapp.com/LC5mqBrIPXdLJhK6cLJsmu";
   const [activeFeature, setActiveFeature] = useState(1);
   const [activeCommunity, setActiveCommunity] = useState(1);
   const [showScrollTop, setShowScrollTop] = useState(false);
@@ -162,7 +162,7 @@ export default function Home() {
                 viewport={{ once: true }}
                 className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gold/10 border border-gold/20 mb-6 text-gold text-xs font-bold uppercase tracking-widest"
               >
-                {t("About Youth CapitalCore", "حول منصتنا")}
+                {t("About Youth Capital", "حول منصتنا")}
               </motion.div>
               <motion.h2
                 initial={{ opacity: 0, x: -20 }}
@@ -182,7 +182,7 @@ export default function Home() {
                 className="text-muted-foreground text-base md:text-lg mb-8 leading-relaxed"
               >
                 {t(
-                  "Youth CapitalCore is Morocco's premier digital sandbox for civic empowerment. We bridge the gap between young minds and national governance institutions, offering a dynamic, real-time environment to shape tomorrow's leaders.",
+                  "Youth Capital is Morocco's premier digital sandbox for civic empowerment. We bridge the gap between young minds and national governance institutions, offering a dynamic, real-time environment to shape tomorrow's leaders.",
                   "منصتنا هي المساحة الرقمية الرائدة في المغرب لتمكين الشباب مدنياً. نحن نسد الفجوة بين العقول الشابة ومؤسسات الحوكمة الوطنية، ونقدم بيئة تفاعلية ديناميكية لصنع قادة الغد."
                 )}
               </motion.p>
@@ -648,21 +648,19 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Discord Simulations Section */}
-      <section className="py-24 px-4 bg-[#5865F2]/5 relative overflow-hidden border-t border-[#5865F2]/20">
+      {/* WhatsApp Community Section */}
+      <section className="py-24 px-4 bg-[#25D366]/5 relative overflow-hidden border-t border-[#25D366]/20">
         {/* Background blobs */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-[#5865F2]/10 rounded-full blur-[100px] z-0" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-[#25D366]/10 rounded-full blur-[100px] z-0" />
         
         <div className="max-w-5xl mx-auto relative z-10 text-center flex flex-col items-center">
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
-            className="w-16 h-16 bg-[#5865F2] rounded-3xl flex items-center justify-center shadow-lg shadow-[#5865F2]/30 mb-8"
+            className="w-16 h-16 bg-[#25D366] rounded-3xl flex items-center justify-center shadow-lg shadow-[#25D366]/30 mb-8"
           >
-            <svg className="w-9 h-9 text-white fill-current" viewBox="0 0 127.14 96.36">
-              <path d="M107.7,8.07A105.15,105.15,0,0,0,77.26,0a77.19,77.19,0,0,0-3.3,6.83A96.67,96.67,0,0,0,52.88,6.83,77.19,77.19,0,0,0,49.58,0,105.15,105.15,0,0,0,19.14,8.07C2.81,32.22-1.71,55.77.47,79A105.73,105.73,0,0,0,32,96.36a77.7,77.7,0,0,0,6.63-10.85,68.43,68.43,0,0,1-10.4-5c.9-.66,1.76-1.35,2.58-2.07a75.18,75.18,0,0,0,72.6,0c.82.72,1.68,1.41,2.58,2.07a68.43,68.43,0,0,1-10.4,5,77.7,77.7,0,0,0,6.63,10.85,105.73,105.73,0,0,0,31.57-17.36C129.66,50.25,124.6,26.91,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53S36.18,40.36,42.45,40.36,53.83,46,53.83,53,48.72,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.24,60,73.24,53S78.41,40.36,84.69,40.36,96.07,46,96.07,53,91,65.69,84.69,65.69Z"/>
-            </svg>
+            <MessageCircle className="w-9 h-9 text-white" />
           </motion.div>
 
           <motion.h2
@@ -671,7 +669,7 @@ export default function Home() {
             viewport={{ once: true }}
             className="text-3xl md:text-5xl font-display font-black text-foreground mb-6"
           >
-            {t("Join Live Debates on Discord", "انضم للمحاكاة المباشرة على ديسكورد")}
+            {t("Join the Community on WhatsApp", "انضم إلى مجتمعنا على واتساب")}
           </motion.h2>
 
           <motion.p
@@ -682,8 +680,8 @@ export default function Home() {
             className="text-muted-foreground text-lg md:text-xl max-w-2xl mb-12 leading-relaxed"
           >
             {t(
-              "Our simulations are fully active on Discord! Connect with hundreds of other Moroccan youth, join live voice chambers, vote on real-time crisis scenarios, and coordinate your ministerial efforts directly.",
-              "محاكاتنا نشطة بالكامل على ديسكورد! تواصل مع المئات من الشباب المغربي الآخر، وانضم إلى الغرف الصوتية المباشرة، وصوت على سيناريوهات الأزمات في الوقت الفعلي."
+              "Our community is fully active on WhatsApp! Connect with hundreds of other Moroccan youth, join live discussions, vote on real-time crisis scenarios, and coordinate your ministerial efforts directly.",
+              "مجتمعنا نشط بالكامل على واتساب! تواصل مع المئات من الشباب المغربي الآخر، وانضم إلى النقاشات المباشرة، وصوت على سيناريوهات الأزمات في الوقت الفعلي."
             )}
           </motion.p>
 
@@ -694,15 +692,13 @@ export default function Home() {
             transition={{ delay: 0.2 }}
           >
             <a
-              href={discordLink}
+              href={communityLink}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-4 bg-[#5865F2] text-white text-xl font-bold px-12 py-5 rounded-[2rem] shadow-[0_8px_0_#4752c4] hover:shadow-[0_6px_0_#4752c4] active:shadow-none active:translate-y-[8px] hover:translate-y-[2px] transition-all transform duration-150 group"
+              className="inline-flex items-center gap-4 bg-[#25D366] text-white text-xl font-bold px-12 py-5 rounded-[2rem] shadow-[0_8px_0_#1DA851] hover:shadow-[0_6px_0_#1DA851] active:shadow-none active:translate-y-[8px] hover:translate-y-[2px] transition-all transform duration-150 group"
             >
-              <svg className="w-7 h-7 text-white fill-current group-hover:scale-110 transition-transform" viewBox="0 0 127.14 96.36">
-                <path d="M107.7,8.07A105.15,105.15,0,0,0,77.26,0a77.19,77.19,0,0,0-3.3,6.83A96.67,96.67,0,0,0,52.88,6.83,77.19,77.19,0,0,0,49.58,0,105.15,105.15,0,0,0,19.14,8.07C2.81,32.22-1.71,55.77.47,79A105.73,105.73,0,0,0,32,96.36a77.7,77.7,0,0,0,6.63-10.85,68.43,68.43,0,0,1-10.4-5c.9-.66,1.76-1.35,2.58-2.07a75.18,75.18,0,0,0,72.6,0c.82.72,1.68,1.41,2.58,2.07a68.43,68.43,0,0,1-10.4,5,77.7,77.7,0,0,0,6.63,10.85,105.73,105.73,0,0,0,31.57-17.36C129.66,50.25,124.6,26.91,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53S36.18,40.36,42.45,40.36,53.83,46,53.83,53,48.72,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.24,60,73.24,53S78.41,40.36,84.69,40.36,96.07,46,96.07,53,91,65.69,84.69,65.69Z"/>
-              </svg>
-              {t("Join Simulation Server", "انضم لخادم المحاكاة")}
+              <MessageCircle className="w-7 h-7 text-white group-hover:scale-110 transition-transform" />
+              {t("Join WhatsApp Community", "انضم لمجتمع الواتساب")}
             </a>
           </motion.div>
         </div>

@@ -124,8 +124,8 @@ export default function About() {
           </h1>
           <p className="text-xl text-white/70 max-w-2xl mx-auto leading-relaxed">
             {t(
-              "Youth CapitalCore is Morocco's first digital civic governance simulation platform : built to give ambitious young people an authentic experience of how government works.",
-              "Youth CapitalCore هي أول منصة مغربية لمحاكاة الحوكمة المدنية الرقمية : بُنيت لمنح الشباب الطموح تجربة حقيقية لكيفية عمل الحكومة."
+              "Youth Capital is Morocco's first digital civic governance simulation platform : built to give ambitious young people an authentic experience of how government works.",
+              "Youth Capital هي أول منصة مغربية لمحاكاة الحوكمة المدنية الرقمية : بُنيت لمنح الشباب الطموح تجربة حقيقية لكيفية عمل الحكومة."
             )}
           </p>
         </div>
@@ -152,8 +152,8 @@ export default function About() {
             </h2>
             <p className="text-muted-foreground max-w-xl mx-auto">
               {t(
-                "Four core pillars define the Youth CapitalCore experience.",
-                "أربعة محاور أساسية تحدد تجربة Youth CapitalCore."
+                "Four core pillars define the Youth Capital experience.",
+                "أربعة محاور أساسية تحدد تجربة Youth Capital."
               )}
             </p>
           </div>
@@ -187,8 +187,8 @@ export default function About() {
               </h2>
               <p className="text-muted-foreground leading-relaxed mb-4">
                 {t(
-                  "Youth CapitalCore was born from a simple belief: that young Moroccans have the intelligence, passion, and drive to lead : they just need the right stage to practice.",
-                  "وُلد Youth CapitalCore من إيمان بسيط: أن الشباب المغربي يمتلك الذكاء والشغف والطموح للقيادة : وكل ما يحتاجونه هو المنصة الصحيحة للتدرب."
+                  "Youth Capital was born from a simple belief: that young Moroccans have the intelligence, passion, and drive to lead : they just need the right stage to practice.",
+                  "وُلد Youth Capital من إيمان بسيط: أن الشباب المغربي يمتلك الذكاء والشغف والطموح للقيادة : وكل ما يحتاجونه هو المنصة الصحيحة للتدرب."
                 )}
               </p>
               <p className="text-muted-foreground leading-relaxed mb-6">
