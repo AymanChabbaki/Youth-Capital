@@ -216,6 +216,7 @@ export default function Apply() {
                   <div>
                     <Label>{t("Password", "كلمة المرور")}</Label>
                     <Input type="password" {...form.register("password")} error={form.formState.errors.password?.message} />
+                    <p className="text-xs text-muted-foreground mt-1.5">{t("Minimum 8 characters", "8 أحرف كحد أدنى")}</p>
                   </div>
                   <Button type="button" onClick={nextStep} className="w-full mt-6">{t("Next Step", "الخطوة التالية")}</Button>
                 </motion.div>
@@ -275,6 +276,7 @@ export default function Apply() {
                       error={form.formState.errors.motivation?.message}
                       className="h-40"
                     />
+                    <p className="text-xs text-muted-foreground mt-1.5">{t("Minimum 50 characters required.", "مطلوب 50 حرفاً كحد أدنى.")}</p>
                   </div>
                   <div className="flex gap-4 mt-6">
                     <Button type="button" variant="outline" onClick={() => setStep(2)} className="w-full">{t("Back", "رجوع")}</Button>
