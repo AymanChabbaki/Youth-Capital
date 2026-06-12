@@ -27,7 +27,7 @@ export default function Privacy() {
       titleEn: "2. How We Use Your Information",
       titleAr: "2. كيف نستخدم معلوماتك",
       contentEn: [
-        "To operate and improve the Youth CapitalCore simulation platform.",
+        "To operate and improve the Youth Capital simulation platform.",
         "To assign and manage simulation roles based on your application and performance.",
         "To facilitate community discussions, voting, and crisis scenarios.",
         "To send you platform-related notifications (role assignments, event reminders, crisis alerts).",
@@ -35,7 +35,7 @@ export default function Privacy() {
         "To detect and prevent fraud, abuse, or violations of our Simulation Rules.",
       ],
       contentAr: [
-        "لتشغيل منصة محاكاة Youth CapitalCore وتحسينها.",
+        "لتشغيل منصة محاكاة Youth Capital وتحسينها.",
         "لتعيين وإدارة أدوار المحاكاة بناءً على طلبك وأدائك.",
         "لتيسير نقاشات المجتمع والتصويت وسيناريوهات الأزمات.",
         "لإرسال إشعارات متعلقة بالمنصة (تعيين الأدوار، تذكيرات الفعاليات، تنبيهات الأزمات).",
@@ -199,8 +199,8 @@ export default function Privacy() {
       <section className="py-10 px-4 bg-muted/30 text-center">
         <p className="text-sm text-muted-foreground max-w-2xl mx-auto">
           {t(
-            "This Privacy Policy applies to all users of the Youth CapitalCore platform. By registering and using the platform, you agree to the collection and use of information as described herein.",
-            "تنطبق سياسة الخصوصية هذه على جميع مستخدمي منصة Youth CapitalCore. بالتسجيل واستخدام المنصة، فإنك توافق على جمع المعلومات واستخدامها على النحو الموضح هنا."
+            "This Privacy Policy applies to all users of the Youth Capital platform. By registering and using the platform, you agree to the collection and use of information as described herein.",
+            "تنطبق سياسة الخصوصية هذه على جميع مستخدمي منصة Youth Capital. بالتسجيل واستخدام المنصة، فإنك توافق على جمع المعلومات واستخدامها على النحو الموضح هنا."
           )}
         </p>
       </section>

@@ -18,7 +18,9 @@ import {
   Instagram,
   Facebook,
   Linkedin,
-  Send
+  Send,
+  MessageCircle,
+  Youtube
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useLogout } from "@workspace/api-client-react";
@@ -108,22 +110,28 @@ function Navbar() {
             {/* Social Media Icons Desktop */}
             <div className="hidden md:flex flex-col items-center mr-1 gap-0.5">
               <div className="flex items-center gap-1">
-                <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="p-1 rounded-lg text-muted-foreground/80 hover:text-accent transition-colors hover:bg-white/5" title="Twitter / X">
+                <a href="https://x.com/youthcapitalhq" target="_blank" rel="noopener noreferrer" className="p-1 rounded-lg text-muted-foreground/80 hover:text-accent transition-colors hover:bg-white/5" title="Twitter / X">
                   <Twitter className="w-3.5 h-3.5" />
                 </a>
-                <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="p-1 rounded-lg text-muted-foreground/80 hover:text-accent transition-colors hover:bg-white/5" title="Facebook">
+                <a href="https://www.facebook.com/youthcapital" target="_blank" rel="noopener noreferrer" className="p-1 rounded-lg text-muted-foreground/80 hover:text-accent transition-colors hover:bg-white/5" title="Facebook">
                   <Facebook className="w-3.5 h-3.5" />
                 </a>
-                <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="p-1 rounded-lg text-muted-foreground/80 hover:text-accent transition-colors hover:bg-white/5" title="Instagram">
+                <a href="https://www.instagram.com/youthcapitalhq" target="_blank" rel="noopener noreferrer" className="p-1 rounded-lg text-muted-foreground/80 hover:text-accent transition-colors hover:bg-white/5" title="Instagram">
                   <Instagram className="w-3.5 h-3.5" />
                 </a>
-                <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="p-1 rounded-lg text-muted-foreground/80 hover:text-accent transition-colors hover:bg-white/5" title="LinkedIn">
+                <a href="https://www.linkedin.com/company/youthcapitalhq" target="_blank" rel="noopener noreferrer" className="p-1 rounded-lg text-muted-foreground/80 hover:text-accent transition-colors hover:bg-white/5" title="LinkedIn">
                   <Linkedin className="w-3.5 h-3.5" />
                 </a>
-                <a href="https://discord.gg/example" target="_blank" rel="noopener noreferrer" className="p-1 rounded-lg text-muted-foreground/80 hover:text-accent transition-colors hover:bg-white/5 flex items-center justify-center" title="Discord">
-                  <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 127.14 96.36">
-                    <path d="M107.7,8.07A105.15,105.15,0,0,0,77.26,0a77.19,77.19,0,0,0-3.3,6.83A96.67,96.67,0,0,0,52.88,6.83,77.19,77.19,0,0,0,49.58,0,105.15,105.15,0,0,0,19.14,8.07C2.81,32.22-1.71,55.77.47,79A105.73,105.73,0,0,0,32,96.36a77.7,77.7,0,0,0,6.63-10.85,68.43,68.43,0,0,1-10.4-5c.9-.66,1.76-1.35,2.58-2.07a75.18,75.18,0,0,0,72.6,0c.82.72,1.68,1.41,2.58,2.07a68.43,68.43,0,0,1-10.4,5,77.7,77.7,0,0,0,6.63,10.85,105.73,105.73,0,0,0,31.57-17.36C129.66,50.25,124.6,26.91,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53S36.18,40.36,42.45,40.36,53.83,46,53.83,53,48.72,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.24,60,73.24,53S78.41,40.36,84.69,40.36,96.07,46,96.07,53,91,65.69,84.69,65.69Z"/>
+                <a href="https://www.tiktok.com/@youthcapitalhq" target="_blank" rel="noopener noreferrer" className="p-1 rounded-lg text-muted-foreground/80 hover:text-accent transition-colors hover:bg-white/5 flex items-center justify-center" title="TikTok">
+                  <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 448 512">
+                    <path d="M448,209.91a210.06,210.06,0,0,1-122.77-39.25V349.38A162.55,162.55,0,1,1,185,188.31V278.2a74.62,74.62,0,1,0,52.23,71.18V0l88,0a121.18,121.18,0,0,0,1.86,22.17h0A122.18,122.18,0,0,0,381,102.39a121.43,121.43,0,0,0,67,20.14Z"/>
                   </svg>
+                </a>
+                <a href="https://www.youtube.com/@youthcapitalhq" target="_blank" rel="noopener noreferrer" className="p-1 rounded-lg text-muted-foreground/80 hover:text-accent transition-colors hover:bg-white/5" title="YouTube">
+                  <Youtube className="w-3.5 h-3.5" />
+                </a>
+                <a href="https://chat.whatsapp.com/LC5mqBrIPXdLJhK6cLJsmu" target="_blank" rel="noopener noreferrer" className="p-1 rounded-lg text-muted-foreground/80 hover:text-accent transition-colors hover:bg-white/5 flex items-center justify-center" title="WhatsApp Community">
+                  <MessageCircle className="w-3.5 h-3.5" />
                 </a>
               </div>
               <span className="text-[7.5px] font-black tracking-widest text-muted-foreground/50 uppercase select-none mt-0.5 leading-none">{t("Follow Us", "تابعنا")}</span>
@@ -215,23 +223,29 @@ function Navbar() {
                     <div className="mt-8 pt-8 border-t border-white/5 space-y-4">
                       {/* Social Media Icons Mobile Sheet */}
                       <div className="flex flex-col items-center gap-1 py-2">
-                        <div className="flex justify-center gap-4">
-                          <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="p-2.5 text-muted-foreground hover:text-accent transition-colors bg-white/5 rounded-xl border border-white/10 flex items-center justify-center">
+                        <div className="flex justify-center gap-2 flex-wrap">
+                          <a href="https://x.com/youthcapitalhq" target="_blank" rel="noopener noreferrer" className="p-2.5 text-muted-foreground hover:text-accent transition-colors bg-white/5 rounded-xl border border-white/10 flex items-center justify-center">
                             <Twitter className="w-5 h-5" />
                           </a>
-                          <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="p-2.5 text-muted-foreground hover:text-accent transition-colors bg-white/5 rounded-xl border border-white/10 flex items-center justify-center">
+                          <a href="https://www.facebook.com/youthcapital" target="_blank" rel="noopener noreferrer" className="p-2.5 text-muted-foreground hover:text-accent transition-colors bg-white/5 rounded-xl border border-white/10 flex items-center justify-center">
                             <Facebook className="w-5 h-5" />
                           </a>
-                          <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="p-2.5 text-muted-foreground hover:text-accent transition-colors bg-white/5 rounded-xl border border-white/10 flex items-center justify-center">
+                          <a href="https://www.instagram.com/youthcapitalhq" target="_blank" rel="noopener noreferrer" className="p-2.5 text-muted-foreground hover:text-accent transition-colors bg-white/5 rounded-xl border border-white/10 flex items-center justify-center">
                             <Instagram className="w-5 h-5" />
                           </a>
-                          <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="p-2.5 text-muted-foreground hover:text-accent transition-colors bg-white/5 rounded-xl border border-white/10 flex items-center justify-center">
+                          <a href="https://www.linkedin.com/company/youthcapitalhq" target="_blank" rel="noopener noreferrer" className="p-2.5 text-muted-foreground hover:text-accent transition-colors bg-white/5 rounded-xl border border-white/10 flex items-center justify-center">
                             <Linkedin className="w-5 h-5" />
                           </a>
-                          <a href="https://discord.gg/example" target="_blank" rel="noopener noreferrer" className="p-2.5 text-muted-foreground hover:text-accent transition-colors bg-white/5 rounded-xl border border-white/10 flex items-center justify-center">
-                            <svg className="w-5 h-5 fill-current" viewBox="0 0 127.14 96.36">
-                              <path d="M107.7,8.07A105.15,105.15,0,0,0,77.26,0a77.19,77.19,0,0,0-3.3,6.83A96.67,96.67,0,0,0,52.88,6.83,77.19,77.19,0,0,0,49.58,0,105.15,105.15,0,0,0,19.14,8.07C2.81,32.22-1.71,55.77.47,79A105.73,105.73,0,0,0,32,96.36a77.7,77.7,0,0,0,6.63-10.85,68.43,68.43,0,0,1-10.4-5c.9-.66,1.76-1.35,2.58-2.07a75.18,75.18,0,0,0,72.6,0c.82.72,1.68,1.41,2.58,2.07a68.43,68.43,0,0,1-10.4,5,77.7,77.7,0,0,0,6.63,10.85,105.73,105.73,0,0,0,31.57-17.36C129.66,50.25,124.6,26.91,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53S36.18,40.36,42.45,40.36,53.83,46,53.83,53,48.72,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.24,60,73.24,53S78.41,40.36,84.69,40.36,96.07,46,96.07,53,91,65.69,84.69,65.69Z"/>
+                          <a href="https://www.tiktok.com/@youthcapitalhq" target="_blank" rel="noopener noreferrer" className="p-2.5 text-muted-foreground hover:text-accent transition-colors bg-white/5 rounded-xl border border-white/10 flex items-center justify-center">
+                            <svg className="w-5 h-5 fill-current" viewBox="0 0 448 512">
+                              <path d="M448,209.91a210.06,210.06,0,0,1-122.77-39.25V349.38A162.55,162.55,0,1,1,185,188.31V278.2a74.62,74.62,0,1,0,52.23,71.18V0l88,0a121.18,121.18,0,0,0,1.86,22.17h0A122.18,122.18,0,0,0,381,102.39a121.43,121.43,0,0,0,67,20.14Z"/>
                             </svg>
+                          </a>
+                          <a href="https://www.youtube.com/@youthcapitalhq" target="_blank" rel="noopener noreferrer" className="p-2.5 text-muted-foreground hover:text-accent transition-colors bg-white/5 rounded-xl border border-white/10 flex items-center justify-center">
+                            <Youtube className="w-5 h-5" />
+                          </a>
+                          <a href="https://chat.whatsapp.com/LC5mqBrIPXdLJhK6cLJsmu" target="_blank" rel="noopener noreferrer" className="p-2.5 text-muted-foreground hover:text-accent transition-colors bg-white/5 rounded-xl border border-white/10 flex items-center justify-center">
+                            <MessageCircle className="w-5 h-5" />
                           </a>
                         </div>
                         <span className="text-[9px] font-black tracking-widest text-muted-foreground/45 uppercase select-none mt-1 leading-none">{t("Follow Us", "تابعنا")}</span>
@@ -350,24 +364,30 @@ function Footer() {
           </div>
         </div>
         <div className="pt-8 border-t border-white/10 text-center text-white/50 text-xs flex flex-col md:flex-row justify-between items-center gap-4">
-          <p>© {new Date().getFullYear()} Youth CapitalCore. {t("All rights reserved.", "جميع الحقوق محفوظة.")}</p>
-          <div className="flex gap-4">
-            <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors">
+          <p>© {new Date().getFullYear()} Youth Capital. {t("All rights reserved.", "جميع الحقوق محفوظة.")}</p>
+          <div className="flex gap-4 flex-wrap">
+            <a href="https://x.com/youthcapitalhq" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors">
               <Twitter className="w-4 h-4 text-white/80 hover:text-white" />
             </a>
-            <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors">
+            <a href="https://www.facebook.com/youthcapital" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors">
               <Facebook className="w-4 h-4 text-white/80 hover:text-white" />
             </a>
-            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors">
+            <a href="https://www.instagram.com/youthcapitalhq" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors">
               <Instagram className="w-4 h-4 text-white/80 hover:text-white" />
             </a>
-            <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors">
+            <a href="https://www.linkedin.com/company/youthcapitalhq" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors">
               <Linkedin className="w-4 h-4 text-white/80 hover:text-white" />
             </a>
-            <a href="https://discord.gg/example" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors">
-              <svg className="w-4 h-4 text-white/80 hover:text-white fill-current" viewBox="0 0 127.14 96.36">
-                <path d="M107.7,8.07A105.15,105.15,0,0,0,77.26,0a77.19,77.19,0,0,0-3.3,6.83A96.67,96.67,0,0,0,52.88,6.83,77.19,77.19,0,0,0,49.58,0,105.15,105.15,0,0,0,19.14,8.07C2.81,32.22-1.71,55.77.47,79A105.73,105.73,0,0,0,32,96.36a77.7,77.7,0,0,0,6.63-10.85,68.43,68.43,0,0,1-10.4-5c.9-.66,1.76-1.35,2.58-2.07a75.18,75.18,0,0,0,72.6,0c.82.72,1.68,1.41,2.58,2.07a68.43,68.43,0,0,1-10.4,5,77.7,77.7,0,0,0,6.63,10.85,105.73,105.73,0,0,0,31.57-17.36C129.66,50.25,124.6,26.91,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53S36.18,40.36,42.45,40.36,53.83,46,53.83,53,48.72,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.24,60,73.24,53S78.41,40.36,84.69,40.36,96.07,46,96.07,53,91,65.69,84.69,65.69Z"/>
+            <a href="https://www.tiktok.com/@youthcapitalhq" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors">
+              <svg className="w-4 h-4 text-white/80 hover:text-white fill-current" viewBox="0 0 448 512">
+                <path d="M448,209.91a210.06,210.06,0,0,1-122.77-39.25V349.38A162.55,162.55,0,1,1,185,188.31V278.2a74.62,74.62,0,1,0,52.23,71.18V0l88,0a121.18,121.18,0,0,0,1.86,22.17h0A122.18,122.18,0,0,0,381,102.39a121.43,121.43,0,0,0,67,20.14Z"/>
               </svg>
+            </a>
+            <a href="https://www.youtube.com/@youthcapitalhq" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors">
+              <Youtube className="w-4 h-4 text-white/80 hover:text-white" />
+            </a>
+            <a href="https://chat.whatsapp.com/LC5mqBrIPXdLJhK6cLJsmu" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors">
+              <MessageCircle className="w-4 h-4 text-white/80 hover:text-white" />
             </a>
           </div>
         </div>
