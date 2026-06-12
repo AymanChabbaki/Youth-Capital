@@ -3,7 +3,7 @@ import { useLanguage } from "@/hooks/use-language";
 import { Button, Card } from "@/components/ui-custom";
 import { Link } from "wouter";
 import { useGetPlatformStats, useGetForums, useGetArticles, useGetPolls } from "@workspace/api-client-react";
-import { Users, FileText, Landmark, ShieldAlert, ArrowRight, Gavel, Briefcase, AlertCircle, Target, Zap, ArrowUp, MessageCircle } from "lucide-react";
+import { Users, FileText, Landmark, ShieldAlert, ArrowRight, Gavel, Briefcase, AlertCircle, Target, Zap, ArrowUp } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function Home() {
@@ -660,7 +660,7 @@ export default function Home() {
             viewport={{ once: true }}
             className="w-16 h-16 bg-[#25D366] rounded-3xl flex items-center justify-center shadow-lg shadow-[#25D366]/30 mb-8"
           >
-            <MessageCircle className="w-9 h-9 text-white" />
+            <img src="/images/whatsapp.png" alt="WhatsApp" className="w-9 h-9" />
           </motion.div>
 
           <motion.h2
@@ -697,7 +697,7 @@ export default function Home() {
               rel="noopener noreferrer"
               className="inline-flex items-center gap-4 bg-[#25D366] text-white text-xl font-bold px-12 py-5 rounded-[2rem] shadow-[0_8px_0_#1DA851] hover:shadow-[0_6px_0_#1DA851] active:shadow-none active:translate-y-[8px] hover:translate-y-[2px] transition-all transform duration-150 group"
             >
-              <MessageCircle className="w-7 h-7 text-white group-hover:scale-110 transition-transform" />
+              <img src="/images/whatsapp.png" alt="WhatsApp" className="w-7 h-7 group-hover:scale-110 transition-transform" />
               {t("Join WhatsApp Community", "انضم لمجتمع الواتساب")}
             </a>
           </motion.div>

@@ -131,7 +131,7 @@ function Navbar() {
                   <Youtube className="w-3.5 h-3.5" />
                 </a>
                 <a href="https://chat.whatsapp.com/LC5mqBrIPXdLJhK6cLJsmu" target="_blank" rel="noopener noreferrer" className="p-1 rounded-lg text-muted-foreground/80 hover:text-accent transition-colors hover:bg-white/5 flex items-center justify-center" title="WhatsApp Community">
-                  <MessageCircle className="w-3.5 h-3.5" />
+                  <img src="/images/whatsapp.png" alt="WhatsApp" className="w-3.5 h-3.5 opacity-80 hover:opacity-100 transition-opacity" />
                 </a>
               </div>
               <span className="text-[7.5px] font-black tracking-widest text-muted-foreground/50 uppercase select-none mt-0.5 leading-none">{t("Follow Us", "تابعنا")}</span>
@@ -245,7 +245,7 @@ function Navbar() {
                             <Youtube className="w-5 h-5" />
                           </a>
                           <a href="https://chat.whatsapp.com/LC5mqBrIPXdLJhK6cLJsmu" target="_blank" rel="noopener noreferrer" className="p-2.5 text-muted-foreground hover:text-accent transition-colors bg-white/5 rounded-xl border border-white/10 flex items-center justify-center">
-                            <MessageCircle className="w-5 h-5" />
+                            <img src="/images/whatsapp.png" alt="WhatsApp" className="w-5 h-5 opacity-80 hover:opacity-100 transition-opacity" />
                           </a>
                         </div>
                         <span className="text-[9px] font-black tracking-widest text-muted-foreground/45 uppercase select-none mt-1 leading-none">{t("Follow Us", "تابعنا")}</span>
@@ -387,7 +387,7 @@ function Footer() {
               <Youtube className="w-4 h-4 text-white/80 hover:text-white" />
             </a>
             <a href="https://chat.whatsapp.com/LC5mqBrIPXdLJhK6cLJsmu" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors">
-              <MessageCircle className="w-4 h-4 text-white/80 hover:text-white" />
+              <img src="/images/whatsapp.png" alt="WhatsApp" className="w-4 h-4 opacity-80 hover:opacity-100 transition-opacity" />
             </a>
           </div>
         </div>
