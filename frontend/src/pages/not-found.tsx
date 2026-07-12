@@ -63,14 +63,14 @@ export default function NotFound() {
         >
           <Link href="/">
             <Button variant="gold" size="lg" className="px-10 group w-full sm:w-auto">
-              <Home className="w-5 h-5 mr-2" />
+              <Home className="w-5 h-5 me-2" />
               {t("Return to the Capital", "العودة إلى العاصمة")}
             </Button>
           </Link>
           <Link href="/support">
             <Button variant="outline" size="lg" className="px-8 w-full sm:w-auto text-white border-white/20 hover:bg-white/10 group">
               {t("Get Help", "احصل على مساعدة")}
-              <ArrowRight className={`w-5 h-5 ml-2 transition-transform group-hover:translate-x-1 ${isAr ? "rotate-180 group-hover:-translate-x-1" : ""}`} />
+              <ArrowRight className={`w-5 h-5 ms-2 transition-transform group-hover:translate-x-1 ${isAr ? "rotate-180 group-hover:-translate-x-1" : ""}`} />
             </Button>
           </Link>
         </motion.div>

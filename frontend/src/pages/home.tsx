@@ -6,6 +6,59 @@ import { useGetPlatformStats, useGetForums, useGetArticles, useGetPolls } from "
 import { Users, FileText, Landmark, ShieldAlert, ArrowRight, Gavel, Briefcase, AlertCircle, Target, Zap, ArrowUp } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
+// Rotating "live activity" social-proof ticker
+function ActivityTicker() {
+  const { t } = useLanguage();
+  const [index, setIndex] = useState(0);
+
+  const regions = [
+    t("Casablanca-Settat", "الدار البيضاء-سطات"),
+    t("Rabat-Salé-Kénitra", "الرباط-سلا-القنيطرة"),
+    t("Fès-Meknès", "فاس-مكناس"),
+    t("Marrakech-Safi", "مراكش-آسفي"),
+    t("Souss-Massa", "سوس-ماسة"),
+    t("Tanger-Tétouan", "طنجة-تطوان"),
+    t("the Diaspora", "الجالية"),
+  ];
+  const actions = [
+    (r: string) => t(`A delegate from ${r} just cast a vote`, `مندوب من ${r} صوّت للتو`),
+    (r: string) => t(`A new bill was proposed by ${r}'s bloc`, `كتلة ${r} اقترحت قانوناً جديداً`),
+    (r: string) => t(`A minister from ${r} responded to a crisis`, `وزير من ${r} استجاب لأزمة`),
+    (r: string) => t(`A new delegate from ${r} joined the simulation`, `مندوب جديد من ${r} انضم إلى المحاكاة`),
+  ];
+
+  useEffect(() => {
+    const timer = setInterval(() => setIndex(i => i + 1), 4500);
+    return () => clearInterval(timer);
+  }, []);
+
+  const message = actions[index % actions.length](regions[index % regions.length]);
+
+  return (
+    <div className="max-w-6xl mx-auto mt-4 flex justify-center">
+      <div className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-navy-dark/90 border border-gold/20 backdrop-blur-md shadow-lg overflow-hidden">
+        <span className="relative flex shrink-0">
+          <span className="absolute w-2 h-2 bg-gold rounded-full animate-ping opacity-70" />
+          <span className="relative w-2 h-2 bg-gold rounded-full" />
+        </span>
+        <span className="text-[10px] font-black text-gold uppercase tracking-[0.2em] shrink-0">{t("Live", "مباشر")}</span>
+        <AnimatePresence mode="wait">
+          <motion.span
+            key={index}
+            initial={{ y: 14, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: -14, opacity: 0 }}
+            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+            className="text-xs font-semibold text-white/80 whitespace-nowrap"
+          >
+            {message}
+          </motion.span>
+        </AnimatePresence>
+      </div>
+    </div>
+  );
+}
+
 export default function Home() {
   const { t, isAr } = useLanguage();
   const { data: stats } = useGetPlatformStats();
@@ -131,7 +184,7 @@ export default function Home() {
             <Link href="/apply">
               <Button variant="gold" size="lg" className="w-full sm:w-auto text-lg px-12 group h-14 md:h-16 shadow-2xl shadow-gold/20">
                 {t("Apply Now", "قدّم طلبك الآن")}
-                <ArrowRight className={`ml-2 w-5 h-5 transition-transform group-hover:translate-x-1 ${isAr ? 'rotate-180 group-hover:-translate-x-1' : ''}`} />
+                <ArrowRight className={`ms-2 w-5 h-5 transition-transform group-hover:translate-x-1 ${isAr ? 'rotate-180 group-hover:-translate-x-1' : ''}`} />
               </Button>
             </Link>
             <Link href="/about">
@@ -197,6 +250,7 @@ export default function Home() {
               );
             })}
           </Card>
+          <ActivityTicker />
         </div>
       </section>
 
@@ -440,7 +494,7 @@ export default function Home() {
                           <Link href="/about">
                             <Button variant="ghost" className="text-gold hover:text-gold hover:bg-gold/10 px-0 group/btn h-auto py-2">
                               {t("View Details", "التفاصيل")}
-                              <ArrowRight className={`ml-2 w-4 h-4 transition-transform group-hover/btn:translate-x-1 ${isAr ? 'rotate-180 group-hover/btn:-translate-x-1' : ''}`} />
+                              <ArrowRight className={`ms-2 w-4 h-4 transition-transform group-hover/btn:translate-x-1 ${isAr ? 'rotate-180 group-hover/btn:-translate-x-1' : ''}`} />
                             </Button>
                           </Link>
                         </motion.div>
@@ -689,7 +743,7 @@ export default function Home() {
                 <Link href="/apply">
                   <Button variant="gold" size="lg" className="rounded-2xl px-12 group shadow-xl shadow-gold/20">
                     {t("Start Your Journey", "ابدأ رحلتك الآن")}
-                    <ArrowRight className={`ml-2 w-5 h-5 transition-transform group-hover:translate-x-1 ${isAr ? 'rotate-180 group-hover:-translate-x-1' : ''}`} />
+                    <ArrowRight className={`ms-2 w-5 h-5 transition-transform group-hover:translate-x-1 ${isAr ? 'rotate-180 group-hover:-translate-x-1' : ''}`} />
                   </Button>
                 </Link>
               </motion.div>

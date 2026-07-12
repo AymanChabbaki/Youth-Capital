@@ -667,18 +667,18 @@ export default function Admin() {
                       <div className="bg-secondary/40 p-4 rounded-xl border border-border">
                         <div className="flex items-center gap-2 mb-2">
                           <MapPin className="w-4 h-4 text-primary" />
-                          <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t("Civic Region", "الجهة المدنية")}</span>
+                          <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">{t("Civic Region", "الجهة المدنية")}</span>
                         </div>
-                        <p className="text-sm font-bold text-slate-900">{app.region}</p>
+                        <p className="text-sm font-bold text-foreground">{app.region}</p>
                       </div>
 
                       {app.preferredRole === "minister" && (
                         <div className="bg-secondary/40 p-4 rounded-xl border border-border">
                           <div className="flex items-center gap-2 mb-2">
                             <Shield className="w-4 h-4 text-primary" />
-                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t("Ministry Choice", "الوزارة المختارة")}</span>
+                            <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">{t("Ministry Choice", "الوزارة المختارة")}</span>
                           </div>
-                          <p className="text-sm font-bold text-slate-900">{app.ministryPreference || t("Not Specific", "غير محدد")}</p>
+                          <p className="text-sm font-bold text-foreground">{app.ministryPreference || t("Not Specific", "غير محدد")}</p>
                         </div>
                       )}
 
@@ -686,19 +686,19 @@ export default function Admin() {
                         <div className="bg-secondary/40 p-4 rounded-xl border border-border">
                           <div className="flex items-center gap-2 mb-2">
                             <Landmark className="w-4 h-4 text-primary" />
-                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t("Chamber", "الغرفة")}</span>
+                            <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">{t("Chamber", "الغرفة")}</span>
                           </div>
-                          <p className="text-sm font-bold text-slate-900 capitalize">{app.parliamentHouse?.replace(/_/g, " ") || t("Not Specific", "غير محدد")}</p>
+                          <p className="text-sm font-bold text-foreground capitalize">{app.parliamentHouse?.replace(/_/g, " ") || t("Not Specific", "غير محدد")}</p>
                         </div>
                       )}
                     </div>
 
-                    <div className="bg-secondary/40 p-6 rounded-[24px] mb-8 border-2 border-slate-100">
-                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                    <div className="bg-secondary/40 p-6 rounded-[24px] mb-8 border-2 border-border/40">
+                      <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-4 flex items-center gap-2">
                         <MessageSquare className="w-3 h-3" />
                         {t("Motivation Statement", "بيان الدوافع")}
                       </p>
-                      <p className="text-sm text-slate-600 italic font-medium leading-relaxed">"{app.motivation}"</p>
+                      <p className="text-sm text-muted-foreground italic font-medium leading-relaxed">"{app.motivation}"</p>
                     </div>
                     <div className="flex justify-end gap-3">
                       <button
@@ -871,18 +871,18 @@ export default function Admin() {
                     }} className="space-y-6">
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                          <label className="text-xs font-black text-slate-400 uppercase tracking-widest">{t("Title (English)", "العنوان (إنجليزي)")}</label>
-                          <Input name="title" defaultValue={editingArticle?.title} required className="rounded-xl border-slate-200" />
+                          <label className="text-xs font-black text-muted-foreground uppercase tracking-widest">{t("Title (English)", "العنوان (إنجليزي)")}</label>
+                          <Input name="title" defaultValue={editingArticle?.title} required className="rounded-xl border-border/50" />
                         </div>
                         <div className="space-y-2">
-                          <label className="text-xs font-black text-slate-400 uppercase tracking-widest">{t("Title (Arabic)", "العنوان (عربي)")}</label>
-                          <Input name="titleAr" defaultValue={editingArticle?.titleAr} required dir="rtl" className="rounded-xl border-slate-200" />
+                          <label className="text-xs font-black text-muted-foreground uppercase tracking-widest">{t("Title (Arabic)", "العنوان (عربي)")}</label>
+                          <Input name="titleAr" defaultValue={editingArticle?.titleAr} required dir="rtl" className="rounded-xl border-border/50" />
                         </div>
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                          <label className="text-xs font-black text-slate-400 uppercase tracking-widest">{t("Article Type", "نوع المقال")}</label>
-                          <Select name="type" defaultValue={editingArticle?.type || "news"} className="rounded-xl border-slate-200">
+                          <label className="text-xs font-black text-muted-foreground uppercase tracking-widest">{t("Article Type", "نوع المقال")}</label>
+                          <Select name="type" defaultValue={editingArticle?.type || "news"} className="rounded-xl border-border/50">
                             <option value="news">{t("News", "أخبار")}</option>
                             <option value="announcement">{t("Announcement", "إعلان")}</option>
                             <option value="decree">{t("Official Decree", "مرسوم رسمي")}</option>
@@ -890,17 +890,17 @@ export default function Admin() {
                           </Select>
                         </div>
                         <div className="space-y-2">
-                          <label className="text-xs font-black text-slate-400 uppercase tracking-widest">{t("Thumbnail URL", "رابط الصورة")}</label>
-                          <Input name="thumbnailUrl" defaultValue={editingArticle?.thumbnailUrl} placeholder="https://..." className="rounded-xl border-slate-200" />
+                          <label className="text-xs font-black text-muted-foreground uppercase tracking-widest">{t("Thumbnail URL", "رابط الصورة")}</label>
+                          <Input name="thumbnailUrl" defaultValue={editingArticle?.thumbnailUrl} placeholder="https://..." className="rounded-xl border-border/50" />
                         </div>
                       </div>
                       <div className="space-y-2">
-                        <label className="text-xs font-black text-slate-400 uppercase tracking-widest">{t("Content (English)", "المحتوى (إنجليزي)")}</label>
-                        <Textarea name="content" defaultValue={editingArticle?.content} required className="h-40 rounded-2xl border-slate-200" />
+                        <label className="text-xs font-black text-muted-foreground uppercase tracking-widest">{t("Content (English)", "المحتوى (إنجليزي)")}</label>
+                        <Textarea name="content" defaultValue={editingArticle?.content} required className="h-40 rounded-2xl border-border/50" />
                       </div>
                       <div className="space-y-2">
-                        <label className="text-xs font-black text-slate-400 uppercase tracking-widest">{t("Content (Arabic)", "المحتوى (عربي)")}</label>
-                        <Textarea name="contentAr" defaultValue={editingArticle?.contentAr} required dir="rtl" className="h-40 rounded-2xl border-slate-200" />
+                        <label className="text-xs font-black text-muted-foreground uppercase tracking-widest">{t("Content (Arabic)", "المحتوى (عربي)")}</label>
+                        <Textarea name="contentAr" defaultValue={editingArticle?.contentAr} required dir="rtl" className="h-40 rounded-2xl border-border/50" />
                       </div>
                       <div className="flex gap-3 pt-4">
                         <Button type="button" variant="outline" onClick={() => setIsArticleModalOpen(false)} className="flex-1 rounded-xl h-12">{t("Cancel", "إلغاء")}</Button>
@@ -998,18 +998,18 @@ export default function Admin() {
                     }} className="space-y-6">
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                          <label className="text-xs font-black text-slate-400 uppercase tracking-widest">{t("Event Name (English)", "اسم الفعالية (إنجليزي)")}</label>
-                          <Input name="title" defaultValue={editingEvent?.title} required className="rounded-xl border-slate-200" />
+                          <label className="text-xs font-black text-muted-foreground uppercase tracking-widest">{t("Event Name (English)", "اسم الفعالية (إنجليزي)")}</label>
+                          <Input name="title" defaultValue={editingEvent?.title} required className="rounded-xl border-border/50" />
                         </div>
                         <div className="space-y-2">
-                          <label className="text-xs font-black text-slate-400 uppercase tracking-widest">{t("Event Name (Arabic)", "اسم الفعالية (عربي)")}</label>
-                          <Input name="titleAr" defaultValue={editingEvent?.titleAr} required dir="rtl" className="rounded-xl border-slate-200" />
+                          <label className="text-xs font-black text-muted-foreground uppercase tracking-widest">{t("Event Name (Arabic)", "اسم الفعالية (عربي)")}</label>
+                          <Input name="titleAr" defaultValue={editingEvent?.titleAr} required dir="rtl" className="rounded-xl border-border/50" />
                         </div>
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                          <label className="text-xs font-black text-slate-400 uppercase tracking-widest">{t("Activity Type", "نوع النشاط")}</label>
-                          <Select name="type" defaultValue={editingEvent?.type || "meeting"} className="rounded-xl border-slate-200">
+                          <label className="text-xs font-black text-muted-foreground uppercase tracking-widest">{t("Activity Type", "نوع النشاط")}</label>
+                          <Select name="type" defaultValue={editingEvent?.type || "meeting"} className="rounded-xl border-border/50">
                             <option value="meeting">{t("Legislative Meeting", "اجتماع تشريعي")}</option>
                             <option value="workshop">{t("Civic Workshop", "ورشة عمل")}</option>
                             <option value="conference">{t("Simulation Conference", "مؤتمر")}</option>
@@ -1017,38 +1017,38 @@ export default function Admin() {
                           </Select>
                         </div>
                         <div className="space-y-2">
-                          <label className="text-xs font-black text-slate-400 uppercase tracking-widest">{t("Meeting URL", "رابط الاجتماع")}</label>
-                          <Input name="meetingUrl" defaultValue={editingEvent?.meetingUrl} placeholder="https://zoom.us/..." className="rounded-xl border-slate-200" />
+                          <label className="text-xs font-black text-muted-foreground uppercase tracking-widest">{t("Meeting URL", "رابط الاجتماع")}</label>
+                          <Input name="meetingUrl" defaultValue={editingEvent?.meetingUrl} placeholder="https://zoom.us/..." className="rounded-xl border-border/50" />
                         </div>
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                          <label className="text-xs font-black text-slate-400 uppercase tracking-widest">{t("Start Time", "وقت البدء")}</label>
+                          <label className="text-xs font-black text-muted-foreground uppercase tracking-widest">{t("Start Time", "وقت البدء")}</label>
                           <Input 
                             name="startAt" 
                             type="datetime-local" 
                             defaultValue={editingEvent?.startAt ? new Date(editingEvent.startAt).toISOString().slice(0, 16) : ""} 
                             required 
-                            className="rounded-xl border-slate-200" 
+                            className="rounded-xl border-border/50" 
                           />
                         </div>
                         <div className="space-y-2">
-                          <label className="text-xs font-black text-slate-400 uppercase tracking-widest">{t("End Time (Optional)", "وقت الانتهاء (اختياري)")}</label>
+                          <label className="text-xs font-black text-muted-foreground uppercase tracking-widest">{t("End Time (Optional)", "وقت الانتهاء (اختياري)")}</label>
                           <Input 
                             name="endAt" 
                             type="datetime-local" 
                             defaultValue={editingEvent?.endAt ? new Date(editingEvent.endAt).toISOString().slice(0, 16) : ""} 
-                            className="rounded-xl border-slate-200" 
+                            className="rounded-xl border-border/50" 
                           />
                         </div>
                       </div>
                       <div className="space-y-2">
-                        <label className="text-xs font-black text-slate-400 uppercase tracking-widest">{t("Description (English)", "الوصف (إنجليزي)")}</label>
-                        <Textarea name="description" defaultValue={editingEvent?.description} required className="h-24 rounded-2xl border-slate-200" />
+                        <label className="text-xs font-black text-muted-foreground uppercase tracking-widest">{t("Description (English)", "الوصف (إنجليزي)")}</label>
+                        <Textarea name="description" defaultValue={editingEvent?.description} required className="h-24 rounded-2xl border-border/50" />
                       </div>
                       <div className="space-y-2">
-                        <label className="text-xs font-black text-slate-400 uppercase tracking-widest">{t("Description (Arabic)", "الوصف (عربي)")}</label>
-                        <Textarea name="descriptionAr" defaultValue={editingEvent?.descriptionAr} required dir="rtl" className="h-24 rounded-2xl border-slate-200" />
+                        <label className="text-xs font-black text-muted-foreground uppercase tracking-widest">{t("Description (Arabic)", "الوصف (عربي)")}</label>
+                        <Textarea name="descriptionAr" defaultValue={editingEvent?.descriptionAr} required dir="rtl" className="h-24 rounded-2xl border-border/50" />
                       </div>
                       <div className="flex gap-3 pt-4">
                         <Button type="button" variant="outline" onClick={() => setIsEventModalOpen(false)} className="flex-1 rounded-xl h-12">{t("Cancel", "إلغاء")}</Button>
@@ -1161,27 +1161,27 @@ export default function Admin() {
                     }} className="space-y-6">
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                          <label className="text-xs font-black text-slate-400 uppercase tracking-widest">{t("Poll Question (English)", "سؤال الاستطلاع (إنجليزي)")}</label>
-                          <Input name="title" defaultValue={editingPoll?.title} required className="rounded-xl border-slate-200" />
+                          <label className="text-xs font-black text-muted-foreground uppercase tracking-widest">{t("Poll Question (English)", "سؤال الاستطلاع (إنجليزي)")}</label>
+                          <Input name="title" defaultValue={editingPoll?.title} required className="rounded-xl border-border/50" />
                         </div>
                         <div className="space-y-2">
-                          <label className="text-xs font-black text-slate-400 uppercase tracking-widest">{t("Poll Question (Arabic)", "سؤال الاستطلاع (عربي)")}</label>
-                          <Input name="titleAr" defaultValue={editingPoll?.titleAr} required dir="rtl" className="rounded-xl border-slate-200" />
+                          <label className="text-xs font-black text-muted-foreground uppercase tracking-widest">{t("Poll Question (Arabic)", "سؤال الاستطلاع (عربي)")}</label>
+                          <Input name="titleAr" defaultValue={editingPoll?.titleAr} required dir="rtl" className="rounded-xl border-border/50" />
                         </div>
                       </div>
 
                       <div className="space-y-2">
-                        <label className="text-xs font-black text-slate-400 uppercase tracking-widest">{t("Description (English)", "الوصف (إنجليزي)")}</label>
-                        <Textarea name="description" defaultValue={editingPoll?.description || ""} className="h-20 rounded-2xl border-slate-200" />
+                        <label className="text-xs font-black text-muted-foreground uppercase tracking-widest">{t("Description (English)", "الوصف (إنجليزي)")}</label>
+                        <Textarea name="description" defaultValue={editingPoll?.description || ""} className="h-20 rounded-2xl border-border/50" />
                       </div>
 
                       <div className="space-y-2">
-                        <label className="text-xs font-black text-slate-400 uppercase tracking-widest">{t("End Time", "وقت الانتهاء")}</label>
+                        <label className="text-xs font-black text-muted-foreground uppercase tracking-widest">{t("End Time", "وقت الانتهاء")}</label>
                         <Input 
                           name="endsAt" 
                           type="datetime-local" 
                           defaultValue={editingPoll?.endsAt ? new Date(editingPoll.endsAt).toISOString().slice(0, 16) : ""} 
-                          className="rounded-xl border-slate-200" 
+                          className="rounded-xl border-border/50" 
                         />
                       </div>
 
@@ -1190,45 +1190,45 @@ export default function Admin() {
                           <h4 className="text-sm font-bold text-foreground">{t("Poll Options (Minimum 2, Maximum 4)", "خيارات الاستطلاع (الحد الأدنى 2، الأقصى 4)")}</h4>
                           <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">
-                              <label className="text-xs font-black text-slate-400 uppercase tracking-widest">{t("Option 1 (English)", "الخيار 1 (إنجليزي)")}</label>
-                              <Input name="opt1_label" required className="rounded-xl border-slate-200" />
+                              <label className="text-xs font-black text-muted-foreground uppercase tracking-widest">{t("Option 1 (English)", "الخيار 1 (إنجليزي)")}</label>
+                              <Input name="opt1_label" required className="rounded-xl border-border/50" />
                             </div>
                             <div className="space-y-2">
-                              <label className="text-xs font-black text-slate-400 uppercase tracking-widest">{t("Option 1 (Arabic)", "الخيار 1 (عربي)")}</label>
-                              <Input name="opt1_labelAr" required dir="rtl" className="rounded-xl border-slate-200" />
-                            </div>
-                          </div>
-
-                          <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                              <label className="text-xs font-black text-slate-400 uppercase tracking-widest">{t("Option 2 (English)", "الخيار 2 (إنجليزي)")}</label>
-                              <Input name="opt2_label" required className="rounded-xl border-slate-200" />
-                            </div>
-                            <div className="space-y-2">
-                              <label className="text-xs font-black text-slate-400 uppercase tracking-widest">{t("Option 2 (Arabic)", "الخيار 2 (عربي)")}</label>
-                              <Input name="opt2_labelAr" required dir="rtl" className="rounded-xl border-slate-200" />
+                              <label className="text-xs font-black text-muted-foreground uppercase tracking-widest">{t("Option 1 (Arabic)", "الخيار 1 (عربي)")}</label>
+                              <Input name="opt1_labelAr" required dir="rtl" className="rounded-xl border-border/50" />
                             </div>
                           </div>
 
                           <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">
-                              <label className="text-xs font-black text-slate-400 uppercase tracking-widest">{t("Option 3 (English - Optional)", "الخيار 3 (إنجليزي - اختياري)")}</label>
-                              <Input name="opt3_label" className="rounded-xl border-slate-200" />
+                              <label className="text-xs font-black text-muted-foreground uppercase tracking-widest">{t("Option 2 (English)", "الخيار 2 (إنجليزي)")}</label>
+                              <Input name="opt2_label" required className="rounded-xl border-border/50" />
                             </div>
                             <div className="space-y-2">
-                              <label className="text-xs font-black text-slate-400 uppercase tracking-widest">{t("Option 3 (Arabic - Optional)", "الخيار 3 (عربي - اختياري)")}</label>
-                              <Input name="opt3_labelAr" dir="rtl" className="rounded-xl border-slate-200" />
+                              <label className="text-xs font-black text-muted-foreground uppercase tracking-widest">{t("Option 2 (Arabic)", "الخيار 2 (عربي)")}</label>
+                              <Input name="opt2_labelAr" required dir="rtl" className="rounded-xl border-border/50" />
                             </div>
                           </div>
 
                           <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">
-                              <label className="text-xs font-black text-slate-400 uppercase tracking-widest">{t("Option 4 (English - Optional)", "الخيار 4 (إنجليزي - اختياري)")}</label>
-                              <Input name="opt4_label" className="rounded-xl border-slate-200" />
+                              <label className="text-xs font-black text-muted-foreground uppercase tracking-widest">{t("Option 3 (English - Optional)", "الخيار 3 (إنجليزي - اختياري)")}</label>
+                              <Input name="opt3_label" className="rounded-xl border-border/50" />
                             </div>
                             <div className="space-y-2">
-                              <label className="text-xs font-black text-slate-400 uppercase tracking-widest">{t("Option 4 (Arabic - Optional)", "الخيار 4 (عربي - اختياري)")}</label>
-                              <Input name="opt4_labelAr" dir="rtl" className="rounded-xl border-slate-200" />
+                              <label className="text-xs font-black text-muted-foreground uppercase tracking-widest">{t("Option 3 (Arabic - Optional)", "الخيار 3 (عربي - اختياري)")}</label>
+                              <Input name="opt3_labelAr" dir="rtl" className="rounded-xl border-border/50" />
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                              <label className="text-xs font-black text-muted-foreground uppercase tracking-widest">{t("Option 4 (English - Optional)", "الخيار 4 (إنجليزي - اختياري)")}</label>
+                              <Input name="opt4_label" className="rounded-xl border-border/50" />
+                            </div>
+                            <div className="space-y-2">
+                              <label className="text-xs font-black text-muted-foreground uppercase tracking-widest">{t("Option 4 (Arabic - Optional)", "الخيار 4 (عربي - اختياري)")}</label>
+                              <Input name="opt4_labelAr" dir="rtl" className="rounded-xl border-border/50" />
                             </div>
                           </div>
                         </div>

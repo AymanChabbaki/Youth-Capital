@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { useLanguage } from "@/hooks/use-language";
-import { Card, Badge, Button, Input, PageHero, HeroStat } from "@/components/ui-custom";
+import { Card, Badge, Button, Input, PageHero, HeroStat, Skeleton } from "@/components/ui-custom";
 import { useGetEvents } from "@workspace/api-client-react";
 import {
   Calendar as CalendarIcon,
@@ -74,11 +74,35 @@ export default function Events() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-4">
-        <div className="w-14 h-14 border-2 border-gold/20 border-t-gold rounded-full animate-spin" />
-        <p className="text-muted-foreground font-bold animate-pulse text-sm uppercase tracking-widest">
-          {t("Syncing Simulation Calendar...", "جاري مزامنة تقويم المحاكاة...")}
-        </p>
+      <div className="min-h-screen bg-background pb-32" aria-busy="true" aria-label="Loading">
+        <div className="bg-navy-dark pt-24 pb-28 px-4">
+          <div className="max-w-7xl mx-auto space-y-6">
+            <Skeleton className="h-4 w-52 bg-white/10" />
+            <Skeleton className="h-14 md:h-20 w-2/3 max-w-2xl bg-white/10" />
+            <div className="flex gap-8 pt-4">
+              <Skeleton className="h-14 w-32 bg-white/10" />
+              <Skeleton className="h-14 w-32 bg-white/10" />
+            </div>
+          </div>
+        </div>
+        <div className="max-w-7xl mx-auto px-4 md:px-6 -mt-12 relative z-20 space-y-6">
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="flex flex-col md:flex-row rounded-[2.5rem] border border-border/40 overflow-hidden bg-card">
+              <Skeleton className="w-full md:w-56 h-48 md:h-52 rounded-none" />
+              <div className="flex-1 p-8 md:p-10 space-y-4">
+                <div className="flex gap-3">
+                  <Skeleton className="h-5 w-20" />
+                  <Skeleton className="h-5 w-24" />
+                </div>
+                <Skeleton className="h-8 w-2/3" />
+                <Skeleton className="h-4 w-80 max-w-full" />
+              </div>
+              <div className="p-8 md:p-10 flex items-center">
+                <Skeleton className="h-16 w-full md:w-44 rounded-2xl" />
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     );
   }

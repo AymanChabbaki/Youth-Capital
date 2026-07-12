@@ -253,7 +253,7 @@ export default function Profile() {
              <form onSubmit={handleSubmit} className="space-y-10">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                    <div className="space-y-4">
-                      <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest block ml-2">{t("Official Name (Latin)", "الاسم الرسمي (لاتيني)")}</label>
+                      <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest block ms-2">{t("Official Name (Latin)", "الاسم الرسمي (لاتيني)")}</label>
                       <div className="relative group">
                          <User className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground/50 group-focus-within:text-gold transition-colors" />
                          <Input 
@@ -267,7 +267,7 @@ export default function Profile() {
                    </div>
                    
                    <div className="space-y-4">
-                      <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest block mr-2 text-right">{t("Official Name (Arabic)", "الاسم الرسمي (عربي)")}</label>
+                      <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest block me-2 text-end">{t("Official Name (Arabic)", "الاسم الرسمي (عربي)")}</label>
                       <div className="relative group dir-rtl">
                          <Input 
                             name="fullNameAr"
@@ -281,7 +281,7 @@ export default function Profile() {
                 </div>
 
                 <div className="space-y-4">
-                   <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest block ml-2">{t("Civic Region / Sector", "المنطقة المدنية / القطاع")}</label>
+                   <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest block ms-2">{t("Civic Region / Sector", "المنطقة المدنية / القطاع")}</label>
                    <div className="relative group">
                       <MapPin className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground/50 group-focus-within:text-gold transition-colors z-10" />
                       <Select 
@@ -299,7 +299,7 @@ export default function Profile() {
                 </div>
 
                 <div className="space-y-4">
-                   <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest block ml-2">{t("Statement of Purpose / Bio", "بيان الغرض / السيرة الذاتية")}</label>
+                   <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest block ms-2">{t("Statement of Purpose / Bio", "بيان الغرض / السيرة الذاتية")}</label>
                    <Textarea 
                       name="bio"
                       value={formData.bio}
@@ -354,6 +354,33 @@ export default function Profile() {
                    <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest">
                       <span className="text-white/40">{t("Simulation Role", "دور المحاكاة")}</span>
                       <span className="text-white">{user.simulationRole || "MEMBER"}</span>
+                   </div>
+                </div>
+
+                {/* Achievement Badges */}
+                <div className="pt-6 mt-6 border-t border-white/10">
+                   <p className="text-[9px] font-black text-white/40 uppercase tracking-[0.3em] mb-3">{t("Honors & Badges", "الأوسمة والشارات")}</p>
+                   <div className="flex flex-wrap gap-2">
+                      {[
+                        { earned: true, icon: "🏛️", label: t("Founding Wave", "الجيل المؤسس") },
+                        { earned: (user as any).applicationStatus === "approved" || user.status === "approved", icon: "✅", label: t("Verified Citizen", "مواطن موثق") },
+                        { earned: !!user.simulationRole, icon: "⚖️", label: t("Office Holder", "صاحب منصب") },
+                        { earned: !!formData.bio, icon: "✍️", label: t("Storyteller", "صاحب رؤية") },
+                        { earned: !!avatarUrl, icon: "🎖️", label: t("Public Figure", "شخصية عامة") },
+                      ].map((badge, i) => (
+                        <span
+                          key={i}
+                          title={badge.label}
+                          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-wider border transition-all duration-300 ${
+                            badge.earned
+                              ? "bg-gold/15 border-gold/40 text-gold hover:scale-105"
+                              : "bg-white/5 border-white/10 text-white/25 grayscale"
+                          }`}
+                        >
+                          <span className="text-xs">{badge.icon}</span>
+                          {badge.label}
+                        </span>
+                      ))}
                    </div>
                 </div>
                 <CloudUpload className="absolute -bottom-6 -right-6 w-24 h-24 text-white/5 -rotate-12" />

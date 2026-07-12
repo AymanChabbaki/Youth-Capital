@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useLanguage } from "@/hooks/use-language";
-import { Card, Badge, Button, Input, PageHero } from "@/components/ui-custom";
+import { Card, Badge, Button, Input, PageHero, Skeleton } from "@/components/ui-custom";
 import { useGetArticles } from "@workspace/api-client-react";
 import { format } from "date-fns";
 import { Link } from "wouter";
@@ -46,11 +46,37 @@ export default function Press() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-4">
-        <div className="w-14 h-14 border-2 border-gold/20 border-t-gold rounded-full animate-spin" />
-        <p className="text-muted-foreground font-bold animate-pulse text-sm uppercase tracking-widest">
-          {t("Syncing with Press Desk...", "جاري المزامنة مع مكتب الصحافة...")}
-        </p>
+      <div className="min-h-screen bg-background pb-32" aria-busy="true" aria-label="Loading">
+        <div className="bg-navy-dark pt-24 pb-28 px-4">
+          <div className="max-w-7xl mx-auto space-y-6">
+            <Skeleton className="h-4 w-44 bg-white/10" />
+            <Skeleton className="h-14 md:h-20 w-2/3 max-w-2xl bg-white/10" />
+            <Skeleton className="h-5 w-full max-w-xl bg-white/10" />
+          </div>
+        </div>
+        <div className="max-w-7xl mx-auto px-4 md:px-6 mt-12 space-y-12">
+          {/* Hero article skeleton */}
+          <Skeleton className="h-[50vh] w-full rounded-[3rem]" />
+          {/* Feed skeletons */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+            <div className="lg:col-span-8 space-y-8">
+              {[...Array(2)].map((_, i) => (
+                <div key={i} className="flex flex-col md:flex-row gap-8 p-8 border border-border/40 rounded-[2rem]">
+                  <Skeleton className="w-full md:w-64 h-48 rounded-3xl shrink-0" />
+                  <div className="flex-1 space-y-4 py-2">
+                    <Skeleton className="h-7 w-3/4" />
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-2/3" />
+                    <Skeleton className="h-4 w-40 mt-6" />
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="lg:col-span-4">
+              <Skeleton className="h-96 w-full rounded-[2.5rem]" />
+            </div>
+          </div>
+        </div>
       </div>
     );
   }

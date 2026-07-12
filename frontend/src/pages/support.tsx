@@ -96,6 +96,7 @@ export default function Support() {
                   >
                     <button
                       onClick={() => setActiveFaq(activeFaq === i ? null : i)}
+                      aria-expanded={activeFaq === i}
                       className="w-full p-6 flex items-center justify-between text-start gap-4"
                     >
                       <span className="font-bold text-base md:text-lg text-foreground">{faq.q}</span>
