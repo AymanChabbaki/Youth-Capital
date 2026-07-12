@@ -123,77 +123,128 @@ export default function Apply() {
 
   if (isSuccess) {
     return (
-      <div className="min-h-screen pt-24 pb-12 px-4 flex items-center justify-center bg-secondary/30">
-        <Card className="w-full max-w-lg p-10 text-center rounded-[40px] shadow-2xl shadow-slate-200">
-          <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="flex justify-center mb-6">
-            <div className="w-24 h-24 bg-green-100 rounded-3xl flex items-center justify-center shadow-lg shadow-green-100">
-              <CheckCircle2 className="w-12 h-12 text-green-600" />
+      <div className="min-h-screen pt-24 pb-12 px-4 flex items-center justify-center bg-navy-dark relative overflow-hidden">
+        <div className="absolute inset-0 bg-grid-gold opacity-30 pointer-events-none" />
+        <div className="absolute -top-32 -left-32 w-[480px] h-[480px] bg-primary/25 blur-[130px] rounded-full" />
+        <div className="absolute -bottom-40 -right-32 w-[420px] h-[420px] bg-gold/10 blur-[130px] rounded-full" />
+
+        <Card className="w-full max-w-lg p-10 text-center rounded-[2.5rem] shadow-2xl shadow-navy/30 relative z-10 border border-gold/20">
+          <motion.div initial={{ scale: 0, rotate: -12 }} animate={{ scale: 1, rotate: 0 }} transition={{ type: "spring", stiffness: 200, damping: 15 }} className="flex justify-center mb-6">
+            <div className="w-24 h-24 bg-gold/15 rounded-3xl flex items-center justify-center shadow-lg shadow-gold/10 animate-pulse-glow">
+              <CheckCircle2 className="w-12 h-12 text-gold" />
             </div>
           </motion.div>
-          <h2 className="text-3xl font-display font-black text-slate-900 mb-4 tracking-tight">
+          <h2 className="text-3xl font-display font-black text-foreground mb-4 tracking-tight">
             {t("Application Transmitted!", "تم إرسال طلبك!")}
           </h2>
-          <p className="text-slate-500 font-bold mb-8 leading-relaxed">
+          <p className="text-muted-foreground font-semibold mb-8 leading-relaxed">
             {t("Your civic record has been successfully queued for review by the platform overseers.", "تم وضع سجلك المدني بنجاح في قائمة الانتظار للمراجعة من قبل مشرفي المنصة.")}
           </p>
-          
-          <motion.div 
+
+          <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="bg-primary/5 border-2 border-primary/20 p-8 rounded-[32px] text-left mb-10 relative overflow-hidden group hover:border-primary/40 transition-all shadow-xl shadow-primary/5"
+            className="bg-gold/5 border-2 border-gold/25 p-8 rounded-[2rem] text-start mb-10 relative overflow-hidden group hover:border-gold/50 transition-all shadow-xl shadow-gold/5"
           >
-            <div className="absolute top-0 right-0 w-24 h-24 bg-primary/10 blur-[40px] -mr-12 -mt-12" />
+            <div className="absolute top-0 right-0 w-24 h-24 bg-gold/10 blur-[40px] -mr-12 -mt-12" />
             <div className="flex items-center gap-4 mb-4">
-               <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center text-primary">
-                  <Fingerprint className="w-5 h-5" />
-               </div>
-               <h4 className="font-black text-slate-900 uppercase tracking-widest text-xs">{t("Mandatory Next Step", "الخطوة التالية الإلزامية")}</h4>
+              <div className="w-10 h-10 bg-gold/15 rounded-xl flex items-center justify-center text-gold">
+                <Fingerprint className="w-5 h-5" />
+              </div>
+              <h4 className="font-black text-foreground uppercase tracking-widest text-xs">{t("Mandatory Next Step", "الخطوة التالية الإلزامية")}</h4>
             </div>
-            <p className="text-sm font-bold text-slate-600 leading-relaxed mb-6">
-               {t("To finalize your candidacy, you MUST join our WhatsApp community to stay updated.", "لإكمال ترشيحك، يجب أن تنضم إلى مجتمع الواتساب الخاص بنا للبقاء على اطلاع.")}
+            <p className="text-sm font-bold text-muted-foreground leading-relaxed mb-6">
+              {t("To finalize your candidacy, you MUST join our WhatsApp community to stay updated.", "لإكمال ترشيحك، يجب أن تنضم إلى مجتمع الواتساب الخاص بنا للبقاء على اطلاع.")}
             </p>
             <a href={communityLink} target="_blank" rel="noopener noreferrer">
-               <Button variant="primary" className="w-full h-14 rounded-2xl gap-3 shadow-lg shadow-primary/20 text-md font-black bg-[#25D366] hover:bg-[#1DA851] text-white border-none">
-                  <img src="/images/whatsapp.png" alt="WhatsApp" className="w-5 h-5" />
-                  {t("Join WhatsApp Community", "انضم إلى مجتمع واتساب")}
-               </Button>
+              <Button variant="primary" className="w-full h-14 rounded-2xl gap-3 shadow-lg text-md font-black bg-[#25D366] hover:bg-[#1DA851] text-white border-none">
+                <img src="/images/whatsapp.png" alt="WhatsApp" className="w-5 h-5" />
+                {t("Join WhatsApp Community", "انضم إلى مجتمع واتساب")}
+              </Button>
             </a>
           </motion.div>
 
           <Link href="/login">
-            <Button variant="ghost" className="w-full font-bold text-slate-400 hover:text-primary transition-colors">{t("Proceed to Login", "المتابعة لتسجيل الدخول")}</Button>
+            <Button variant="ghost" className="w-full font-bold text-muted-foreground hover:text-gold transition-colors">{t("Proceed to Login", "المتابعة لتسجيل الدخول")}</Button>
           </Link>
         </Card>
       </div>
     );
   }
 
+  const stepLabels = [
+    t("Identity", "الهوية"),
+    t("Role", "الدور"),
+    t("Motivation", "الدوافع"),
+  ];
+
   return (
-    <div className="min-h-screen pt-24 pb-12 px-4 bg-secondary/30">
-      <div className="max-w-2xl mx-auto">
-        <div className="mb-8 text-center">
-          <h1 className="text-4xl font-display font-bold text-primary mb-4">
-            {t("Join the Simulation", "انضم إلى المحاكاة")}
+    <div className="min-h-screen pb-16 bg-background relative overflow-hidden">
+      {/* Dark hero band behind the form */}
+      <div className="absolute top-0 left-0 right-0 h-[420px] bg-navy-dark overflow-hidden">
+        <div className="absolute inset-0 bg-grid-gold opacity-30" />
+        <div className="absolute -top-24 -right-24 w-[420px] h-[420px] bg-primary/25 blur-[120px] rounded-full" />
+        <div className="absolute -bottom-32 -left-24 w-[380px] h-[380px] bg-gold/10 blur-[110px] rounded-full" />
+        <div className="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-t from-background to-transparent" />
+      </div>
+
+      <div className="max-w-2xl mx-auto px-4 pt-20 md:pt-24 relative z-10">
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          className="mb-10 text-center"
+        >
+          <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 border border-white/20 backdrop-blur-md text-gold-pale text-[11px] font-bold uppercase tracking-[0.2em] mb-6">
+            <span className="w-1.5 h-1.5 rounded-full bg-gold animate-pulse" />
+            {t("Candidacy Registration", "تسجيل الترشيح")}
+          </span>
+          <h1 className="text-4xl md:text-5xl font-display font-black text-white mb-4">
+            {t("Join the", "انضم إلى")} <span className="text-gradient-gold">{t("Simulation", "المحاكاة")}</span>
           </h1>
-          <p className="text-muted-foreground">
+          <p className="text-white/60">
             {t("Complete the form below to apply for a role in Youth Capital.", "أكمل النموذج أدناه للتقدم لدور في شباب العاصمة.")}
           </p>
-        </div>
+        </motion.div>
 
         {/* Step Indicator */}
-        <div className="flex items-center justify-center gap-4 mb-12">
+        <div className="flex items-center justify-center mb-10">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="flex items-center gap-4">
-              <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition-colors ${step >= i ? 'bg-primary text-white' : 'bg-white text-muted-foreground border border-border'}`}>
-                {i}
+            <div key={i} className="flex items-center">
+              <div className="flex flex-col items-center gap-2">
+                <motion.div
+                  animate={step === i ? { scale: [1, 1.08, 1] } : {}}
+                  transition={{ duration: 2, repeat: Infinity }}
+                  className={`w-11 h-11 rounded-2xl flex items-center justify-center font-black transition-all duration-500 ${
+                    step > i
+                      ? "bg-gold text-navy-dark shadow-lg shadow-gold/30"
+                      : step === i
+                        ? "bg-gold text-navy-dark shadow-lg shadow-gold/40 ring-4 ring-gold/20"
+                        : "bg-white/10 text-white/50 border border-white/20 backdrop-blur-md"
+                  }`}
+                >
+                  {step > i ? <CheckCircle2 className="w-5 h-5" /> : i}
+                </motion.div>
+                <span className={`text-[10px] font-black uppercase tracking-widest ${step >= i ? "text-gold" : "text-white/40"}`}>
+                  {stepLabels[i - 1]}
+                </span>
               </div>
-              {i < 3 && <div className={`w-12 h-1 transition-colors ${step > i ? 'bg-primary' : 'bg-border'}`} />}
+              {i < 3 && (
+                <div className="w-14 sm:w-20 h-1 mx-2 mb-6 rounded-full bg-white/10 overflow-hidden">
+                  <motion.div
+                    initial={false}
+                    animate={{ width: step > i ? "100%" : "0%" }}
+                    transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                    className="h-full bg-gradient-to-r from-gold to-gold-pale"
+                  />
+                </div>
+              )}
             </div>
           ))}
         </div>
 
-        <Card className="p-8">
+        <Card className="p-8 md:p-10 rounded-[2rem] border border-gold/15 shadow-2xl shadow-navy/10">
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <AnimatePresence mode="wait">
               {step === 1 && (
@@ -296,7 +347,7 @@ export default function Apply() {
         </Card>
         
         <p className="text-center mt-8 text-muted-foreground">
-          {t("Already have an account?", "لديك حساب بالفعل؟")} <Link href="/login" className="text-primary font-bold hover:underline">{t("Log in", "تسجيل الدخول")}</Link>
+          {t("Already have an account?", "لديك حساب بالفعل؟")} <Link href="/login" className="text-gold font-bold hover:underline">{t("Log in", "تسجيل الدخول")}</Link>
         </p>
       </div>
     </div>

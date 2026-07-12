@@ -67,6 +67,36 @@
     @apply bg-background text-foreground antialiased;
   }
 
+  ::selection {
+    background: var(--color-gold);
+    color: var(--color-navy-dark);
+  }
+
+  /* Custom scrollbar in brand colors */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--color-background);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: color-mix(in srgb, var(--color-gold) 55%, var(--color-navy));
+    border-radius: 8px;
+    border: 2px solid var(--color-background);
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-gold);
+  }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in srgb, var(--color-gold) 55%, var(--color-navy)) transparent;
+  }
+
   /* Font handling based on language direction */
   html[dir="ltr"] {
     font-family: var(--font-body-en);
@@ -93,6 +123,49 @@
   }
 }
 
+/* ============ Motion Keyframes ============ */
+@keyframes gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+@keyframes shimmer-sweep {
+  0% { transform: translateX(-150%) skewX(-20deg); }
+  100% { transform: translateX(250%) skewX(-20deg); }
+}
+
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0) translateX(0); }
+  33% { transform: translateY(-18px) translateX(8px); }
+  66% { transform: translateY(8px) translateX(-6px); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 20px 0 hsl(44 55% 54% / 0.25); }
+  50% { box-shadow: 0 0 45px 8px hsl(44 55% 54% / 0.45); }
+}
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+@keyframes scroll-wheel {
+  0% { opacity: 1; transform: translateY(0); }
+  70% { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 0; transform: translateY(10px); }
+}
+
+@keyframes border-spin {
+  to { --border-angle: 360deg; }
+}
+
+@property --border-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;
@@ -100,5 +173,155 @@
 
   .glass-panel {
     @apply bg-white/70 dark:bg-charcoal/70 backdrop-blur-xl border border-white/20 dark:border-white/10 shadow-xl;
+  }
+
+  /* Animated gold gradient headline text */
+  .text-gradient-gold {
+    background: linear-gradient(90deg, var(--color-gold), var(--color-gold-pale), var(--color-gold), var(--color-gold-pale));
+    background-size: 300% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: gradient-shift 6s ease-in-out infinite;
+  }
+
+  /* Card that lifts and glows gold on hover */
+  .hover-lift {
+    transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.4s ease, border-color 0.4s ease;
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 40px -12px hsl(221 47% 20% / 0.18), 0 0 0 1px hsl(44 55% 54% / 0.35);
+  }
+
+  /* Spotlight card: pair with JS setting --mouse-x / --mouse-y */
+  .card-spotlight {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card-spotlight::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(400px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), hsl(44 55% 54% / 0.12), transparent 45%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .card-spotlight:hover::before {
+    opacity: 1;
+  }
+
+  /* Shimmer sweep across gold buttons */
+  .btn-shimmer {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-shimmer::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 40%;
+    background: linear-gradient(90deg, transparent, hsl(0 0% 100% / 0.35), transparent);
+    transform: translateX(-150%) skewX(-20deg);
+    pointer-events: none;
+  }
+
+  .btn-shimmer:hover::after {
+    animation: shimmer-sweep 0.9s ease;
+  }
+
+  /* Link underline that draws in from the start */
+  .animated-underline {
+    position: relative;
+  }
+
+  .animated-underline::after {
+    content: "";
+    position: absolute;
+    bottom: -2px;
+    inset-inline-start: 0;
+    width: 100%;
+    height: 2px;
+    background: var(--color-gold);
+    border-radius: 2px;
+    transform: scaleX(0);
+    transform-origin: var(--underline-origin, left);
+    transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  html[dir="rtl"] .animated-underline::after {
+    --underline-origin: right;
+  }
+
+  .animated-underline:hover::after {
+    transform: scaleX(1);
+  }
+
+  .animate-float-slow {
+    animation: float-slow 8s ease-in-out infinite;
+  }
+
+  .animate-pulse-glow {
+    animation: pulse-glow 3s ease-in-out infinite;
+  }
+
+  .animate-marquee {
+    animation: marquee 30s linear infinite;
+  }
+
+  .animate-marquee:hover {
+    animation-play-state: paused;
+  }
+
+  /* Rotating conic gold border — wrap content in an inner element with bg */
+  .border-glow {
+    border: 1px solid transparent;
+    background:
+      linear-gradient(var(--color-card), var(--color-card)) padding-box,
+      conic-gradient(from var(--border-angle), hsl(44 55% 54% / 0.1) 0%, var(--color-gold) 15%, hsl(44 55% 54% / 0.1) 30%) border-box;
+    animation: border-spin 4s linear infinite;
+  }
+
+  /* Subtle dotted grid backdrop for sections */
+  .bg-grid-gold {
+    background-image: radial-gradient(hsl(44 55% 54% / 0.14) 1px, transparent 1px);
+    background-size: 28px 28px;
+  }
+
+  /* Scroll-mouse indicator */
+  .scroll-indicator {
+    width: 26px;
+    height: 42px;
+    border: 2px solid hsl(0 0% 100% / 0.4);
+    border-radius: 999px;
+    display: flex;
+    justify-content: center;
+    padding-top: 8px;
+  }
+
+  .scroll-indicator::after {
+    content: "";
+    width: 4px;
+    height: 8px;
+    border-radius: 999px;
+    background: var(--color-gold);
+    animation: scroll-wheel 1.8s ease-out infinite;
+  }
+}
+
+/* Respect users who prefer less motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.15s !important;
+    scroll-behavior: auto !important;
   }
 }

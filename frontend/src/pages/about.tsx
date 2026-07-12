@@ -14,6 +14,7 @@ import {
   Workflow
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { PageHero, Reveal, TiltCard, CountUp, Button } from "@/components/ui-custom";
 import team from "@/data/team.json";
 
 function TeamAvatar({ member, className = "w-16 h-16 text-2xl" }: { member: any; className?: string }) {
@@ -108,37 +109,31 @@ export default function About() {
   return (
     <div className="min-h-screen bg-background text-foreground font-sans">
 
-      {/* Hero */}
-      <section className="relative bg-navy-dark overflow-hidden py-28 px-4 text-white">
-        <div className="absolute inset-0 opacity-20"
-          style={{ backgroundImage: "radial-gradient(circle at 30% 50%, #C9A84C 0%, transparent 60%), radial-gradient(circle at 80% 20%, #1B2A4A 0%, transparent 50%)" }}
-        />
-        <div className="relative max-w-4xl mx-auto text-center z-10">
-          <div className="inline-flex items-center gap-2 bg-gold/20 text-gold border border-gold/30 rounded-full px-4 py-1.5 text-sm font-semibold mb-8">
-            <Sparkles className="w-4 h-4" />
-            {t("Our Mission", "مهمتنا")}
-          </div>
-          <h1 className="text-5xl md:text-6xl font-display font-bold text-white mb-6 leading-tight">
-            {t("Shaping Tomorrow's", "تشكيل")}
-            <span className="text-gold block">{t("Leaders Today", "قادة الغد اليوم")}</span>
-          </h1>
-          <p className="text-xl text-white/70 max-w-2xl mx-auto leading-relaxed">
-            {t(
-              "Youth Capital is Morocco's first digital civic governance simulation platform : built to give ambitious young people an authentic experience of how government works.",
-              "Youth Capital هي أول منصة مغربية لمحاكاة الحوكمة المدنية الرقمية : بُنيت لمنح الشباب الطموح تجربة حقيقية لكيفية عمل الحكومة."
-            )}
-          </p>
-        </div>
-      </section>
+      <PageHero
+        eyebrow={t("Our Mission", "مهمتنا")}
+        title={t("Shaping Tomorrow's", "تشكيل قادة")}
+        highlight={t("Leaders Today", "الغد اليوم")}
+        subtitle={t(
+          "Youth Capital is Morocco's first digital civic governance simulation platform : built to give ambitious young people an authentic experience of how government works.",
+          "Youth Capital هي أول منصة مغربية لمحاكاة الحوكمة المدنية الرقمية : بُنيت لمنح الشباب الطموح تجربة حقيقية لكيفية عمل الحكومة."
+        )}
+      />
 
       {/* Stats Bar */}
-      <section className="bg-navy py-10 px-4 text-white">
-        <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+      <section className="px-4 -mt-16 relative z-20">
+        <div className="max-w-5xl mx-auto glass-panel rounded-[2.5rem] py-10 px-6 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
           {stats.map((s, i) => (
-            <div key={i}>
-              <div className="text-4xl font-display font-bold text-gold mb-1">{s.value}</div>
-              <div className="text-sm text-white/60">{t(s.labelEn, s.labelAr)}</div>
-            </div>
+            <motion.div
+              key={i}
+              whileHover={{ y: -4 }}
+              transition={{ type: "spring", stiffness: 300, damping: 20 }}
+              className={`cursor-default ${i > 0 ? "md:border-s md:border-border/50" : ""}`}
+            >
+              <div className="text-4xl md:text-5xl font-display font-black text-gradient-gold mb-2">
+                <CountUp value={s.value} />
+              </div>
+              <div className="text-xs md:text-sm text-muted-foreground font-bold uppercase tracking-widest">{t(s.labelEn, s.labelAr)}</div>
+            </motion.div>
           ))}
         </div>
       </section>
@@ -146,28 +141,32 @@ export default function About() {
       {/* What We Do */}
       <section className="py-24 px-4 bg-background">
         <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-display font-bold text-primary mb-4">
-              {t("What We Offer", "ما نقدمه")}
+          <Reveal className="text-center mb-16">
+            <h2 className="text-3xl md:text-5xl font-display font-black text-foreground mb-4">
+              {t("What We", "ما")} <span className="text-gradient-gold">{t("Offer", "نقدمه")}</span>
             </h2>
-            <p className="text-muted-foreground max-w-xl mx-auto">
+            <p className="text-muted-foreground max-w-xl mx-auto text-lg">
               {t(
                 "Four core pillars define the Youth Capital experience.",
                 "أربعة محاور أساسية تحدد تجربة Youth Capital."
               )}
             </p>
-          </div>
+          </Reveal>
           <div className="grid md:grid-cols-2 gap-8">
             {pillars.map((p, i) => (
-              <div key={i} className="group flex gap-5 p-6 rounded-2xl border border-border bg-card hover:border-gold/40 hover:shadow-lg hover:shadow-gold/5 transition-all duration-300">
-                <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-gold/10 transition-colors">
-                  <p.icon className="w-6 h-6 text-primary group-hover:text-gold transition-colors" />
-                </div>
-                <div>
-                  <h3 className="font-bold text-lg text-foreground mb-2">{t(p.en, p.ar)}</h3>
-                  <p className="text-muted-foreground text-sm leading-relaxed">{t(p.descEn, p.descAr)}</p>
-                </div>
-              </div>
+              <Reveal key={i} delay={i * 0.08}>
+                <TiltCard className="group h-full flex gap-5 p-7 rounded-3xl border border-border/50 bg-card hover:border-gold/40 hover:shadow-xl hover:shadow-gold/5 transition-[border-color,box-shadow] duration-300">
+                  <div className="relative z-10 flex gap-5">
+                    <div className="flex-shrink-0 w-14 h-14 rounded-2xl bg-gold/10 flex items-center justify-center group-hover:bg-gold/20 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
+                      <p.icon className="w-7 h-7 text-gold" />
+                    </div>
+                    <div>
+                      <h3 className="font-display font-bold text-lg text-foreground mb-2 group-hover:text-gold transition-colors duration-300">{t(p.en, p.ar)}</h3>
+                      <p className="text-muted-foreground text-sm leading-relaxed">{t(p.descEn, p.descAr)}</p>
+                    </div>
+                  </div>
+                </TiltCard>
+              </Reveal>
             ))}
           </div>
         </div>
@@ -177,13 +176,13 @@ export default function About() {
       <section className="py-24 px-4 bg-ice-blue/30">
         <div className="max-w-4xl mx-auto">
           <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div>
-              <div className="inline-flex items-center gap-2 text-gold text-sm font-semibold mb-4">
-                <Target className="w-4 h-4" />
+            <Reveal direction="right">
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gold/10 border border-gold/25 text-gold text-[11px] font-bold uppercase tracking-[0.2em] mb-5">
+                <Target className="w-3.5 h-3.5" />
                 {t("Our Story", "قصتنا")}
               </div>
-              <h2 className="text-3xl font-display font-bold text-primary mb-6">
-                {t("Born from a Belief", "وُلد من إيمان")}
+              <h2 className="text-3xl md:text-4xl font-display font-black text-foreground mb-6">
+                {t("Born from a", "وُلد من")} <span className="text-gradient-gold">{t("Belief", "إيمان")}</span>
               </h2>
               <p className="text-muted-foreground leading-relaxed mb-4">
                 {t(
@@ -198,18 +197,30 @@ export default function About() {
                 )}
               </p>
               <Link href="/apply">
-                <button className="inline-flex items-center gap-2 bg-gold text-navy-dark font-bold px-6 py-3 rounded-xl hover:opacity-90 transition-opacity">
-                  {t("Join the Simulation", "انضم للمحاكاة")} <ChevronRight className="w-4 h-4" />
-                </button>
+                <Button variant="gold" size="lg" className="rounded-2xl px-8 group">
+                  {t("Join the Simulation", "انضم للمحاكاة")}
+                  <ChevronRight className={`w-4 h-4 ml-1 transition-transform group-hover:translate-x-1 ${isAr ? "rotate-180 group-hover:-translate-x-1" : ""}`} />
+                </Button>
               </Link>
-            </div>
-            <div className="rounded-2xl overflow-hidden border border-border shadow-xl">
-              <img
-                src="/images/parliament.png"
-                alt="Parliament simulation"
-                className="w-full h-80 object-cover"
-              />
-            </div>
+            </Reveal>
+            <Reveal direction="left">
+              <div className="relative rounded-[2rem] overflow-hidden border border-border/50 shadow-2xl shadow-navy/10 group">
+                <img
+                  src="/images/parliament.png"
+                  alt="Parliament simulation"
+                  className="w-full h-80 object-cover group-hover:scale-105 transition-transform duration-700"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-navy-dark/70 via-transparent to-transparent" />
+                <div className="absolute bottom-5 start-5 px-4 py-2 rounded-2xl glass-panel">
+                  <span className="text-[10px] font-black text-gold uppercase tracking-widest block">
+                    {t("Est. 2025", "تأسست 2025")}
+                  </span>
+                  <span className="text-sm font-display font-bold text-white">
+                    {t("Kingdom of Morocco Simulation", "محاكاة المملكة المغربية")}
+                  </span>
+                </div>
+              </div>
+            </Reveal>
           </div>
         </div>
       </section>
@@ -666,19 +677,27 @@ export default function About() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 px-4 bg-navy-dark text-center text-white">
-        <div className="max-w-2xl mx-auto">
-          <h2 className="text-3xl font-display font-bold text-white mb-4">
-            {t("Ready to Lead?", "مستعد للقيادة؟")}
-          </h2>
-          <p className="text-white/70 mb-8">
-            {t("Apply for your simulation role and start shaping policy today.", "تقدّم لدورك في المحاكاة وابدأ صياغة السياسات اليوم.")}
-          </p>
-          <Link href="/apply">
-            <button className="bg-gold text-navy-dark font-bold px-8 py-4 rounded-xl text-lg hover:opacity-90 transition-opacity shadow-lg shadow-gold/30">
-              {t("Apply Now", "قدّم طلبك الآن")}
-            </button>
-          </Link>
+      <section className="py-24 md:py-32 px-4 bg-navy-dark text-center text-white relative overflow-hidden">
+        <div className="absolute inset-0 bg-grid-gold opacity-30 pointer-events-none" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-gold/10 blur-[140px] rounded-full pointer-events-none" />
+        <div className="max-w-2xl mx-auto relative z-10">
+          <Reveal>
+            <h2 className="text-4xl md:text-6xl font-display font-black text-white mb-6">
+              {t("Ready to", "مستعد")} <span className="text-gradient-gold">{t("Lead?", "للقيادة؟")}</span>
+            </h2>
+          </Reveal>
+          <Reveal delay={0.1}>
+            <p className="text-white/60 mb-10 text-lg leading-relaxed">
+              {t("Apply for your simulation role and start shaping policy today.", "تقدّم لدورك في المحاكاة وابدأ صياغة السياسات اليوم.")}
+            </p>
+          </Reveal>
+          <Reveal delay={0.2}>
+            <Link href="/apply">
+              <Button variant="gold" size="lg" className="rounded-2xl px-12 h-16 text-lg shadow-2xl shadow-gold/25 animate-pulse-glow">
+                {t("Apply Now", "قدّم طلبك الآن")}
+              </Button>
+            </Link>
+          </Reveal>
         </div>
       </section>
 

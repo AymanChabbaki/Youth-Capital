@@ -1,5 +1,6 @@
 import { useLanguage } from "@/hooks/use-language";
 import { Lock, Eye, Database, Mail, Shield, UserCheck, Globe, FileText } from "lucide-react";
+import { PageHero, Reveal } from "@/components/ui-custom";
 
 export default function Privacy() {
   const { t } = useLanguage();
@@ -129,28 +130,21 @@ export default function Privacy() {
   return (
     <div className="min-h-screen bg-background">
 
-      {/* Hero */}
-      <section className="bg-navy-dark py-24 px-4 text-center">
-        <div className="max-w-3xl mx-auto">
-          <div className="inline-flex items-center gap-2 bg-gold/20 text-gold border border-gold/30 rounded-full px-4 py-1.5 text-sm font-semibold mb-8">
-            <Lock className="w-4 h-4" />
-            {t("Privacy Policy", "سياسة الخصوصية")}
-          </div>
-          <h1 className="text-5xl font-display font-bold text-white mb-6">
-            {t("Your Privacy Matters", "خصوصيتك تهمنا")}
-          </h1>
-          <p className="text-xl text-white/70 leading-relaxed">
-            {t(
-              "We are committed to protecting your personal information and being transparent about what we collect and how we use it.",
-              "نلتزم بحماية معلوماتك الشخصية والشفافية بشأن ما نجمعه وكيفية استخدامه."
-            )}
-          </p>
-          <p className="text-sm text-white/40 mt-6">
-            {t("Last updated: March 2026 : Compliant with GDPR and Moroccan Law 09-08 on personal data protection.",
-              "آخر تحديث: مارس 2026 : متوافق مع GDPR والقانون المغربي 09-08 بشأن حماية البيانات الشخصية.")}
-          </p>
-        </div>
-      </section>
+      <PageHero
+        compact
+        eyebrow={t("Privacy Policy", "سياسة الخصوصية")}
+        title={t("Your Privacy", "خصوصيتك")}
+        highlight={t("Matters", "تهمنا")}
+        subtitle={t(
+          "We are committed to protecting your personal information and being transparent about what we collect and how we use it.",
+          "نلتزم بحماية معلوماتك الشخصية والشفافية بشأن ما نجمعه وكيفية استخدامه."
+        )}
+      >
+        <p className="text-sm text-white/40">
+          {t("Last updated: March 2026 : Compliant with GDPR and Moroccan Law 09-08 on personal data protection.",
+            "آخر تحديث: مارس 2026 : متوافق مع GDPR والقانون المغربي 09-08 بشأن حماية البيانات الشخصية.")}
+        </p>
+      </PageHero>
 
       {/* Commitment Banner */}
       <section className="py-10 px-4 bg-primary/5 border-y border-primary/10">
@@ -161,10 +155,12 @@ export default function Privacy() {
             { icon: UserCheck, en: "You control your data", ar: "تتحكم في بياناتك" },
             { icon: Globe, en: "GDPR compliant", ar: "متوافق مع GDPR" },
           ].map((item, i) => (
-            <div key={i} className="flex items-center gap-2 text-sm font-semibold text-primary">
-              <item.icon className="w-4 h-4 text-gold" />
-              {t(item.en, item.ar)}
-            </div>
+            <Reveal key={i} delay={i * 0.08}>
+              <div className="flex items-center gap-2.5 text-sm font-bold text-primary px-4 py-2 rounded-full bg-card border border-gold/20 shadow-sm hover:border-gold/50 hover:-translate-y-0.5 transition-all duration-300">
+                <item.icon className="w-4 h-4 text-gold" />
+                {t(item.en, item.ar)}
+              </div>
+            </Reveal>
           ))}
         </div>
       </section>
@@ -173,24 +169,26 @@ export default function Privacy() {
       <section className="py-16 px-4 bg-background">
         <div className="max-w-4xl mx-auto space-y-8">
           {sections.map((section, i) => (
-            <div key={i} className="border border-border rounded-2xl overflow-hidden">
-              <div className="flex items-center gap-3 p-6 bg-card border-b border-border">
-                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
-                  <section.icon className="w-5 h-5 text-primary" />
+            <Reveal key={i} delay={0.05}>
+              <div className="border border-border/50 rounded-[2rem] overflow-hidden bg-card hover:border-gold/30 hover:shadow-xl hover:shadow-gold/5 transition-all duration-300 group">
+                <div className="flex items-center gap-4 p-6 md:p-7 border-b border-border/50 bg-secondary/10">
+                  <div className="w-12 h-12 rounded-2xl bg-gold/10 flex items-center justify-center flex-shrink-0 group-hover:bg-gold/20 group-hover:scale-105 transition-all duration-300">
+                    <section.icon className="w-6 h-6 text-gold" />
+                  </div>
+                  <h2 className="text-xl md:text-2xl font-display font-black text-foreground">
+                    {t(section.titleEn, section.titleAr)}
+                  </h2>
                 </div>
-                <h2 className="text-xl font-display font-bold text-foreground">
-                  {t(section.titleEn, section.titleAr)}
-                </h2>
+                <ul className="divide-y divide-border/40">
+                  {section.contentEn.map((_, j) => (
+                    <li key={j} className="px-6 md:px-7 py-5 flex items-start gap-4 text-sm text-muted-foreground leading-relaxed hover:bg-gold/[0.04] transition-colors">
+                      <span className="flex-shrink-0 w-1.5 h-1.5 rounded-full bg-gold mt-2" />
+                      {t(section.contentEn[j], section.contentAr[j])}
+                    </li>
+                  ))}
+                </ul>
               </div>
-              <ul className="divide-y divide-border">
-                {section.contentEn.map((_, j) => (
-                  <li key={j} className="px-6 py-4 flex items-start gap-3 text-sm text-muted-foreground leading-relaxed hover:bg-muted/30 transition-colors">
-                    <span className="flex-shrink-0 w-1.5 h-1.5 rounded-full bg-gold mt-2" />
-                    {t(section.contentEn[j], section.contentAr[j])}
-                  </li>
-                ))}
-              </ul>
-            </div>
+            </Reveal>
           ))}
         </div>
       </section>

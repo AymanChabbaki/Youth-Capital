@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useScroll, useSpring } from "framer-motion";
 import { useAuth } from "@/hooks/use-auth";
 import { useLanguage } from "@/hooks/use-language";
 import { Button } from "@/components/ui-custom";
@@ -40,6 +40,8 @@ function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const { mutate: logout } = useLogout();
   const queryClient = useQueryClient();
+  const { scrollYProgress } = useScroll();
+  const progressX = useSpring(scrollYProgress, { stiffness: 120, damping: 30, restDelta: 0.001 });
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
@@ -69,9 +71,18 @@ function Navbar() {
   };
 
   return (
-    <header 
-      className="relative z-50 w-full bg-background border-b border-border/30 py-2"
+    <header
+      className={`sticky top-0 z-50 w-full py-2 transition-all duration-500 ${
+        isScrolled
+          ? "bg-background/80 backdrop-blur-xl border-b border-border/50 shadow-lg shadow-navy/5"
+          : "bg-background border-b border-border/30"
+      }`}
     >
+      {/* Gold scroll progress bar */}
+      <motion.div
+        style={{ scaleX: progressX }}
+        className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-gold via-gold-pale to-gold origin-left rtl:origin-right z-10"
+      />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           
@@ -91,7 +102,7 @@ function Navbar() {
                 key={link.href} 
                 href={link.href}
                 className={`text-sm font-semibold transition-all hover:text-accent relative py-1 ${
-                  location === link.href ? "text-accent" : "text-muted-foreground/80"
+                  location === link.href ? "text-accent" : "text-muted-foreground/80 animated-underline"
                 }`}
               >
                 {link.label}
@@ -326,8 +337,11 @@ function MobileBottomNav() {
 function Footer() {
   const { t } = useLanguage();
   return (
-    <footer className="bg-navy-dark text-white pt-16 pb-24 md:pb-8 border-t border-white/10">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <footer className="relative bg-navy-dark text-white pt-16 pb-24 md:pb-8 border-t border-white/10 overflow-hidden">
+      {/* Gold top accent + ambient glow */}
+      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-gold/60 to-transparent" />
+      <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[600px] h-64 bg-gold/5 blur-[120px] rounded-full pointer-events-none" />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
           <div className="col-span-1 md:col-span-2">
             <div className="mb-6 text-center md:text-start">
@@ -349,44 +363,44 @@ function Footer() {
           <div className="hidden md:block">
             <h4 className="font-bold text-gold mb-4">{t("Platform", "المنصة")}</h4>
             <ul className="space-y-3">
-              <li><Link href="/about" className="text-white/70 hover:text-white transition-colors">{t("About Us", "من نحن")}</Link></li>
-              <li><Link href="/press" className="text-white/70 hover:text-white transition-colors">{t("Press & News", "الأخبار والصحافة")}</Link></li>
-              <li><Link href="/events" className="text-white/70 hover:text-white transition-colors">{t("Events", "الفعاليات")}</Link></li>
+              <li><Link href="/about" className="text-white/70 hover:text-gold transition-colors animated-underline">{t("About Us", "من نحن")}</Link></li>
+              <li><Link href="/press" className="text-white/70 hover:text-gold transition-colors animated-underline">{t("Press & News", "الأخبار والصحافة")}</Link></li>
+              <li><Link href="/events" className="text-white/70 hover:text-gold transition-colors animated-underline">{t("Events", "الفعاليات")}</Link></li>
             </ul>
           </div>
           <div className="hidden md:block">
             <h4 className="font-bold text-gold mb-4">{t("Support", "الدعم")}</h4>
             <ul className="space-y-3">
-              <li><Link href="/support" className="text-white/70 hover:text-white transition-colors">{t("Help Center", "مركز المساعدة")}</Link></li>
-              <li><Link href="/rules" className="text-white/70 hover:text-white transition-colors">{t("Simulation Rules", "قواعد المحاكاة")}</Link></li>
-              <li><Link href="/privacy" className="text-white/70 hover:text-white transition-colors">{t("Privacy Policy", "سياسة الخصوصية")}</Link></li>
+              <li><Link href="/support" className="text-white/70 hover:text-gold transition-colors animated-underline">{t("Help Center", "مركز المساعدة")}</Link></li>
+              <li><Link href="/rules" className="text-white/70 hover:text-gold transition-colors animated-underline">{t("Simulation Rules", "قواعد المحاكاة")}</Link></li>
+              <li><Link href="/privacy" className="text-white/70 hover:text-gold transition-colors animated-underline">{t("Privacy Policy", "سياسة الخصوصية")}</Link></li>
             </ul>
           </div>
         </div>
         <div className="pt-8 border-t border-white/10 text-center text-white/50 text-xs flex flex-col md:flex-row justify-between items-center gap-4">
           <p>© {new Date().getFullYear()} Youth Capital. {t("All rights reserved.", "جميع الحقوق محفوظة.")}</p>
           <div className="flex gap-4 flex-wrap">
-            <a href="https://x.com/youthcapitalhq" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors">
+            <a href="https://x.com/youthcapitalhq" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/5 hover:bg-gold/20 hover:-translate-y-1 hover:scale-110 flex items-center justify-center transition-all duration-300">
               <Twitter className="w-4 h-4 text-white/80 hover:text-white" />
             </a>
-            <a href="https://www.facebook.com/youthcapital" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors">
+            <a href="https://www.facebook.com/youthcapital" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/5 hover:bg-gold/20 hover:-translate-y-1 hover:scale-110 flex items-center justify-center transition-all duration-300">
               <Facebook className="w-4 h-4 text-white/80 hover:text-white" />
             </a>
-            <a href="https://www.instagram.com/youthcapitalhq" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors">
+            <a href="https://www.instagram.com/youthcapitalhq" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/5 hover:bg-gold/20 hover:-translate-y-1 hover:scale-110 flex items-center justify-center transition-all duration-300">
               <Instagram className="w-4 h-4 text-white/80 hover:text-white" />
             </a>
-            <a href="https://www.linkedin.com/company/youthcapitalhq" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors">
+            <a href="https://www.linkedin.com/company/youthcapitalhq" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/5 hover:bg-gold/20 hover:-translate-y-1 hover:scale-110 flex items-center justify-center transition-all duration-300">
               <Linkedin className="w-4 h-4 text-white/80 hover:text-white" />
             </a>
-            <a href="https://www.tiktok.com/@youthcapitalhq" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors">
+            <a href="https://www.tiktok.com/@youthcapitalhq" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/5 hover:bg-gold/20 hover:-translate-y-1 hover:scale-110 flex items-center justify-center transition-all duration-300">
               <svg className="w-4 h-4 text-white/80 hover:text-white fill-current" viewBox="0 0 448 512">
                 <path d="M448,209.91a210.06,210.06,0,0,1-122.77-39.25V349.38A162.55,162.55,0,1,1,185,188.31V278.2a74.62,74.62,0,1,0,52.23,71.18V0l88,0a121.18,121.18,0,0,0,1.86,22.17h0A122.18,122.18,0,0,0,381,102.39a121.43,121.43,0,0,0,67,20.14Z"/>
               </svg>
             </a>
-            <a href="https://www.youtube.com/@youthcapitalhq" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors">
+            <a href="https://www.youtube.com/@youthcapitalhq" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/5 hover:bg-gold/20 hover:-translate-y-1 hover:scale-110 flex items-center justify-center transition-all duration-300">
               <Youtube className="w-4 h-4 text-white/80 hover:text-white" />
             </a>
-            <a href="https://chat.whatsapp.com/LC5mqBrIPXdLJhK6cLJsmu" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors">
+            <a href="https://chat.whatsapp.com/LC5mqBrIPXdLJhK6cLJsmu" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/5 hover:bg-gold/20 hover:-translate-y-1 hover:scale-110 flex items-center justify-center transition-all duration-300">
               <img src="/images/whatsapp.png" alt="WhatsApp" className="w-4 h-4 opacity-80 hover:opacity-100 transition-opacity" />
             </a>
           </div>
