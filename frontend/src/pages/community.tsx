@@ -180,16 +180,16 @@ export default function Community() {
   const forums = forumsData?.forums || [];
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] flex flex-col lg:flex-row font-sans">
+    <div className="min-h-screen bg-background flex flex-col lg:flex-row font-sans">
       {/* Sidebar - Chambers of Debate */}
-      <aside className="w-full lg:w-85 bg-white border-r border-slate-200 p-6 lg:h-screen lg:sticky lg:top-0 overflow-y-auto shrink-0 z-20">
+      <aside className="w-full lg:w-85 bg-card border-e border-border/50 p-6 lg:h-screen lg:sticky lg:top-0 overflow-y-auto shrink-0 z-20">
         <div className="flex items-center gap-3 mb-10 px-2">
-          <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center text-primary">
+          <div className="w-10 h-10 bg-gold/10 rounded-xl flex items-center justify-center text-gold">
             <Users className="w-6 h-6" />
           </div>
           <div>
-            <h1 className="text-xl font-display font-bold text-slate-900 tracking-tight">{t("Civic Pulse", "النبض المدني")}</h1>
-            <p className="text-xs text-slate-500 font-medium uppercase tracking-widest">{t("Community Chambers", "غرف المجتمع")}</p>
+            <h1 className="text-xl font-display font-black text-foreground tracking-tight">{t("Civic Pulse", "النبض المدني")}</h1>
+            <p className="text-xs text-muted-foreground font-medium uppercase tracking-widest">{t("Community Chambers", "غرف المجتمع")}</p>
           </div>
         </div>
 
@@ -202,34 +202,34 @@ export default function Community() {
               onClick={() => { setSelectedForumId(forum.id); setIsComposing(false); setActivePostId(null); }}
               className={`w-full flex items-center gap-4 p-4 rounded-2xl transition-all duration-300 group ${
                 selectedForumId === forum.id 
-                  ? "bg-primary text-white shadow-xl shadow-primary/20 ring-1 ring-primary" 
-                  : "hover:bg-slate-50 text-slate-600"
+                  ? "bg-navy-dark text-white shadow-xl shadow-navy/20 ring-1 ring-gold/40" 
+                  : "hover:bg-secondary/40 text-muted-foreground"
               }`}
             >
               <div className={`p-2 rounded-lg transition-colors ${
-                selectedForumId === forum.id ? "bg-white/20 text-white" : "bg-slate-100 text-slate-500 group-hover:bg-white"
+                selectedForumId === forum.id ? "bg-white/20 text-white" : "bg-secondary/60 text-muted-foreground group-hover:bg-card"
               }`}>
                 <Hash className="w-4 h-4" />
               </div>
-              <div className="flex-1 text-left">
+              <div className="flex-1 text-start">
                 <div className="font-bold text-sm leading-tight">{isAr ? forum.nameAr : forum.name}</div>
                 <div className={`text-[10px] uppercase font-bold tracking-tighter mt-0.5 opacity-70 ${
-                  selectedForumId === forum.id ? "text-white" : "text-slate-400"
+                  selectedForumId === forum.id ? "text-gold" : "text-muted-foreground"
                 }`}>
                   {forum.postCount} {t("Motions", "مقترحات")}
                 </div>
               </div>
               {selectedForumId === forum.id && (
-                <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" />
+                <div className="w-1.5 h-1.5 bg-gold rounded-full animate-pulse" />
               )}
             </motion.button>
           ))}
         </div>
 
-        <div className="mt-12 p-6 rounded-3xl bg-slate-900 text-white relative overflow-hidden group">
-           <div className="absolute top-0 right-0 w-32 h-32 bg-primary/20 blur-3xl -mr-16 -mt-16 group-hover:bg-primary/40 transition-colors" />
-           <p className="text-xs font-bold text-primary mb-2 uppercase tracking-widest">{t("Guidelines", "الإرشادات")}</p>
-           <p className="text-sm text-slate-300 mb-4 leading-relaxed font-medium">
+        <div className="mt-12 p-6 rounded-3xl bg-navy-dark text-white relative overflow-hidden group">
+           <div className="absolute top-0 right-0 w-32 h-32 bg-gold/20 blur-3xl -mr-16 -mt-16 group-hover:bg-gold/30 transition-colors" />
+           <p className="text-xs font-bold text-gold mb-2 uppercase tracking-widest">{t("Guidelines", "الإرشادات")}</p>
+           <p className="text-sm text-white/70 mb-4 leading-relaxed font-medium">
              {t("Respect the constitutional framework in all debates.", "احترم الإطار الدستوري في جميع النقاشات.")}
            </p>
            <Link href="/rules">
@@ -248,12 +248,12 @@ export default function Community() {
             animate={{ opacity: 1, y: 0 }}
             className="h-[80vh] flex flex-col items-center justify-center text-center px-6"
           >
-            <div className="w-24 h-24 bg-white rounded-[40px] shadow-2xl flex items-center justify-center mb-8 relative">
-                <div className="absolute inset-0 bg-primary/5 rounded-[40px] animate-ping opacity-50" />
-                <MessageSquare className="w-10 h-10 text-primary" />
+            <div className="w-24 h-24 bg-card rounded-[2.5rem] shadow-2xl flex items-center justify-center mb-8 relative">
+                <div className="absolute inset-0 bg-gold/10 rounded-[2.5rem] animate-ping opacity-50" />
+                <MessageSquare className="w-10 h-10 text-gold" />
             </div>
-            <h2 className="text-3xl font-display font-bold text-slate-900 mb-4">{t("Enter a Debate Chamber", "ادخل غرفة النقاش")}</h2>
-            <p className="text-slate-500 max-w-sm font-medium leading-relaxed">
+            <h2 className="text-3xl font-display font-black text-foreground mb-4">{t("Enter a Debate Chamber", "ادخل غرفة النقاش")}</h2>
+            <p className="text-muted-foreground max-w-sm font-medium leading-relaxed">
               {t("Select a forum from the sidebar to represent your constituency and engage in the legislative simulation.", "اختر منتدى من القائمة الجانبية لتمثيل دائرتك الانتخابية والمشاركة في محاكاة العمل التشريعي.")}
             </p>
           </motion.div>
@@ -261,16 +261,16 @@ export default function Community() {
           <div className="space-y-10">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-2">
                 <div className="flex-1">
-                  <h1 className="text-3xl lg:text-4xl font-display font-bold text-slate-900 mb-2">
+                  <h1 className="text-3xl lg:text-4xl font-display font-black text-foreground mb-2">
                     {isAr ? forums.find(f => f.id === selectedForumId)?.nameAr : forums.find(f => f.id === selectedForumId)?.name}
                   </h1>
-                  <div className="flex items-center gap-4 text-slate-500 text-sm font-medium">
+                  <div className="flex items-center gap-4 text-muted-foreground text-sm font-medium">
                      <span className="flex items-center gap-1.5">
                        <Users className="w-4 h-4" />
                        {t("Simulation Members", "أعضاء المحاكاة")}
                      </span>
-                     <span className="w-1 h-1 bg-slate-300 rounded-full" />
-                     <span className="px-2 py-0.5 bg-slate-100 rounded text-[10px] uppercase font-bold tracking-wider">
+                     <span className="w-1 h-1 bg-border rounded-full" />
+                     <span className="px-2 py-0.5 bg-secondary/50 rounded text-[10px] uppercase font-bold tracking-wider">
                        {forums.find(f => f.id === selectedForumId)?.category}
                      </span>
                   </div>
@@ -278,46 +278,47 @@ export default function Community() {
                 
                 <div className="flex flex-1 items-center gap-3">
                    <div className="relative flex-1 max-w-sm">
-                     <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                     <Search className="absolute start-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                      <Input 
                        placeholder={t("Search motions...", "بحث في المقترحات...")}
                        value={searchQuery}
                        onChange={(e) => setSearchQuery(e.target.value)}
-                       className="pl-11 h-12 bg-white border-slate-200 rounded-2xl shadow-sm focus-visible:ring-primary/20"
+                       className="ps-11 h-12 bg-card border-border/50 rounded-2xl shadow-sm focus-visible:ring-gold/30"
                      />
                    </div>
                    
                    <DropdownMenu>
                      <DropdownMenuTrigger asChild>
-                       <Button variant="outline" size="icon" className="rounded-2xl w-12 h-12 border-slate-200 bg-white shrink-0">
-                          <Filter className="w-5 h-5 text-slate-600" />
+                       <Button variant="outline" size="icon" className="rounded-2xl w-12 h-12 border-border/50 bg-card shrink-0">
+                          <Filter className="w-5 h-5 text-muted-foreground" />
                        </Button>
                      </DropdownMenuTrigger>
-                     <DropdownMenuContent align="end" className="w-56 p-2 rounded-2xl border-slate-200 shadow-xl">
-                       <DropdownMenuLabel className="text-xs uppercase tracking-widest text-slate-400 font-black px-3 py-2">
+                     <DropdownMenuContent align="end" className="w-56 p-2 rounded-2xl border-border/50 shadow-xl">
+                       <DropdownMenuLabel className="text-xs uppercase tracking-widest text-muted-foreground font-black px-3 py-2">
                          {t("Sort By", "ترتيب حسب")}
                        </DropdownMenuLabel>
                        <DropdownMenuSeparator />
                        <DropdownMenuItem 
                          onClick={() => setSortBy("newest")}
-                         className={`rounded-xl py-3 px-4 font-bold flex items-center justify-between cursor-pointer ${sortBy === 'newest' ? 'bg-primary/5 text-primary' : ''}`}
+                         className={`rounded-xl py-3 px-4 font-bold flex items-center justify-between cursor-pointer ${sortBy === 'newest' ? 'bg-gold/10 text-gold' : ''}`}
                        >
                          {t("Newest Motions", "أحدث المقترحات")}
-                         {sortBy === 'newest' && <div className="w-1.5 h-1.5 bg-primary rounded-full" />}
+                         {sortBy === 'newest' && <div className="w-1.5 h-1.5 bg-gold rounded-full" />}
                        </DropdownMenuItem>
                        <DropdownMenuItem 
                          onClick={() => setSortBy("popular")}
-                         className={`rounded-xl py-3 px-4 font-bold flex items-center justify-between cursor-pointer ${sortBy === 'popular' ? 'bg-primary/5 text-primary' : ''}`}
+                         className={`rounded-xl py-3 px-4 font-bold flex items-center justify-between cursor-pointer ${sortBy === 'popular' ? 'bg-gold/10 text-gold' : ''}`}
                        >
                          {t("Most Supported", "الأكثر تأييداً")}
-                         {sortBy === 'popular' && <div className="w-1.5 h-1.5 bg-primary rounded-full" />}
+                         {sortBy === 'popular' && <div className="w-1.5 h-1.5 bg-gold rounded-full" />}
                        </DropdownMenuItem>
                      </DropdownMenuContent>
                    </DropdownMenu>
 
-                   <Button 
-                      onClick={() => setIsComposing(!isComposing)} 
-                      className="gap-3 h-12 px-6 rounded-2xl shadow-xl shadow-primary/20 text-[15px] font-bold shrink-0"
+                   <Button
+                      variant="gold"
+                      onClick={() => setIsComposing(!isComposing)}
+                      className="gap-3 h-12 px-6 rounded-2xl shadow-xl shadow-gold/20 text-[15px] font-bold shrink-0"
                     >
                       {isComposing ? t("Cancel", "إلغاء") : <><Plus className="w-5 h-5"/> {t("New Motion", "موضوع جديد")}</>}
                    </Button>
@@ -332,10 +333,10 @@ export default function Community() {
                   exit={{ opacity: 0, height: 0, marginTop: 0 }}
                   className="overflow-hidden"
                 >
-                  <Card className="p-8 border-primary/20 shadow-2xl shadow-primary/5 bg-white relative">
-                    <div className="absolute top-4 right-4 text-[10px] uppercase font-bold text-primary tracking-widest">{t("DRAFTING PHASE", "مرحلة الصياغة")}</div>
+                  <Card className="p-8 border-gold/25 shadow-2xl shadow-gold/5 relative">
+                    <div className="absolute top-4 right-4 text-[10px] uppercase font-bold text-gold tracking-widest">{t("DRAFTING PHASE", "مرحلة الصياغة")}</div>
                     <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
-                      <Send className="w-5 h-5 text-primary" />
+                      <Send className="w-5 h-5 text-gold" />
                       {t("Propose a New Motion", "اقتراح موضوع جديد")}
                     </h3>
                     <div className="space-y-5">
@@ -343,16 +344,16 @@ export default function Community() {
                         placeholder={t("Subject line...", "موضوع النقاش...")} 
                         value={newPostTitle}
                         onChange={(e) => setNewPostTitle(e.target.value)}
-                        className="bg-slate-50 border-none h-14 text-lg font-bold placeholder:text-slate-400 px-6 rounded-2xl"
+                        className="bg-secondary/30 border-none h-14 text-lg font-bold px-6 rounded-2xl"
                       />
                       <Textarea 
                         placeholder={t("Elaborate on your proposal... Use evidence-based arguments for better impact.", "اشرح مقترحك بالتفصيل... استخدم حججاً مبنية على أدلة لتأثير أفضل.")}
                         value={newPostContent}
                         onChange={(e) => setNewPostContent(e.target.value)}
-                        className="min-h-[150px] bg-slate-50 border-none text-md leading-relaxed placeholder:text-slate-400 p-6 rounded-2xl"
+                        className="min-h-[150px] bg-secondary/30 border-none text-md leading-relaxed p-6 rounded-2xl"
                       />
-                      <div className="flex justify-between items-center bg-slate-50/50 p-4 rounded-2xl border border-dashed border-slate-200">
-                        <p className="text-xs text-slate-500 font-medium italic">
+                      <div className="flex justify-between items-center bg-secondary/20 p-4 rounded-2xl border border-dashed border-border/50">
+                        <p className="text-xs text-muted-foreground font-medium italic">
                           {t("This proposal will be visible to all members of this chamber.", "سيكون هذا المقترح مرئياً لجميع أعضاء هذه الغرفة.")}
                         </p>
                         <Button 
@@ -375,16 +376,16 @@ export default function Community() {
               {isLoadingPosts ? (
                 <div className="space-y-8">
                   {[1, 2, 3].map((n) => (
-                    <div key={n} className="h-64 bg-slate-100 rounded-[32px] animate-pulse" />
+                    <div key={n} className="h-64 bg-foreground/[0.06] rounded-[2rem] animate-pulse" />
                   ))}
                 </div>
               ) : !postsData?.posts || postsData.posts.length === 0 ? (
-                <div className="text-center py-20 bg-white rounded-[40px] border border-dashed border-slate-200">
-                  <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Plus className="w-8 h-8 text-slate-300" />
+                <div className="text-center py-20 bg-card rounded-[2.5rem] border border-dashed border-border">
+                  <div className="w-16 h-16 bg-secondary/40 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Plus className="w-8 h-8 text-muted-foreground/40" />
                   </div>
-                  <h3 className="text-xl font-bold text-slate-900 mb-1">{t("Floor is open", "الباب مفتوح")}</h3>
-                  <p className="text-slate-500 font-medium">{t("No motions have been tabled yet.", "لم يتم طرح أي مقترحات بعد.")}</p>
+                  <h3 className="text-xl font-display font-black text-foreground mb-1">{t("Floor is open", "الباب مفتوح")}</h3>
+                  <p className="text-muted-foreground font-medium">{t("No motions have been tabled yet.", "لم يتم طرح أي مقترحات بعد.")}</p>
                 </div>
               ) : (
                 (postsData.posts as any as Post[]).map(post => (
@@ -394,8 +395,8 @@ export default function Community() {
                     animate={{ opacity: 1, scale: 1 }}
                     key={post.id}
                   >
-                    <Card className={`group bg-white p-0 overflow-hidden border-slate-200 transition-all duration-300 hover:shadow-2xl hover:shadow-slate-200/50 rounded-[32px] ${
-                      activePostId === post.id ? 'ring-2 ring-primary ring-offset-2' : ''
+                    <Card className={`group p-0 overflow-hidden border-border/50 transition-all duration-300 hover:border-gold/40 hover:shadow-2xl hover:shadow-gold/5 rounded-[2rem] ${
+                      activePostId === post.id ? 'ring-2 ring-gold ring-offset-2 ring-offset-background' : ''
                     }`}>
                       <div className="p-8 pb-4">
                         <div className="flex items-start justify-between mb-8">
@@ -408,18 +409,18 @@ export default function Community() {
                                   (isAr && post.author.fullNameAr ? post.author.fullNameAr : post.author.fullName).charAt(0)
                                 )}
                               </div>
-                              <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 border-2 border-white rounded-full" />
+                              <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 border-2 border-card rounded-full" />
                             </div>
                             <div>
-                              <div className="font-black text-slate-900 text-lg leading-tight flex items-center gap-2">
+                              <div className="font-black text-foreground text-lg leading-tight flex items-center gap-2">
                                 {isAr && post.author.fullNameAr ? post.author.fullNameAr : post.author.fullName}
                                 {post.author.simulationRole?.includes('Admin') && (
                                   <Badge className="bg-primary/10 text-primary border-none text-[10px] py-0 px-2 uppercase font-bold tracking-tighter">ADMIN</Badge>
                                 )}
                               </div>
-                              <div className="text-xs text-slate-400 font-bold uppercase tracking-wider flex items-center gap-2 mt-1">
+                              <div className="text-xs text-muted-foreground font-bold uppercase tracking-wider flex items-center gap-2 mt-1">
                                 {post.author.simulationRole || t("Member", "عضو")}
-                                <span className="w-1 h-1 bg-slate-200 rounded-full" />
+                                <span className="w-1 h-1 bg-border rounded-full" />
                                 <span className="flex items-center gap-1">
                                   <Clock className="w-3 h-3" />
                                   {formatDistanceToNow(new Date(post.createdAt), { addSuffix: true })}
@@ -432,7 +433,7 @@ export default function Community() {
                             {user?.id === post.author.id && (
                               <button 
                                 onClick={() => handleDelete(post.id)}
-                                className="w-10 h-10 rounded-xl text-slate-300 hover:text-red-500 hover:bg-red-50 flex items-center justify-center transition-colors"
+                                className="w-10 h-10 rounded-xl text-muted-foreground/40 hover:text-destructive hover:bg-destructive/10 flex items-center justify-center transition-colors"
                               >
                                 <Trash2 className="w-5 h-5" />
                               </button>
@@ -440,18 +441,18 @@ export default function Community() {
                           </div>
                         </div>
                         
-                        {post.title && <h4 className="text-2xl font-display font-black text-slate-900 mb-4 leading-tight">{post.title}</h4>}
-                        <p className="text-slate-600 text-lg leading-relaxed mb-8 font-medium whitespace-pre-wrap">{post.content}</p>
+                        {post.title && <h4 className="text-2xl font-display font-black text-foreground mb-4 leading-tight">{post.title}</h4>}
+                        <p className="text-foreground/80 text-lg leading-relaxed mb-8 font-medium whitespace-pre-wrap">{post.content}</p>
                         
-                        <div className="flex items-center justify-between pt-6 border-t border-slate-100">
+                        <div className="flex items-center justify-between pt-6 border-t border-border/40">
                           <div className="flex items-center gap-2">
                             <motion.button 
                               whileTap={{ scale: 0.8 }}
                               onClick={() => handleLike(post)}
                               className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl font-bold text-sm transition-all ${
                                 post.isLiked 
-                                  ? 'bg-rose-500 text-white shadow-lg shadow-rose-200' 
-                                  : 'bg-slate-50 text-slate-500 hover:bg-slate-100'
+                                  ? 'bg-destructive text-white shadow-lg shadow-destructive/25' 
+                                  : 'bg-secondary/40 text-muted-foreground hover:bg-secondary/60'
                               }`}
                             >
                               <Heart className={`w-4 h-4 ${post.isLiked ? 'fill-current' : ''}`} />
@@ -468,8 +469,8 @@ export default function Community() {
                               }}
                               className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl font-bold text-sm transition-all ${
                                 activePostId === post.id 
-                                  ? 'bg-primary text-white shadow-lg shadow-primary/20' 
-                                  : 'bg-slate-50 text-slate-500 hover:bg-slate-100'
+                                  ? 'bg-navy-dark text-white shadow-lg shadow-navy/20' 
+                                  : 'bg-secondary/40 text-muted-foreground hover:bg-secondary/60'
                               }`}
                             >
                               <MessageSquare className="w-4 h-4" />
@@ -485,12 +486,12 @@ export default function Community() {
                             initial={{ height: 0, opacity: 0 }}
                             animate={{ height: "auto", opacity: 1 }}
                             exit={{ height: 0, opacity: 0 }}
-                            className="bg-slate-50 border-t border-slate-100 overflow-hidden"
+                            className="bg-secondary/20 border-t border-border/40 overflow-hidden"
                           >
                             <div className="p-8">
                               {/* Reply Input */}
                               <div className="flex gap-4 mb-10">
-                                <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center text-primary font-black shrink-0 overflow-hidden shadow-lg shadow-primary/5">
+                                <div className="w-10 h-10 bg-gold/10 rounded-xl flex items-center justify-center text-gold font-black shrink-0 overflow-hidden shadow-lg shadow-primary/5">
                                   {user?.avatarUrl ? (
                                      <img src={user.avatarUrl} alt={user.fullName} className="w-full h-full object-cover" />
                                   ) : (
@@ -502,13 +503,13 @@ export default function Community() {
                                     placeholder={t("Draft a constructive reply...", "اكتب رداً بناءً...")}
                                     value={replyContent[post.id] || ""}
                                     onChange={(e) => setReplyContent(prev => ({ ...prev, [post.id]: e.target.value }))}
-                                    className="min-h-[60px] max-h-[200px] w-full bg-white border-2 border-slate-200 group-focus-within:border-primary group-focus-within:ring-4 ring-primary/5 p-4 rounded-2xl text-md pr-14 transition-all"
+                                    className="min-h-[60px] max-h-[200px] w-full bg-card border-2 border-border/50 group-focus-within:border-gold group-focus-within:ring-4 ring-gold/10 p-4 rounded-2xl text-md pe-14 transition-all"
                                   />
                                   <motion.button 
                                     whileTap={{ scale: 0.9 }}
                                     onClick={() => handleReplySubmit(post.id)}
                                     disabled={!replyContent[post.id]}
-                                    className="absolute right-3 bottom-3 w-10 h-10 bg-primary text-white rounded-xl flex items-center justify-center disabled:opacity-30 transition-opacity shadow-lg shadow-primary/20"
+                                    className="absolute end-3 bottom-3 w-10 h-10 bg-gold text-navy-dark rounded-xl flex items-center justify-center disabled:opacity-30 transition-opacity shadow-lg shadow-primary/20"
                                   >
                                     <Send className="w-5 h-5" />
                                   </motion.button>
@@ -519,10 +520,10 @@ export default function Community() {
                               <div className="space-y-6">
                                 {loadingReplies[post.id] ? (
                                   <div className="flex justify-center py-4">
-                                     <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                                     <div className="w-6 h-6 border-2 border-gold border-t-transparent rounded-full animate-spin" />
                                   </div>
                                 ) : replies[post.id]?.length === 0 ? (
-                                  <div className="text-center py-6 text-slate-400 font-bold text-sm uppercase tracking-widest">{t("No replies yet", "لا توجد ردود بعد")}</div>
+                                  <div className="text-center py-6 text-muted-foreground font-bold text-sm uppercase tracking-widest">{t("No replies yet", "لا توجد ردود بعد")}</div>
                                 ) : (
                                   replies[post.id]?.map((reply: any) => (
                                     <motion.div 
@@ -531,7 +532,7 @@ export default function Community() {
                                       key={reply.id} 
                                       className="flex gap-4 relative"
                                     >
-                                      <div className="w-10 h-10 bg-white border border-slate-200 rounded-xl flex items-center justify-center text-slate-900 font-black shrink-0 shadow-sm overflow-hidden">
+                                      <div className="w-10 h-10 bg-card border border-border/50 rounded-xl flex items-center justify-center text-foreground font-black shrink-0 shadow-sm overflow-hidden">
                                         {reply.author.avatarUrl ? (
                                            <img src={reply.author.avatarUrl} alt={reply.author.fullName} className="w-full h-full object-cover" />
                                         ) : (
@@ -539,31 +540,31 @@ export default function Community() {
                                         )}
                                       </div>
                                       <div className="flex-1 space-y-2">
-                                        <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 relative">
+                                        <div className="bg-card p-5 rounded-2xl shadow-sm border border-border/50 relative">
                                           <div className="flex items-center justify-between mb-2">
-                                            <div className="font-bold text-slate-900 text-sm">
+                                            <div className="font-bold text-foreground text-sm">
                                               {isAr && reply.author.fullNameAr ? reply.author.fullNameAr : reply.author.fullName}
                                             </div>
                                             <div className="flex items-center gap-2">
-                                              <span className="text-[10px] text-slate-400 font-bold uppercase tracking-tighter">
+                                              <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-tighter">
                                                 {formatDistanceToNow(new Date(reply.createdAt), { addSuffix: true })}
                                               </span>
                                               {user?.id === reply.author.id && (
-                                                <button onClick={() => handleDelete(reply.id, true, post.id)} className="text-slate-300 hover:text-red-500">
+                                                <button onClick={() => handleDelete(reply.id, true, post.id)} className="text-muted-foreground/40 hover:text-destructive">
                                                   <Trash2 className="w-3.5 h-3.5" />
                                                 </button>
                                               )}
                                             </div>
                                           </div>
-                                          <p className="text-slate-600 text-md leading-relaxed font-medium">{reply.content}</p>
+                                          <p className="text-foreground/80 text-md leading-relaxed font-medium">{reply.content}</p>
                                           
                                           <motion.button 
                                             whileTap={{ scale: 0.8 }}
                                             onClick={() => handleLike(reply, true, post.id)}
-                                            className={`absolute -bottom-2 -right-2 flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-bold text-[11px] transition-all shadow-lg ${
+                                            className={`absolute -bottom-2 -end-2 flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-bold text-[11px] transition-all shadow-lg ${
                                               reply.isLiked 
                                                 ? 'bg-rose-500 text-white shadow-rose-200' 
-                                                : 'bg-white text-slate-400 border border-slate-100 hover:bg-slate-50'
+                                                : 'bg-card text-muted-foreground border border-border/50 hover:bg-secondary/40'
                                             }`}
                                           >
                                             <Heart className={`w-3 h-3 ${reply.isLiked ? 'fill-current' : ''}`} />

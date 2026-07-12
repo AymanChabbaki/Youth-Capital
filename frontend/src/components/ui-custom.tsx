@@ -42,7 +42,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         {...props}
       >
         {isLoading && (
-          <svg className="animate-spin -ml-1 mr-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <svg className="animate-spin -ms-1 me-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
           </svg>
@@ -65,7 +65,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className="relative w-full">
         {icon && (
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-muted-foreground">
+          <div className="absolute inset-y-0 start-0 ps-3 flex items-center pointer-events-none text-muted-foreground">
             {icon}
           </div>
         )}
@@ -77,7 +77,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
             "placeholder:text-muted-foreground",
             "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:border-primary",
             "disabled:cursor-not-allowed disabled:opacity-50",
-            icon && "pl-10",
+            icon && "ps-10",
             error && "border-destructive focus-visible:ring-destructive",
             className
           )}
@@ -283,6 +283,47 @@ export function Reveal({
     >
       {children}
     </motion.div>
+  );
+}
+
+// --- SKELETON ---
+// Shimmering placeholder block. Compose into content-shaped loading layouts.
+export function Skeleton({ className }: { className?: string }) {
+  return <div className={cn("animate-pulse rounded-2xl bg-foreground/[0.07]", className)} aria-hidden />;
+}
+
+// Skeleton page shell matching the PageHero + overlapping panel layout.
+export function PageSkeleton({ rows = 3 }: { rows?: number }) {
+  return (
+    <div className="w-full flex flex-col bg-background" aria-busy="true" aria-label="Loading">
+      <div className="bg-navy-dark pt-24 pb-32 md:pt-32 md:pb-40 px-4">
+        <div className="max-w-7xl mx-auto space-y-6">
+          <Skeleton className="h-4 w-44 bg-white/10" />
+          <Skeleton className="h-14 md:h-20 w-3/4 max-w-2xl bg-white/10" />
+          <Skeleton className="h-5 w-full max-w-xl bg-white/10" />
+          <div className="flex gap-8 pt-4">
+            {[...Array(3)].map((_, i) => (
+              <Skeleton key={i} className="h-14 w-28 bg-white/10" />
+            ))}
+          </div>
+        </div>
+      </div>
+      <div className="max-w-7xl mx-auto w-full px-4 -mt-16 relative z-20 pb-24">
+        <div className="glass-panel rounded-[2.5rem] p-8 md:p-12 space-y-10">
+          {[...Array(rows)].map((_, i) => (
+            <div key={i} className="flex items-center gap-6">
+              <Skeleton className="hidden md:block w-12 h-10 shrink-0" />
+              <div className="flex-1 space-y-3">
+                <Skeleton className="h-4 w-36" />
+                <Skeleton className="h-8 w-2/3" />
+                <Skeleton className="h-4 w-full max-w-2xl" />
+              </div>
+              <Skeleton className="w-16 h-16 rounded-full shrink-0" />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
   );
 }
 

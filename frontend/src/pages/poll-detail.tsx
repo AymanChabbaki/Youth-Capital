@@ -21,6 +21,61 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "wouter";
 
+// Full-screen gold confetti burst + seal, played once after a successful vote
+function VoteCelebration({ onDone }: { onDone: () => void }) {
+  const pieces = Array.from({ length: 28 }, (_, i) => ({
+    angle: (i / 28) * Math.PI * 2 + Math.random() * 0.4,
+    dist: 120 + Math.random() * 220,
+    size: 6 + Math.random() * 8,
+    rot: Math.random() * 720 - 360,
+    color: ["#caa849", "#ecd9a0", "#1b2a4a", "#c11236"][i % 4],
+    shape: i % 3, // 0 square, 1 circle, 2 bar
+  }));
+
+  return (
+    <motion.div
+      initial={{ opacity: 1 }}
+      animate={{ opacity: 0 }}
+      transition={{ delay: 1.6, duration: 0.5 }}
+      onAnimationComplete={onDone}
+      className="fixed inset-0 z-[150] pointer-events-none flex items-center justify-center"
+      aria-hidden
+    >
+      {/* Confetti */}
+      {pieces.map((p, i) => (
+        <motion.span
+          key={i}
+          initial={{ x: 0, y: 0, scale: 0, rotate: 0, opacity: 1 }}
+          animate={{
+            x: Math.cos(p.angle) * p.dist,
+            y: Math.sin(p.angle) * p.dist + 140,
+            scale: [0, 1, 1, 0.6],
+            rotate: p.rot,
+            opacity: [1, 1, 1, 0],
+          }}
+          transition={{ duration: 1.6, ease: [0.15, 0.6, 0.4, 1] }}
+          className="absolute"
+          style={{
+            width: p.shape === 2 ? p.size * 2 : p.size,
+            height: p.shape === 2 ? p.size / 2 : p.size,
+            borderRadius: p.shape === 1 ? "50%" : "2px",
+            backgroundColor: p.color,
+          }}
+        />
+      ))}
+      {/* Gold seal */}
+      <motion.div
+        initial={{ scale: 0, rotate: -20 }}
+        animate={{ scale: [0, 1.15, 1], rotate: 0 }}
+        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+        className="w-24 h-24 rounded-full bg-gradient-to-br from-gold to-gold-pale shadow-2xl shadow-gold/40 flex items-center justify-center"
+      >
+        <CheckCircle2 className="w-12 h-12 text-navy-dark" />
+      </motion.div>
+    </motion.div>
+  );
+}
+
 export default function PollDetail() {
   const [, params] = useRoute("/polls/:id");
   const [, setLocation] = useLocation();
@@ -29,6 +84,7 @@ export default function PollDetail() {
   const { toast } = useToast();
   const castVoteMutation = useCastVote();
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
+  const [celebrating, setCelebrating] = useState(false);
 
   const pollId = params?.id ? parseInt(params.id) : null;
 
@@ -46,6 +102,7 @@ export default function PollDetail() {
         id: pollId, 
         data: { optionId: selectedOption } 
       });
+      setCelebrating(true);
       toast({
         title: t("Vote Cast", "تم تسجيل صوتك"),
         description: t("Your participation strengthens our simulation.", "مشاركتك تعزز محاكاتنا."),
@@ -94,6 +151,9 @@ export default function PollDetail() {
 
   return (
     <div className="min-h-screen bg-background pb-24">
+      <AnimatePresence>
+        {celebrating && <VoteCelebration onDone={() => setCelebrating(false)} />}
+      </AnimatePresence>
       {/* Decorative Header Gradient */}
       <div className="h-64 bg-navy-dark relative overflow-hidden">
         <div className="absolute inset-0 bg-grid-gold opacity-30" />

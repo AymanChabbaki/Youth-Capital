@@ -199,7 +199,7 @@ export default function About() {
               <Link href="/apply">
                 <Button variant="gold" size="lg" className="rounded-2xl px-8 group">
                   {t("Join the Simulation", "انضم للمحاكاة")}
-                  <ChevronRight className={`w-4 h-4 ml-1 transition-transform group-hover:translate-x-1 ${isAr ? "rotate-180 group-hover:-translate-x-1" : ""}`} />
+                  <ChevronRight className={`w-4 h-4 ms-1 transition-transform group-hover:translate-x-1 ${isAr ? "rotate-180 group-hover:-translate-x-1" : ""}`} />
                 </Button>
               </Link>
             </Reveal>
@@ -563,7 +563,7 @@ export default function About() {
                         <h5 className="text-xs font-black tracking-widest text-muted-foreground uppercase mb-2">
                           {t("Biography", "السيرة الذاتية")}
                         </h5>
-                        <p className="text-sm text-muted-foreground leading-relaxed text-left md:text-justify">
+                        <p className="text-sm text-muted-foreground leading-relaxed text-start md:text-justify">
                           {t(selectedMember.descEn, selectedMember.descAr)}
                         </p>
                       </div>
@@ -648,7 +648,7 @@ export default function About() {
                       <h5 className="text-xs font-black tracking-widest text-muted-foreground uppercase mb-2">
                         {t("Biography", "السيرة الذاتية")}
                       </h5>
-                      <p className="text-sm text-muted-foreground leading-relaxed text-left">
+                      <p className="text-sm text-muted-foreground leading-relaxed text-start">
                         {t(selectedMember.descEn, selectedMember.descAr)}
                       </p>
                     </div>

@@ -1,6 +1,6 @@
 import { useLanguage } from "@/hooks/use-language";
 import { useGetPolls, Poll } from "@workspace/api-client-react";
-import { Badge, PageHero, HeroStat, Reveal } from "@/components/ui-custom";
+import { Badge, PageHero, HeroStat, Reveal, PageSkeleton } from "@/components/ui-custom";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, Info, ChevronDown, Scale } from "lucide-react";
 import { Link } from "wouter";
@@ -12,14 +12,7 @@ export default function Polls() {
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
 
   if (isLoading) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
-        <div className="animate-spin rounded-full h-12 w-12 border-2 border-gold/20 border-t-gold" />
-        <p className="text-muted-foreground font-bold animate-pulse text-sm uppercase tracking-widest">
-          {t("Counting Ballots...", "جاري فرز الأصوات...")}
-        </p>
-      </div>
-    );
+    return <PageSkeleton rows={3} />;
   }
 
   const polls = data?.polls || [];
@@ -143,6 +136,7 @@ export default function Polls() {
               >
                 <button
                   onClick={() => setActiveFaq(activeFaq === i ? null : i)}
+                  aria-expanded={activeFaq === i}
                   className="w-full p-6 flex items-center justify-between text-start gap-4"
                 >
                   <span className="font-bold text-lg text-foreground">{faq.q}</span>

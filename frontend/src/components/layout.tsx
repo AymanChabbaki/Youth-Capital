@@ -23,11 +23,16 @@ import {
   Youtube,
   ArrowRight,
   Sun,
-  Moon
+  Moon,
+  Search as SearchIcon,
+  Bell,
+  AlertTriangle,
+  Vote as VoteBellIcon
 } from "lucide-react";
 import { useTheme } from "next-themes";
-import { useState, useEffect } from "react";
-import { useLogout } from "@workspace/api-client-react";
+import { CommandPalette } from "@/components/command-palette";
+import { useState, useEffect, useMemo, useRef } from "react";
+import { useLogout, useGetCrises, useGetPolls } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   Sheet,
@@ -83,6 +88,123 @@ function ThemeToggle({ variant = "navbar" }: { variant?: "navbar" | "sheet" }) {
     >
       {icon}
     </button>
+  );
+}
+
+function NotificationBell() {
+  const { isAuthenticated } = useAuth();
+  const { t, isAr } = useLanguage();
+  const [open, setOpen] = useState(false);
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const { data: crisesData } = useGetCrises({ query: { enabled: isAuthenticated } } as any);
+  const { data: pollsData } = useGetPolls({ query: { enabled: isAuthenticated } } as any);
+  const [lastSeen, setLastSeen] = useState<number>(() => Number(localStorage.getItem("yc-notif-seen") || 0));
+
+  const notifications = useMemo(() => {
+    const crises = (crisesData?.crises || [])
+      .filter((c: any) => c.isActive)
+      .map((c: any) => ({
+        id: `c-${c.id}`,
+        type: "crisis" as const,
+        title: isAr ? c.titleAr : c.title,
+        href: "/community",
+        at: new Date(c.createdAt || Date.now()).getTime(),
+      }));
+    const polls = (pollsData?.polls || [])
+      .filter((p: any) => p.status === "active")
+      .map((p: any) => ({
+        id: `p-${p.id}`,
+        type: "poll" as const,
+        title: isAr ? p.titleAr : p.title,
+        href: `/polls/${p.id}`,
+        at: new Date(p.createdAt || Date.now()).getTime(),
+      }));
+    return [...crises, ...polls].sort((a, b) => b.at - a.at).slice(0, 8);
+  }, [crisesData, pollsData, isAr]);
+
+  const unread = notifications.filter(n => n.at > lastSeen).length;
+
+  // Close on outside click
+  useEffect(() => {
+    if (!open) return;
+    const onDown = (e: MouseEvent) => {
+      if (!wrapRef.current?.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("mousedown", onDown);
+    return () => document.removeEventListener("mousedown", onDown);
+  }, [open]);
+
+  const toggle = () => {
+    if (!open) {
+      const now = Date.now();
+      setLastSeen(now);
+      localStorage.setItem("yc-notif-seen", String(now));
+    }
+    setOpen(o => !o);
+  };
+
+  if (!isAuthenticated) return null;
+
+  return (
+    <div ref={wrapRef} className="relative">
+      <button
+        onClick={toggle}
+        className="flex items-center justify-center w-10 h-10 rounded-full bg-secondary/40 border border-border/50 hover:border-gold/40 hover:bg-gold/10 transition-all duration-300 relative"
+        aria-label={t("Notifications", "الإشعارات")}
+      >
+        <Bell className="w-4 h-4 text-gold" />
+        {unread > 0 && (
+          <span className="absolute -top-1 -end-1 min-w-[18px] h-[18px] px-1 rounded-full bg-destructive text-white text-[9px] font-black flex items-center justify-center border-2 border-background">
+            {unread > 9 ? "9+" : unread}
+          </span>
+        )}
+      </button>
+
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, y: 10, scale: 0.96 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 8, scale: 0.97 }}
+            transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+            className="absolute end-0 top-12 w-80 max-w-[85vw] rounded-3xl bg-card border border-border/60 shadow-2xl shadow-navy/15 overflow-hidden z-50"
+          >
+            <div className="p-4 bg-navy-dark relative overflow-hidden">
+              <div className="absolute inset-0 bg-grid-gold opacity-25" />
+              <h4 className="relative font-display font-bold text-sm text-white flex items-center gap-2">
+                <Bell className="w-4 h-4 text-gold" />
+                {t("Simulation Alerts", "تنبيهات المحاكاة")}
+              </h4>
+            </div>
+            <div className="max-h-80 overflow-y-auto divide-y divide-border/40">
+              {notifications.length === 0 ? (
+                <p className="p-6 text-center text-sm text-muted-foreground">
+                  {t("All quiet in the capital.", "كل شيء هادئ في العاصمة.")}
+                </p>
+              ) : (
+                notifications.map(n => (
+                  <Link key={n.id} href={n.href} onClick={() => setOpen(false)}>
+                    <div className="p-4 flex items-start gap-3 hover:bg-gold/[0.05] transition-colors cursor-pointer">
+                      <span className={`p-2 rounded-xl shrink-0 ${n.type === "crisis" ? "bg-destructive/10" : "bg-gold/10"}`}>
+                        {n.type === "crisis"
+                          ? <AlertTriangle className="w-4 h-4 text-destructive" />
+                          : <VoteBellIcon className="w-4 h-4 text-gold" />}
+                      </span>
+                      <div className="min-w-0">
+                        <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-0.5">
+                          {n.type === "crisis" ? t("Live Crisis", "أزمة نشطة") : t("Active Poll", "تصويت نشط")}
+                        </p>
+                        <p className="text-sm font-bold text-foreground leading-snug line-clamp-2">{n.title}</p>
+                      </div>
+                    </div>
+                  </Link>
+                ))
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   );
 }
 
@@ -182,8 +304,21 @@ function Navbar() {
 
           {/* Right Actions */}
           <div className="flex items-center gap-2 md:gap-3 shrink-0">
+            {/* Command Palette Trigger */}
+            <button
+              onClick={() => window.dispatchEvent(new Event("open-cmdk"))}
+              className="hidden md:flex items-center gap-2 px-3.5 py-2 rounded-full bg-secondary/40 border border-border/50 hover:border-gold/40 text-muted-foreground hover:text-foreground transition-all duration-300 text-xs font-bold"
+              title={t("Search (Ctrl+K)", "بحث (Ctrl+K)")}
+            >
+              <SearchIcon className="w-3.5 h-3.5" />
+              <kbd className="px-1.5 py-0.5 rounded-md bg-background/80 border border-border/50 text-[10px] font-black text-muted-foreground">⌘K</kbd>
+            </button>
+
             {/* Theme Toggle */}
             <ThemeToggle />
+
+            {/* Notifications */}
+            <NotificationBell />
 
             {/* Language Toggle */}
             <button
@@ -231,7 +366,7 @@ function Navbar() {
                 <Link href="/apply">
                   <Button variant="gold" size="sm" className="h-10 px-5 font-black shadow-lg shadow-gold/25 rounded-full group">
                     {t("Join", "انضم")}
-                    <ArrowRight className={`w-4 h-4 ml-1.5 transition-transform group-hover:translate-x-0.5 ${isAr ? "rotate-180 group-hover:-translate-x-0.5" : ""}`} />
+                    <ArrowRight className={`w-4 h-4 ms-1.5 transition-transform group-hover:translate-x-0.5 ${isAr ? "rotate-180 group-hover:-translate-x-0.5" : ""}`} />
                   </Button>
                 </Link>
               </div>
@@ -506,7 +641,7 @@ function Footer() {
             <Link href="/apply">
               <Button variant="gold" size="lg" className="rounded-2xl px-10 h-16 text-lg shadow-2xl shadow-gold/25 group">
                 {t("Apply Now", "قدّم طلبك الآن")}
-                <ArrowRight className={`ml-2 w-5 h-5 transition-transform group-hover:translate-x-1 ${isAr ? "rotate-180 group-hover:-translate-x-1" : ""}`} />
+                <ArrowRight className={`ms-2 w-5 h-5 transition-transform group-hover:translate-x-1 ${isAr ? "rotate-180 group-hover:-translate-x-1" : ""}`} />
               </Button>
             </Link>
           </motion.div>
@@ -902,9 +1037,16 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen flex flex-col bg-background selection:bg-accent selection:text-accent-foreground">
+      {/* Skip link for keyboard users */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:start-4 focus:z-[300] focus:px-6 focus:py-3 focus:rounded-2xl focus:bg-gold focus:text-navy-dark focus:font-black focus:shadow-2xl"
+      >
+        Skip to content
+      </a>
       <SplashScreen />
       <Navbar />
-      <main className="flex-1 w-full relative">
+      <main id="main-content" className="flex-1 w-full relative">
         <AnimatePresence mode="wait">
           <motion.div
             key={location}
@@ -921,6 +1063,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <Footer />
       <MobileBottomNav />
       <PoliticalHelperChatbot />
+      <CommandPalette />
     </div>
   );
 }

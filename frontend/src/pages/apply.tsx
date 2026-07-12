@@ -7,8 +7,18 @@ import { Button, Input, Select, Textarea, Label, Card } from "@/components/ui-cu
 import { motion, AnimatePresence } from "framer-motion";
 import { useRegister, useSubmitRoleApplication } from "@workspace/api-client-react";
 import { useToast } from "@/hooks/use-toast";
-import { CheckCircle2, Fingerprint, Globe } from "lucide-react";
+import { CheckCircle2, Fingerprint, Globe, Eye, EyeOff } from "lucide-react";
 import { Link } from "wouter";
+
+function passwordStrength(pw: string): number {
+  let score = 0;
+  if (pw.length >= 8) score++;
+  if (pw.length >= 12) score++;
+  if (/[a-z]/.test(pw) && /[A-Z]/.test(pw)) score++;
+  if (/\d/.test(pw)) score++;
+  if (/[^a-zA-Z0-9]/.test(pw)) score++;
+  return Math.min(score, 4);
+}
 
 const MOROCCAN_REGIONS = [
   "Tanger-Tétouan-Al Hoceïma",
@@ -54,6 +64,7 @@ export default function Apply() {
   const { t } = useLanguage();
   const [step, setStep] = useState(1);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const { toast } = useToast();
   
   const communityLink = import.meta.env.VITE_COMMUNITY_LINK || "https://chat.whatsapp.com/LC5mqBrIPXdLJhK6cLJsmu";
@@ -266,8 +277,47 @@ export default function Apply() {
                   </div>
                   <div>
                     <Label>{t("Password", "كلمة المرور")}</Label>
-                    <Input type="password" {...form.register("password")} error={form.formState.errors.password?.message} />
-                    <p className="text-xs text-muted-foreground mt-1.5">{t("Minimum 8 characters", "8 أحرف كحد أدنى")}</p>
+                    <div className="relative">
+                      <Input
+                        type={showPassword ? "text" : "password"}
+                        {...form.register("password")}
+                        error={form.formState.errors.password?.message}
+                        className="pe-12"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(s => !s)}
+                        className="absolute end-3 top-[24px] -translate-y-1/2 p-1.5 rounded-lg text-muted-foreground hover:text-gold transition-colors"
+                        aria-label={showPassword ? t("Hide password", "إخفاء كلمة المرور") : t("Show password", "إظهار كلمة المرور")}
+                      >
+                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
+                    {/* Strength meter */}
+                    {(() => {
+                      const pw = form.watch("password") || "";
+                      const score = passwordStrength(pw);
+                      const labels = [
+                        t("Too weak", "ضعيفة جداً"),
+                        t("Weak", "ضعيفة"),
+                        t("Okay", "مقبولة"),
+                        t("Strong", "قوية"),
+                        t("Fortress", "حصينة"),
+                      ];
+                      const colors = ["bg-destructive", "bg-destructive", "bg-orange-400", "bg-gold", "bg-green-500"];
+                      return pw.length > 0 ? (
+                        <div className="mt-2.5">
+                          <div className="flex gap-1.5 mb-1.5">
+                            {[0, 1, 2, 3].map(i => (
+                              <div key={i} className={`h-1.5 flex-1 rounded-full transition-colors duration-300 ${i < score ? colors[score] : "bg-border"}`} />
+                            ))}
+                          </div>
+                          <p className="text-xs text-muted-foreground font-semibold">{labels[score]}</p>
+                        </div>
+                      ) : (
+                        <p className="text-xs text-muted-foreground mt-1.5">{t("Minimum 8 characters", "8 أحرف كحد أدنى")}</p>
+                      );
+                    })()}
                   </div>
                   <Button type="button" onClick={nextStep} className="w-full mt-6">{t("Next Step", "الخطوة التالية")}</Button>
                 </motion.div>
@@ -321,13 +371,31 @@ export default function Apply() {
                   <h3 className="text-xl font-bold mb-4 border-b pb-2">{t("Motivation", "خطاب التحفيز")}</h3>
                   <div>
                     <Label>{t("Why do you want this role?", "لماذا تريد هذا الدور؟")}</Label>
-                    <Textarea 
-                      {...form.register("motivation")} 
+                    <Textarea
+                      {...form.register("motivation")}
                       placeholder={t("Write at least 50 characters explaining your goals and qualifications...", "اكتب ما لا يقل عن 50 حرفًا تشرح فيها أهدافك ومؤهلاتك...")}
                       error={form.formState.errors.motivation?.message}
                       className="h-40"
                     />
-                    <p className="text-xs text-muted-foreground mt-1.5">{t("Minimum 50 characters required.", "مطلوب 50 حرفاً كحد أدنى.")}</p>
+                    {/* Live character counter */}
+                    {(() => {
+                      const len = (form.watch("motivation") || "").length;
+                      const reached = len >= 50;
+                      const pct = Math.min((len / 50) * 100, 100);
+                      return (
+                        <div className="mt-2.5 flex items-center gap-3">
+                          <div className="flex-1 h-1.5 bg-border rounded-full overflow-hidden">
+                            <div
+                              className={`h-full rounded-full transition-all duration-300 ${reached ? "bg-green-500" : "bg-gold"}`}
+                              style={{ width: `${pct}%` }}
+                            />
+                          </div>
+                          <span className={`text-xs font-bold tabular-nums shrink-0 ${reached ? "text-green-500" : "text-muted-foreground"}`}>
+                            {reached ? `✓ ${len}` : `${len} / 50`}
+                          </span>
+                        </div>
+                      );
+                    })()}
                   </div>
                   <div className="flex gap-4 mt-6">
                     <Button type="button" variant="outline" onClick={() => setStep(2)} className="w-full">{t("Back", "رجوع")}</Button>
