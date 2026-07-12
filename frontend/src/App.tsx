@@ -1,5 +1,6 @@
 import { Switch, Route, Router as WouterRouter } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/hooks/use-auth";
@@ -63,6 +64,7 @@ function Router() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
+      <ThemeProvider attribute="class" defaultTheme="light" disableTransitionOnChange={false}>
       <LanguageProvider>
         <AuthProvider>
           <TooltipProvider>
@@ -73,6 +75,7 @@ function App() {
           </TooltipProvider>
         </AuthProvider>
       </LanguageProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   );
 }

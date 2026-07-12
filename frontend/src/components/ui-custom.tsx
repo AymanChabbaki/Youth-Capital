@@ -1,7 +1,7 @@
 import * as React from "react";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { motion, HTMLMotionProps, useInView, useMotionValue, useSpring, useTransform, animate } from "framer-motion";
+import { motion, HTMLMotionProps, useInView, useMotionValue, useScroll, useSpring, useTransform, animate } from "framer-motion";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -283,6 +283,103 @@ export function Reveal({
     >
       {children}
     </motion.div>
+  );
+}
+
+// --- SECTION BACKDROP ---
+// Interactive background layer for sections: scroll-parallax orbs, a gold
+// spotlight that follows the cursor, slow-rotating geometric shapes, and an
+// optional giant outlined ghost word. Drop inside any `relative overflow-hidden`
+// section as the first child.
+export function SectionBackdrop({
+  ghost,
+  grid = true,
+  spotlight = true,
+  orbs = true,
+  shapes = false,
+  flip = false,
+}: {
+  ghost?: string;
+  grid?: boolean;
+  spotlight?: boolean;
+  orbs?: boolean;
+  shapes?: boolean;
+  flip?: boolean;
+}) {
+  const ref = React.useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
+  const yOrb1 = useTransform(scrollYProgress, [0, 1], [-70, 70]);
+  const yOrb2 = useTransform(scrollYProgress, [0, 1], [50, -90]);
+  const yGhost = useTransform(scrollYProgress, [0, 1], [40, -40]);
+  const rotateA = useTransform(scrollYProgress, [0, 1], [0, 60]);
+  const rotateB = useTransform(scrollYProgress, [0, 1], [45, -30]);
+
+  // The backdrop is pointer-events-none, so track the cursor on the parent section
+  React.useEffect(() => {
+    const parent = ref.current?.parentElement;
+    if (!parent) return;
+    const onMove = (e: MouseEvent) => {
+      const rect = parent.getBoundingClientRect();
+      ref.current?.style.setProperty("--spot-x", `${e.clientX - rect.left}px`);
+      ref.current?.style.setProperty("--spot-y", `${e.clientY - rect.top}px`);
+    };
+    parent.addEventListener("mousemove", onMove);
+    return () => parent.removeEventListener("mousemove", onMove);
+  }, []);
+
+  return (
+    <div ref={ref} className="absolute inset-0 pointer-events-none overflow-hidden select-none" aria-hidden>
+      {grid && <div className="absolute inset-0 bg-grid-gold opacity-30" />}
+
+      {spotlight && (
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(650px circle at var(--spot-x, 70%) var(--spot-y, 30%), hsl(44 55% 54% / 0.08), transparent 60%)",
+          }}
+        />
+      )}
+
+      {orbs && (
+        <>
+          <motion.div
+            style={{ y: yOrb1 }}
+            className={`absolute w-[26rem] h-[26rem] bg-gold/10 blur-[110px] rounded-full ${flip ? "-bottom-32 -right-32" : "-top-32 -left-32"}`}
+          />
+          <motion.div
+            style={{ y: yOrb2 }}
+            className={`absolute w-[24rem] h-[24rem] bg-primary/15 blur-[110px] rounded-full ${flip ? "-top-32 -left-32" : "-bottom-32 -right-32"}`}
+          />
+        </>
+      )}
+
+      {shapes && (
+        <>
+          <motion.div style={{ rotate: rotateA }} className="absolute top-[12%] right-[6%] w-24 h-24 md:w-32 md:h-32 border border-gold/20 rounded-[2rem]" />
+          <motion.div style={{ rotate: rotateB }} className="absolute bottom-[14%] left-[5%] w-16 h-16 md:w-24 md:h-24 border border-primary/20 rounded-full border-dashed" />
+          <motion.span
+            animate={{ y: [0, -22, 0], opacity: [0.25, 0.7, 0.25] }}
+            transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute top-[30%] left-[12%] w-2 h-2 rounded-full bg-gold/60"
+          />
+          <motion.span
+            animate={{ y: [0, 18, 0], opacity: [0.2, 0.6, 0.2] }}
+            transition={{ duration: 9, repeat: Infinity, ease: "easeInOut", delay: 1.5 }}
+            className="absolute bottom-[28%] right-[16%] w-3 h-3 rounded-full bg-gold/40"
+          />
+        </>
+      )}
+
+      {ghost && (
+        <motion.span
+          style={{ y: yGhost, WebkitTextStroke: "1.5px hsl(44 55% 54% / 0.14)" }}
+          className={`absolute top-1/2 -translate-y-1/2 font-display font-black uppercase whitespace-nowrap leading-none text-transparent text-[22vw] md:text-[16vw] tracking-tight ${flip ? "-left-[2vw]" : "-right-[2vw]"}`}
+        >
+          {ghost}
+        </motion.span>
+      )}
+    </div>
   );
 }
 

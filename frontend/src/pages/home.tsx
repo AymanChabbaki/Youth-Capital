@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLanguage } from "@/hooks/use-language";
-import { Button, Card, CountUp, TiltCard } from "@/components/ui-custom";
+import { Button, Card, CountUp, TiltCard, SectionBackdrop } from "@/components/ui-custom";
 import { Link } from "wouter";
 import { useGetPlatformStats, useGetForums, useGetArticles, useGetPolls } from "@workspace/api-client-react";
 import { Users, FileText, Landmark, ShieldAlert, ArrowRight, Gavel, Briefcase, AlertCircle, Target, Zap, ArrowUp } from "lucide-react";
@@ -228,6 +228,7 @@ export default function Home() {
 
       {/* About Us Section */}
       <section className="py-20 md:py-28 px-4 bg-secondary/5 relative overflow-hidden">
+        <SectionBackdrop ghost={t("VISION", "الرؤية")} shapes />
         <div className="max-w-7xl mx-auto relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
             {/* Left side: Heading and Intro */}
@@ -328,10 +329,7 @@ export default function Home() {
 
       {/* Immersive Feature Showcase */}
       <section className="py-20 md:py-32 px-4 bg-background relative overflow-hidden">
-        <div className="absolute top-0 left-0 w-full h-full pointer-events-none opacity-20">
-          <div className="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] bg-gold/20 blur-[120px] rounded-full" />
-          <div className="absolute -bottom-[10%] -right-[10%] w-[40%] h-[40%] bg-primary/20 blur-[120px] rounded-full" />
-        </div>
+        <SectionBackdrop flip />
 
         <div className="max-w-7xl mx-auto relative z-10">
           <div className="text-center mb-12 md:mb-20">
@@ -457,8 +455,9 @@ export default function Home() {
       </section>
 
       {/* Path to Leadership - Stepper */}
-      <section className="py-20 md:py-32 px-4 bg-secondary/20 relative">
-        <div className="max-w-7xl mx-auto">
+      <section className="py-20 md:py-32 px-4 bg-secondary/20 relative overflow-hidden">
+        <SectionBackdrop ghost={t("LEAD", "قيادة")} shapes flip />
+        <div className="max-w-7xl mx-auto relative z-10">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-5xl font-display font-bold text-foreground mb-4">
               {t("Your Path to Leadership", "طريقك نحو القيادة")}
@@ -525,6 +524,7 @@ export default function Home() {
 
       {/* Communities Representation Section */}
       <section className="py-20 md:py-32 px-4 bg-background relative overflow-hidden border-t border-border/50">
+        <SectionBackdrop orbs={false} />
         <div className="max-w-7xl mx-auto relative z-10">
           <div className="text-center lg:text-start mb-16">
             <motion.h2 
@@ -655,7 +655,8 @@ export default function Home() {
 
       {/* Community Pulse (Floating Stats) */}
       <section className="py-32 px-4 bg-background overflow-hidden relative">
-        <div className="max-w-7xl mx-auto">
+        <SectionBackdrop ghost={t("IMPACT", "التأثير")} />
+        <div className="max-w-7xl mx-auto relative z-10">
           <div className="flex flex-col lg:flex-row items-center gap-16">
             <div className="flex-1 text-center lg:text-start px-0 lg:px-0">
               <motion.h2 
@@ -698,6 +699,22 @@ export default function Home() {
               {/* Decorative Circle - Centered Background */}
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 md:w-80 md:h-80 bg-gold/5 rounded-full blur-[80px] md:blur-[100px] z-0" />
 
+              {/* Orbiting rings behind the floating cards */}
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ duration: 46, repeat: Infinity, ease: "linear" }}
+                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 md:w-[26rem] md:h-[26rem] rounded-full border border-dashed border-gold/25 z-0"
+              >
+                <span className="absolute -top-1.5 left-1/2 w-3 h-3 rounded-full bg-gold shadow-[0_0_12px_rgba(201,168,76,0.8)]" />
+              </motion.div>
+              <motion.div
+                animate={{ rotate: -360 }}
+                transition={{ duration: 70, repeat: Infinity, ease: "linear" }}
+                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-56 h-56 md:w-72 md:h-72 rounded-full border border-primary/15 z-0"
+              >
+                <span className="absolute top-1/2 -right-1 w-2 h-2 rounded-full bg-primary/60" />
+              </motion.div>
+
               {/* Floating Bubble Matrix - Responsive Architecture */}
               <div className="relative z-10 w-full h-full flex flex-col md:block items-center gap-6 md:gap-0">
                 {[
@@ -739,7 +756,28 @@ export default function Home() {
       <section className="py-24 px-4 bg-[#25D366]/5 relative overflow-hidden border-t border-[#25D366]/20">
         {/* Background blobs */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-[#25D366]/10 rounded-full blur-[100px] z-0" />
-        
+
+        {/* Rising chat bubbles */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden z-0" aria-hidden>
+          {[
+            { left: "8%", size: 14, delay: 0, duration: 11 },
+            { left: "22%", size: 8, delay: 3, duration: 14 },
+            { left: "45%", size: 10, delay: 6, duration: 12 },
+            { left: "68%", size: 16, delay: 1.5, duration: 13 },
+            { left: "84%", size: 9, delay: 4.5, duration: 10 },
+            { left: "93%", size: 12, delay: 7.5, duration: 15 },
+          ].map((b, i) => (
+            <motion.span
+              key={i}
+              initial={{ y: 0, opacity: 0 }}
+              animate={{ y: [40, -520], opacity: [0, 0.5, 0.5, 0] }}
+              transition={{ duration: b.duration, repeat: Infinity, delay: b.delay, ease: "linear" }}
+              className="absolute bottom-0 rounded-full border border-[#25D366]/40 bg-[#25D366]/15"
+              style={{ left: b.left, width: b.size, height: b.size }}
+            />
+          ))}
+        </div>
+
         <div className="max-w-5xl mx-auto relative z-10 text-center flex flex-col items-center">
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
@@ -793,6 +831,7 @@ export default function Home() {
 
       {/* Press & Media Section */}
       <section className="py-24 px-4 bg-background relative overflow-hidden border-t border-border/50">
+        <SectionBackdrop ghost={t("PRESS", "الصحافة")} flip orbs={false} />
         <div className="max-w-5xl mx-auto relative z-10">
           <div className="text-center lg:text-start mb-16">
             <motion.h2
@@ -865,6 +904,7 @@ export default function Home() {
 
       {/* Civic Polls Section */}
       <section className="py-24 px-4 bg-secondary/5 relative overflow-hidden border-t border-border/50">
+        <SectionBackdrop ghost={t("VOTE", "صوّت")} shapes />
         <div className="max-w-5xl mx-auto relative z-10">
           <div className="text-center lg:text-start mb-16">
             <motion.h2
