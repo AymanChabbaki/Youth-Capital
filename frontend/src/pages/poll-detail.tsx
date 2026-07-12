@@ -62,8 +62,11 @@ export default function PollDetail() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
+        <div className="animate-spin rounded-full h-12 w-12 border-2 border-gold/20 border-t-gold" />
+        <p className="text-muted-foreground font-bold animate-pulse text-sm uppercase tracking-widest">
+          {t("Opening Consultation...", "جاري فتح الاستشارة...")}
+        </p>
       </div>
     );
   }
@@ -93,8 +96,10 @@ export default function PollDetail() {
     <div className="min-h-screen bg-background pb-24">
       {/* Decorative Header Gradient */}
       <div className="h-64 bg-navy-dark relative overflow-hidden">
+        <div className="absolute inset-0 bg-grid-gold opacity-30" />
         <div className="absolute inset-0 bg-gradient-to-b from-primary/20 to-transparent" />
         <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-gold/10 blur-[120px] rounded-full" />
+        <div className="absolute -top-24 -left-24 w-80 h-80 bg-primary/25 blur-[110px] rounded-full" />
       </div>
 
       <div className="max-w-5xl mx-auto px-4 -mt-32 relative z-10">
@@ -190,18 +195,18 @@ export default function PollDetail() {
                              onClick={() => setSelectedOption(option.id)}
                              disabled={!isAuthenticated}
                              className={`w-full p-6 rounded-2xl border-2 text-start transition-all duration-300 flex items-center justify-between group ${
-                               selectedOption === option.id 
-                                 ? 'border-primary bg-primary/5 ring-4 ring-primary/10 shadow-lg' 
-                                 : 'border-border/50 bg-background/50 hover:border-primary/50'
+                               selectedOption === option.id
+                                 ? 'border-gold bg-gold/5 ring-4 ring-gold/15 shadow-lg shadow-gold/10'
+                                 : 'border-border/50 bg-background/50 hover:border-gold/50 hover:-translate-y-0.5'
                              } ${!isAuthenticated ? 'opacity-60 grayscale' : ''}`}
                            >
                              <span className="font-bold text-xl">
                                {isAr ? option.labelAr : option.label}
                              </span>
                              <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
-                               selectedOption === option.id ? 'border-primary bg-primary scale-110' : 'border-border'
+                               selectedOption === option.id ? 'border-gold bg-gold scale-110' : 'border-border'
                              }`}>
-                               {selectedOption === option.id && <div className="w-2.5 h-2.5 bg-white rounded-full" />}
+                               {selectedOption === option.id && <div className="w-2.5 h-2.5 bg-navy-dark rounded-full" />}
                              </div>
                            </button>
                          ))}
@@ -215,9 +220,10 @@ export default function PollDetail() {
                                 </Button>
                               </Link>
                            ) : (
-                             <Button 
-                               onClick={handleVote} 
-                               className="w-full py-8 text-xl shadow-2xl shadow-primary/30"
+                             <Button
+                               onClick={handleVote}
+                               variant="gold"
+                               className="w-full py-8 text-xl shadow-2xl shadow-gold/25"
                                disabled={!selectedOption || castVoteMutation.isPending}
                                isLoading={castVoteMutation.isPending}
                              >
@@ -281,7 +287,7 @@ export default function PollDetail() {
                     </div>
                     <div className="flex -space-x-2">
                        {[1,2,3,4].map(i => (
-                         <div key={i} className="w-8 h-8 rounded-full border-2 border-background bg-slate-200" />
+                         <div key={i} className="w-8 h-8 rounded-full border-2 border-background bg-secondary" />
                        ))}
                        <div className="w-8 h-8 rounded-full border-2 border-background bg-primary/20 flex items-center justify-center text-[10px] font-bold">
                          +24

@@ -1,5 +1,6 @@
 import { useLanguage } from "@/hooks/use-language";
 import { Shield, BookOpen, Users, AlertTriangle, CheckCircle, XCircle, Gavel } from "lucide-react";
+import { PageHero, Reveal } from "@/components/ui-custom";
 
 export default function Rules() {
   const { t } = useLanguage();
@@ -137,58 +138,58 @@ export default function Rules() {
   return (
     <div className="min-h-screen bg-background">
 
-      {/* Hero */}
-      <section className="bg-navy-dark py-24 px-4 text-center">
-        <div className="max-w-3xl mx-auto">
-          <div className="inline-flex items-center gap-2 bg-gold/20 text-gold border border-gold/30 rounded-full px-4 py-1.5 text-sm font-semibold mb-8">
-            <Gavel className="w-4 h-4" />
-            {t("Simulation Rules", "قواعد المحاكاة")}
-          </div>
-          <h1 className="text-5xl font-display font-bold text-white mb-6">
-            {t("Rules & Guidelines", "القواعد والإرشادات")}
-          </h1>
-          <p className="text-xl text-white/70 leading-relaxed">
-            {t(
-              "These rules ensure our simulation stays fair, respectful, and meaningful for every participant. Please read them carefully before participating.",
-              "تضمن هذه القواعد أن محاكاتنا تبقى عادلة ومحترمة وذات معنى لكل مشارك. يُرجى قراءتها بعناية قبل المشاركة."
-            )}
-          </p>
-        </div>
-      </section>
+      <PageHero
+        compact
+        eyebrow={t("Simulation Rules", "قواعد المحاكاة")}
+        title={t("Rules &", "القواعد")}
+        highlight={t("Guidelines", "والإرشادات")}
+        subtitle={t(
+          "These rules ensure our simulation stays fair, respectful, and meaningful for every participant. Please read them carefully before participating.",
+          "تضمن هذه القواعد أن محاكاتنا تبقى عادلة ومحترمة وذات معنى لكل مشارك. يُرجى قراءتها بعناية قبل المشاركة."
+        )}
+      />
 
       {/* Quick Summary */}
       <section className="py-16 px-4 bg-ice-blue/30">
         <div className="max-w-5xl mx-auto">
-          <h2 className="text-2xl font-display font-bold text-primary mb-8 text-center">
-            {t("Quick Summary", "ملخص سريع")}
-          </h2>
+          <Reveal>
+            <h2 className="text-3xl md:text-4xl font-display font-black text-foreground mb-10 text-center">
+              {t("Quick", "ملخص")} <span className="text-gradient-gold">{t("Summary", "سريع")}</span>
+            </h2>
+          </Reveal>
           <div className="grid md:grid-cols-2 gap-8">
-            <div className="bg-card rounded-2xl p-6 border border-green-200">
-              <h3 className="font-bold text-green-700 flex items-center gap-2 mb-4">
-                <CheckCircle className="w-5 h-5" /> {t("You CAN", "يُمكنك")}
-              </h3>
-              <ul className="space-y-3">
-                {canDo.map((item, i) => (
-                  <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
-                    <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
-                    {t(item.en, item.ar)}
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div className="bg-card rounded-2xl p-6 border border-red-200">
-              <h3 className="font-bold text-red-700 flex items-center gap-2 mb-4">
-                <XCircle className="w-5 h-5" /> {t("You CANNOT", "لا يُمكنك")}
-              </h3>
-              <ul className="space-y-3">
-                {cannotDo.map((item, i) => (
-                  <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
-                    <XCircle className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" />
-                    {t(item.en, item.ar)}
-                  </li>
-                ))}
-              </ul>
-            </div>
+            <Reveal direction="right">
+              <div className="h-full bg-card rounded-3xl p-8 border border-green-500/25 shadow-lg shadow-green-500/5 hover-lift">
+                <h3 className="font-display font-black text-lg text-green-600 dark:text-green-400 flex items-center gap-3 mb-6">
+                  <span className="p-2 rounded-xl bg-green-500/10"><CheckCircle className="w-5 h-5" /></span>
+                  {t("You CAN", "يُمكنك")}
+                </h3>
+                <ul className="space-y-4">
+                  {canDo.map((item, i) => (
+                    <li key={i} className="flex items-start gap-3 text-sm text-muted-foreground leading-relaxed">
+                      <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                      {t(item.en, item.ar)}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </Reveal>
+            <Reveal direction="left">
+              <div className="h-full bg-card rounded-3xl p-8 border border-destructive/25 shadow-lg shadow-destructive/5 hover-lift">
+                <h3 className="font-display font-black text-lg text-destructive flex items-center gap-3 mb-6">
+                  <span className="p-2 rounded-xl bg-destructive/10"><XCircle className="w-5 h-5" /></span>
+                  {t("You CANNOT", "لا يُمكنك")}
+                </h3>
+                <ul className="space-y-4">
+                  {cannotDo.map((item, i) => (
+                    <li key={i} className="flex items-start gap-3 text-sm text-muted-foreground leading-relaxed">
+                      <XCircle className="w-4 h-4 text-destructive flex-shrink-0 mt-0.5" />
+                      {t(item.en, item.ar)}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </Reveal>
           </div>
         </div>
       </section>
@@ -197,26 +198,28 @@ export default function Rules() {
       <section className="py-16 px-4 bg-background">
         <div className="max-w-4xl mx-auto space-y-10">
           {sections.map((section, i) => (
-            <div key={i} className="border border-border rounded-2xl overflow-hidden">
-              <div className="flex items-center gap-3 p-6 bg-card border-b border-border">
-                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
-                  <section.icon className="w-5 h-5 text-primary" />
+            <Reveal key={i} delay={0.05}>
+              <div className="border border-border/50 rounded-[2rem] overflow-hidden bg-card hover:border-gold/30 hover:shadow-xl hover:shadow-gold/5 transition-all duration-300 group">
+                <div className="flex items-center gap-4 p-6 md:p-7 border-b border-border/50 bg-secondary/10">
+                  <div className="w-12 h-12 rounded-2xl bg-gold/10 flex items-center justify-center flex-shrink-0 group-hover:bg-gold/20 group-hover:scale-105 transition-all duration-300">
+                    <section.icon className="w-6 h-6 text-gold" />
+                  </div>
+                  <h2 className="text-xl md:text-2xl font-display font-black text-foreground">
+                    {t(section.titleEn, section.titleAr)}
+                  </h2>
                 </div>
-                <h2 className="text-xl font-display font-bold text-foreground">
-                  {t(section.titleEn, section.titleAr)}
-                </h2>
+                <ul className="divide-y divide-border/40">
+                  {section.rules.map((rule, j) => (
+                    <li key={j} className="px-6 md:px-7 py-5 flex items-start gap-4 text-sm text-muted-foreground leading-relaxed hover:bg-gold/[0.04] transition-colors">
+                      <span className="flex-shrink-0 w-6 h-6 rounded-full bg-gold/15 text-gold text-xs font-black flex items-center justify-center mt-0.5">
+                        {j + 1}
+                      </span>
+                      {t(rule.en, rule.ar)}
+                    </li>
+                  ))}
+                </ul>
               </div>
-              <ul className="divide-y divide-border">
-                {section.rules.map((rule, j) => (
-                  <li key={j} className="px-6 py-4 flex items-start gap-3 text-sm text-muted-foreground leading-relaxed hover:bg-muted/30 transition-colors">
-                    <span className="flex-shrink-0 w-5 h-5 rounded-full bg-gold/20 text-gold text-xs font-bold flex items-center justify-center mt-0.5">
-                      {j + 1}
-                    </span>
-                    {t(rule.en, rule.ar)}
-                  </li>
-                ))}
-              </ul>
-            </div>
+            </Reveal>
           ))}
         </div>
       </section>

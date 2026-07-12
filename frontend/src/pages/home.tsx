@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLanguage } from "@/hooks/use-language";
-import { Button, Card } from "@/components/ui-custom";
+import { Button, Card, CountUp, TiltCard } from "@/components/ui-custom";
 import { Link } from "wouter";
 import { useGetPlatformStats, useGetForums, useGetArticles, useGetPolls } from "@workspace/api-client-react";
 import { Users, FileText, Landmark, ShieldAlert, ArrowRight, Gavel, Briefcase, AlertCircle, Target, Zap, ArrowUp } from "lucide-react";
@@ -47,6 +47,26 @@ export default function Home() {
         {/* Gradient Overlay */}
         <div className="absolute inset-0 bg-gradient-to-r from-[#0d1828]/75 via-[#0d1828]/40 to-[#1b2a4a]/30 z-0 pointer-events-none" />
 
+        {/* Floating gold particles */}
+        <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+          {[
+            { top: "18%", left: "12%", size: 6, delay: 0 },
+            { top: "30%", left: "85%", size: 4, delay: 1.2 },
+            { top: "62%", left: "8%", size: 5, delay: 2.4 },
+            { top: "72%", left: "78%", size: 7, delay: 0.8 },
+            { top: "12%", left: "60%", size: 3, delay: 1.8 },
+            { top: "48%", left: "92%", size: 4, delay: 3 },
+          ].map((p, i) => (
+            <motion.span
+              key={i}
+              className="absolute rounded-full bg-gold/60 blur-[1px]"
+              style={{ top: p.top, left: p.left, width: p.size, height: p.size }}
+              animate={{ y: [0, -30, 0], opacity: [0.2, 0.8, 0.2] }}
+              transition={{ duration: 6 + i, repeat: Infinity, delay: p.delay, ease: "easeInOut" }}
+            />
+          ))}
+        </div>
+
         <div className="max-w-7xl mx-auto relative z-10 text-center flex flex-col items-center">
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
@@ -58,16 +78,36 @@ export default function Home() {
             {t("Simulation Season 2 is Live", "الموسم الثاني من المحاكاة متاح الآن")}
           </motion.div>
           
-          <motion.h1 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
+          <motion.h1
+            initial="hidden"
+            animate="visible"
+            variants={{ visible: { transition: { staggerChildren: 0.09, delayChildren: 0.15 } } }}
             className="text-4xl sm:text-5xl md:text-7xl font-display font-bold text-white mb-6 leading-[1.1] max-w-4xl text-balance"
           >
-            {t("Experience the Future of ", "عش مستقبل ")}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-gold to-gold-pale">
-              {t("Civic Leadership", "القيادة المدنية")}
-            </span>
+            {t("Experience the Future of", "عش مستقبل").split(" ").map((word, i) => (
+              <motion.span
+                key={`w-${i}`}
+                variants={{
+                  hidden: { opacity: 0, y: 28, filter: "blur(10px)" },
+                  visible: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] } },
+                }}
+                className="inline-block"
+              >
+                {word}&nbsp;
+              </motion.span>
+            ))}
+            {t("Civic Leadership", "القيادة المدنية").split(" ").map((word, i) => (
+              <motion.span
+                key={`h-${i}`}
+                variants={{
+                  hidden: { opacity: 0, y: 28, filter: "blur(10px)" },
+                  visible: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] } },
+                }}
+                className="inline-block text-gradient-gold"
+              >
+                {word}&nbsp;
+              </motion.span>
+            ))}
           </motion.h1>
           
           <motion.p 
@@ -100,8 +140,20 @@ export default function Home() {
               </Button>
             </Link>
           </motion.div>
+          {/* Scroll indicator */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.2, duration: 0.8 }}
+            className="hidden md:flex flex-col items-center gap-2 mt-16"
+          >
+            <div className="scroll-indicator" />
+            <span className="text-white/40 text-[10px] font-bold uppercase tracking-[0.25em]">
+              {t("Scroll", "مرر للأسفل")}
+            </span>
+          </motion.div>
         </div>
-        
+
         {/* Decorative elements for Hero */}
         <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-background to-transparent z-0" />
       </section>
@@ -110,43 +162,67 @@ export default function Home() {
       <section className="relative -mt-12 md:-mt-16 z-20 px-4 md:px-6">
         <div className="max-w-6xl mx-auto">
           <Card className="glass-panel p-6 md:p-8 flex flex-wrap md:grid md:grid-cols-4 gap-6 md:gap-8 justify-center text-center">
-            <div className="flex-[1_1_140px] md:flex-none flex flex-col items-center">
-              <Landmark className="w-6 h-6 md:w-8 md:h-8 text-primary mb-3" />
-              <div className="text-2xl md:text-3xl font-display font-black text-foreground mb-1">
-                {stats?.activeMinistries || 12}
-              </div>
-              <div className="text-[10px] md:text-xs text-muted-foreground font-bold uppercase tracking-widest">
-                {t("Ministries", "الوزارات")}
-              </div>
-            </div>
-            <div className="flex-[1_1_140px] md:flex-none flex flex-col items-center md:border-l md:border-border/50">
-              <FileText className="w-6 h-6 md:w-8 md:h-8 text-primary mb-3" />
-              <div className="text-2xl md:text-3xl font-display font-black text-foreground mb-1">
-                {stats?.billsPassed || 156}
-              </div>
-              <div className="text-[10px] md:text-xs text-muted-foreground font-bold uppercase tracking-widest">
-                {t("Bills Passed", "قوانين مُقرة")}
-              </div>
-            </div>
-            <div className="flex-[1_1_140px] md:flex-none flex flex-col items-center md:border-l md:border-border/50">
-              <Users className="w-6 h-6 md:w-8 md:h-8 text-primary mb-3" />
-              <div className="text-2xl md:text-3xl font-display font-black text-foreground mb-1">
-                {stats?.activeMembers || "1.2k"}
-              </div>
-              <div className="text-[10px] md:text-xs text-muted-foreground font-bold uppercase tracking-widest">
-                {t("Citizens", "المواطنين")}
-              </div>
-            </div>
-            <div className="flex-[1_1_140px] md:flex-none flex flex-col items-center md:border-l md:border-border/50">
-              <ShieldAlert className="w-6 h-6 md:w-8 md:h-8 text-destructive mb-3" />
-              <div className="text-2xl md:text-3xl font-display font-black text-destructive mb-1">
-                {stats?.activeCrises || 2}
-              </div>
-              <div className="text-[10px] md:text-xs text-destructive/80 font-bold uppercase tracking-widest">
-                {t("Live Crises", "الأزمات")}
-              </div>
-            </div>
+            {[
+              { icon: Landmark, value: stats?.activeMinistries || 12, label: t("Ministries", "الوزارات"), danger: false },
+              { icon: FileText, value: stats?.billsPassed || 156, label: t("Bills Passed", "قوانين مُقرة"), danger: false },
+              { icon: Users, value: stats?.activeMembers || "1.2k", label: t("Citizens", "المواطنين"), danger: false },
+              { icon: ShieldAlert, value: stats?.activeCrises || 2, label: t("Live Crises", "الأزمات"), danger: true },
+            ].map((stat, idx) => {
+              const Icon = stat.icon;
+              return (
+                <motion.div
+                  key={idx}
+                  whileHover={{ y: -4 }}
+                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                  className={`flex-[1_1_140px] md:flex-none flex flex-col items-center group cursor-default ${
+                    idx > 0 ? "md:border-l md:border-border/50" : ""
+                  }`}
+                >
+                  <div className={`p-2.5 rounded-2xl mb-3 transition-colors duration-300 ${
+                    stat.danger ? "bg-destructive/10 group-hover:bg-destructive/20" : "bg-primary/10 group-hover:bg-gold/15"
+                  }`}>
+                    <Icon className={`w-6 h-6 md:w-7 md:h-7 transition-transform duration-300 group-hover:scale-110 ${
+                      stat.danger ? "text-destructive" : "text-primary group-hover:text-gold"
+                    }`} />
+                  </div>
+                  <div className={`text-2xl md:text-3xl font-display font-black mb-1 ${stat.danger ? "text-destructive" : "text-foreground"}`}>
+                    <CountUp value={stat.value} />
+                  </div>
+                  <div className={`text-[10px] md:text-xs font-bold uppercase tracking-widest ${
+                    stat.danger ? "text-destructive/80" : "text-muted-foreground"
+                  }`}>
+                    {stat.label}
+                  </div>
+                </motion.div>
+              );
+            })}
           </Card>
+        </div>
+      </section>
+
+      {/* Marquee Ribbon */}
+      <section className="py-10 md:py-14 overflow-hidden select-none" dir="ltr">
+        <div className="flex whitespace-nowrap animate-marquee w-max">
+          {[0, 1].map((dup) => (
+            <div key={dup} className="flex items-center" aria-hidden={dup === 1}>
+              {[
+                t("Parliament", "البرلمان"),
+                t("Ministries", "الوزارات"),
+                t("Legislation", "التشريع"),
+                t("Crisis Response", "إدارة الأزمات"),
+                t("National Debate", "النقاش الوطني"),
+                t("Civic Leadership", "القيادة المدنية"),
+                t("Youth Power", "قوة الشباب"),
+              ].map((word, i) => (
+                <span key={i} className="flex items-center">
+                  <span className="text-2xl md:text-4xl font-display font-black uppercase tracking-wide text-foreground/10 hover:text-gold/60 transition-colors duration-500 px-6">
+                    {word}
+                  </span>
+                  <span className="w-2 h-2 rounded-full bg-gold/40" />
+                </span>
+              ))}
+            </div>
+          ))}
         </div>
       </section>
 
@@ -172,7 +248,7 @@ export default function Home() {
                 className="text-3xl md:text-5xl font-display font-black text-foreground mb-6 leading-tight"
               >
                 {t("Pioneering Civic ", "رواد الحوكمة ")}
-                <span className="text-gold">{t("Governance", "المدنية")}</span>
+                <span className="text-gradient-gold">{t("Governance", "المدنية")}</span>
               </motion.h2>
               <motion.p
                 initial={{ opacity: 0, x: -20 }}
@@ -232,13 +308,16 @@ export default function Home() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: 0.1 * idx }}
-                    className="p-6 rounded-2xl border border-border/50 bg-card hover:border-gold/40 hover:shadow-lg transition-all duration-300 group"
                   >
-                    <div className="w-12 h-12 rounded-xl bg-gold/10 flex items-center justify-center mb-4 group-hover:bg-gold/20 transition-colors">
-                      <Icon className="w-6 h-6 text-gold" />
-                    </div>
-                    <h3 className="text-lg font-bold mb-2 text-foreground font-display">{pillar.title}</h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed">{pillar.desc}</p>
+                    <TiltCard className="h-full p-6 rounded-2xl border border-border/50 bg-card hover:border-gold/40 hover:shadow-xl transition-[border-color,box-shadow] duration-300 group">
+                      <div className="relative z-10">
+                        <div className="w-12 h-12 rounded-xl bg-gold/10 flex items-center justify-center mb-4 group-hover:bg-gold/20 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
+                          <Icon className="w-6 h-6 text-gold" />
+                        </div>
+                        <h3 className="text-lg font-bold mb-2 text-foreground font-display group-hover:text-gold transition-colors duration-300">{pillar.title}</h3>
+                        <p className="text-sm text-muted-foreground leading-relaxed">{pillar.desc}</p>
+                      </div>
+                    </TiltCard>
                   </motion.div>
                 );
               })}
@@ -390,8 +469,14 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12 relative">
-            {/* Connecting Line (Desktop) */}
-            <div className={`hidden md:block absolute top-10 left-[15%] right-[15%] h-0.5 bg-gradient-to-r from-transparent via-gold/30 to-transparent z-0`} />
+            {/* Connecting Line (Desktop) — draws in on scroll */}
+            <motion.div
+              initial={{ scaleX: 0 }}
+              whileInView={{ scaleX: 1 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1], delay: 0.3 }}
+              className={`hidden md:block absolute top-10 left-[15%] right-[15%] h-0.5 bg-gradient-to-r from-transparent via-gold/40 to-transparent z-0 ${isAr ? 'origin-right' : 'origin-left'}`}
+            />
             
             {[
               {
@@ -580,7 +665,7 @@ export default function Home() {
                 className="text-4xl md:text-5xl font-display font-bold text-foreground mb-6 leading-tight"
               >
                 {t("Community-Driven ", "بقيادة المجتمع ")}
-                <span className="text-gold">{t("Impact", "والتأثير")}</span>
+                <span className="text-gradient-gold">{t("Impact", "والتأثير")}</span>
               </motion.h2>
               <motion.p 
                 initial={{ opacity: 0, x: -20 }}
@@ -637,7 +722,9 @@ export default function Home() {
                       <card.icon className="w-5 h-5 md:w-6 md:h-6 text-primary" />
                     </div>
                     <div>
-                      <div className="text-xl md:text-3xl font-black font-display text-foreground">{card.val}</div>
+                      <div className="text-xl md:text-3xl font-black font-display text-foreground">
+                        <CountUp value={card.val} />
+                      </div>
                       <div className="text-[10px] md:text-xs text-muted-foreground uppercase font-bold tracking-widest">{card.label}</div>
                     </div>
                   </motion.div>
@@ -830,7 +917,13 @@ export default function Home() {
                             {isAr ? poll.titleAr : poll.title}
                           </h3>
                           <div className="w-full h-1.5 bg-secondary/35 rounded-full overflow-hidden">
-                            <div className="h-full bg-gold rounded-full" style={{ width: totalVotesVal > 0 ? "65%" : "0%" }} />
+                            <motion.div
+                              initial={{ width: 0 }}
+                              whileInView={{ width: totalVotesVal > 0 ? "65%" : "0%" }}
+                              viewport={{ once: true }}
+                              transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1], delay: 0.2 }}
+                              className="h-full bg-gradient-to-r from-gold to-gold-pale rounded-full"
+                            />
                           </div>
                         </div>
                         <div className="flex items-center gap-2 text-gold font-bold text-sm shrink-0 self-end md:self-center transition-transform duration-300 group-hover:translate-x-2">

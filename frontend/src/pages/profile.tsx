@@ -168,11 +168,11 @@ export default function Profile() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 pb-32">
+    <div className="min-h-screen bg-background pb-32">
       {/* Identity Hero */}
-      <div className="bg-slate-950 pt-32 pb-48 relative overflow-hidden">
-        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20" />
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/10 blur-[150px] -mr-64 -mt-64" />
+      <div className="bg-navy-dark pt-32 pb-48 relative overflow-hidden">
+        <div className="absolute inset-0 bg-grid-gold opacity-30" />
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-gold/10 blur-[150px] -mr-64 -mt-64" />
         
         <div className="max-w-7xl mx-auto px-6 relative z-10">
           <Link href="/dashboard">
@@ -183,15 +183,15 @@ export default function Profile() {
           
           <div className="flex flex-col md:flex-row items-center gap-12">
             <div className="relative group">
-               <div className="w-48 h-48 rounded-[56px] bg-slate-900 border-4 border-white/5 overflow-hidden shadow-2xl relative">
+               <div className="w-48 h-48 rounded-[3.5rem] bg-navy border-4 border-gold/20 overflow-hidden shadow-2xl relative">
                   {avatarUrl ? (
                     <img src={avatarUrl} alt={user.fullName} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-slate-800 text-white/10 italic font-black text-4xl select-none">ID-PHOTO</div>
+                    <div className="w-full h-full flex items-center justify-center bg-navy text-white/10 italic font-black text-4xl select-none">ID-PHOTO</div>
                   )}
                   
                   {isUploading && (
-                    <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm flex flex-col items-center justify-center text-primary">
+                    <div className="absolute inset-0 bg-navy-dark/80 backdrop-blur-sm flex flex-col items-center justify-center text-gold">
                        <Loader2 className="w-10 h-10 animate-spin mb-2" />
                        <span className="text-[10px] font-black uppercase tracking-widest">{t("Syncing", "مزامنة")}</span>
                     </div>
@@ -200,7 +200,7 @@ export default function Profile() {
                
                <button 
                 onClick={() => fileInputRef.current?.click()}
-                className="absolute -bottom-4 -right-4 w-14 h-14 bg-primary text-white rounded-[20px] flex items-center justify-center shadow-xl shadow-primary/40 hover:scale-110 transition-transform active:scale-95 border-4 border-slate-950"
+                className="absolute -bottom-4 -right-4 w-14 h-14 bg-gold text-navy-dark rounded-[20px] flex items-center justify-center shadow-xl shadow-gold/40 hover:scale-110 transition-transform active:scale-95 border-4 border-navy-dark"
                >
                  <Camera className="w-6 h-6" />
                </button>
@@ -215,7 +215,7 @@ export default function Profile() {
             
             <div className="text-center md:text-left flex-1">
               <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 mb-6">
-                <Badge className="bg-primary/20 text-primary border-none rounded-lg px-4 py-1 text-[10px] font-black uppercase tracking-widest shadow-lg shadow-primary/10">
+                <Badge className="bg-gold/20 text-gold border-none rounded-lg px-4 py-1 text-[10px] font-black uppercase tracking-widest shadow-lg shadow-gold/10">
                   {user.role === 'admin' ? t("Platform Overseer", "مشرف المنصة") : t("Citizen Delegate", "مندوب مواطن")}
                 </Badge>
                 <div className="flex items-center gap-2 text-white/40 text-[10px] font-black uppercase tracking-widest">
@@ -226,8 +226,8 @@ export default function Profile() {
               <h1 className="text-5xl md:text-7xl font-display font-black text-white mb-4 tracking-tighter leading-none">
                 {isAr ? user.fullNameAr || user.fullName : user.fullName}
               </h1>
-              <p className="text-slate-400 font-bold max-w-xl text-lg flex items-center justify-center md:justify-start gap-4">
-                 <Globe className="w-5 h-5 text-primary" />
+              <p className="text-white/50 font-bold max-w-xl text-lg flex items-center justify-center md:justify-start gap-4">
+                 <Globe className="w-5 h-5 text-gold" />
                  {user.region || t("Unassigned Sector", "قطاع غير محدد")}
               </p>
             </div>
@@ -239,56 +239,56 @@ export default function Profile() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 items-start">
           
           {/* Identity Editor */}
-          <Card className="lg:col-span-2 p-10 md:p-14 rounded-[48px] border-none bg-white shadow-2xl shadow-slate-200/50">
+          <Card className="lg:col-span-2 p-10 md:p-14 rounded-[3rem] border border-border/40 shadow-2xl shadow-navy/5">
              <div className="flex items-center gap-4 mb-12">
-                <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center text-primary">
+                <div className="w-12 h-12 bg-gold/10 rounded-2xl flex items-center justify-center text-gold">
                    <ShieldCheck className="w-6 h-6" />
                 </div>
                 <div>
-                   <h3 className="text-2xl font-black text-slate-900 tracking-tight">{t("Civic Profile Data", "بيانات الملف الشخصي المدني")}</h3>
-                   <p className="text-slate-400 text-xs font-bold uppercase tracking-widest">{t("HQ Records Department", "قسم السجلات بالمقر الرئيسي")}</p>
+                   <h3 className="text-2xl font-display font-black text-foreground tracking-tight">{t("Civic Profile Data", "بيانات الملف الشخصي المدني")}</h3>
+                   <p className="text-muted-foreground text-xs font-bold uppercase tracking-widest">{t("HQ Records Department", "قسم السجلات بالمقر الرئيسي")}</p>
                 </div>
              </div>
 
              <form onSubmit={handleSubmit} className="space-y-10">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                    <div className="space-y-4">
-                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block ml-2">{t("Official Name (Latin)", "الاسم الرسمي (لاتيني)")}</label>
+                      <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest block ml-2">{t("Official Name (Latin)", "الاسم الرسمي (لاتيني)")}</label>
                       <div className="relative group">
-                         <User className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 group-focus-within:text-primary transition-colors" />
+                         <User className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground/50 group-focus-within:text-gold transition-colors" />
                          <Input 
                             name="fullName"
                             value={formData.fullName}
                             onChange={handleInputChange}
                             placeholder="John Doe"
-                            className="pl-16 h-16 bg-slate-50 border-slate-100 rounded-[24px] font-bold focus-visible:ring-primary/20 focus-visible:bg-white transition-all"
+                            className="pl-16 h-16 bg-secondary/30 border-border/50 rounded-3xl font-bold focus-visible:ring-gold/25 focus-visible:bg-card transition-all"
                          />
                       </div>
                    </div>
                    
                    <div className="space-y-4">
-                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mr-2 text-right">{t("Official Name (Arabic)", "الاسم الرسمي (عربي)")}</label>
+                      <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest block mr-2 text-right">{t("Official Name (Arabic)", "الاسم الرسمي (عربي)")}</label>
                       <div className="relative group dir-rtl">
                          <Input 
                             name="fullNameAr"
                             value={formData.fullNameAr}
                             onChange={handleInputChange}
                             placeholder="جون دو"
-                            className="h-16 bg-slate-50 border-slate-100 rounded-[24px] font-bold text-right focus-visible:ring-primary/20 focus-visible:bg-white transition-all px-8"
+                            className="h-16 bg-secondary/30 border-border/50 rounded-3xl font-bold text-right focus-visible:ring-gold/25 focus-visible:bg-card transition-all px-8"
                          />
                       </div>
                    </div>
                 </div>
 
                 <div className="space-y-4">
-                   <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block ml-2">{t("Civic Region / Sector", "المنطقة المدنية / القطاع")}</label>
+                   <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest block ml-2">{t("Civic Region / Sector", "المنطقة المدنية / القطاع")}</label>
                    <div className="relative group">
-                      <MapPin className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 group-focus-within:text-primary transition-colors z-10" />
+                      <MapPin className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground/50 group-focus-within:text-gold transition-colors z-10" />
                       <Select 
                         name="region"
                         value={formData.region}
                         onChange={handleInputChange}
-                        className="pl-16 h-16 bg-slate-50 border-slate-100 rounded-[24px] font-bold focus-visible:ring-primary/20 focus-visible:bg-white transition-all appearance-none"
+                        className="pl-16 h-16 bg-secondary/30 border-border/50 rounded-3xl font-bold focus-visible:ring-gold/25 focus-visible:bg-card transition-all appearance-none"
                       >
                         <option value="">{t("Select a Region", "اختر جهة")}</option>
                         {MOROCCAN_REGIONS.map(region => (
@@ -299,13 +299,13 @@ export default function Profile() {
                 </div>
 
                 <div className="space-y-4">
-                   <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block ml-2">{t("Statement of Purpose / Bio", "بيان الغرض / السيرة الذاتية")}</label>
+                   <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest block ml-2">{t("Statement of Purpose / Bio", "بيان الغرض / السيرة الذاتية")}</label>
                    <Textarea 
                       name="bio"
                       value={formData.bio}
                       onChange={handleInputChange}
                       placeholder={t("Briefly describe your journalistic or legislative focus within the simulation...", "صف بإيجاز تركيزك الصحفي أو التشريعي ضمن المحاكاة...")}
-                      className="min-h-[160px] p-8 bg-slate-50 border-slate-100 rounded-[32px] font-bold focus-visible:ring-primary/20 focus-visible:bg-white transition-all resize-none leading-relaxed"
+                      className="min-h-[160px] p-8 bg-secondary/30 border-border/50 rounded-[2rem] font-bold focus-visible:ring-gold/25 focus-visible:bg-card transition-all resize-none leading-relaxed"
                    />
                 </div>
 
@@ -313,7 +313,7 @@ export default function Profile() {
                    <Button 
                     type="submit" 
                     disabled={updateUserMutation.isPending}
-                    className="w-full md:w-auto h-16 px-12 rounded-2xl gap-3 shadow-2xl shadow-primary/30 text-lg font-black"
+                    className="w-full md:w-auto h-16 px-12 rounded-2xl gap-3 shadow-2xl shadow-gold/25 text-lg font-black"
                    >
                      {updateUserMutation.isPending ? (
                        <Loader2 className="w-6 h-6 animate-spin" />
@@ -328,9 +328,9 @@ export default function Profile() {
 
           {/* Member Card Preview */}
           <div className="space-y-8 h-full flex flex-col justify-end">
-             <div className="p-8 bg-slate-950 text-white rounded-[40px] shadow-2xl shadow-slate-900/30 relative overflow-hidden group">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/20 blur-[60px] -mr-16 -mt-16" />
-                <Badge className="bg-primary/20 text-primary border-none text-[8px] font-black uppercase mb-6 tracking-[0.3em]">
+             <div className="p-8 bg-navy-dark text-white rounded-[2.5rem] shadow-2xl shadow-navy/30 relative overflow-hidden group">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-gold/20 blur-[60px] -mr-16 -mt-16" />
+                <Badge className="bg-gold/20 text-gold border-none text-[8px] font-black uppercase mb-6 tracking-[0.3em]">
                    {t("Live Simulation Passport", "جواز سفر المحاكاة المباشر")}
                 </Badge>
                 <div className="flex items-center gap-6 mb-8">
@@ -338,34 +338,34 @@ export default function Profile() {
                       {avatarUrl ? (
                          <img src={avatarUrl} className="w-full h-full object-cover" />
                       ) : (
-                         <div className="w-full h-full bg-slate-800" />
+                         <div className="w-full h-full bg-navy" />
                       )}
                    </div>
                    <div className="overflow-hidden">
                       <h4 className="font-black text-lg truncate leading-tight">{formData.fullName || "IDENT-000"}</h4>
-                      <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{user.email}</p>
+                      <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest">{user.email}</p>
                    </div>
                 </div>
                 <div className="space-y-4 pt-6 border-t border-white/10">
                    <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest">
-                      <span className="text-slate-500">{t("Status", "الحالة")}</span>
+                      <span className="text-white/40">{t("Status", "الحالة")}</span>
                       <span className="text-green-500">{user.status}</span>
                    </div>
                    <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest">
-                      <span className="text-slate-500">{t("Simulation Role", "دور المحاكاة")}</span>
+                      <span className="text-white/40">{t("Simulation Role", "دور المحاكاة")}</span>
                       <span className="text-white">{user.simulationRole || "MEMBER"}</span>
                    </div>
                 </div>
                 <CloudUpload className="absolute -bottom-6 -right-6 w-24 h-24 text-white/5 -rotate-12" />
              </div>
 
-             <Card className="p-10 bg-white rounded-[40px] border-none shadow-2xl shadow-slate-200/40">
-                <Mail className="w-10 h-10 text-primary mb-6" />
-                <h4 className="text-xl font-black text-slate-900 mb-2">{t("Communications Hub", "مركز الاتصالات")}</h4>
-                <p className="text-slate-400 text-sm font-medium leading-relaxed mb-6">
+             <Card className="p-10 rounded-[2.5rem] border border-border/40 shadow-2xl shadow-navy/5">
+                <Mail className="w-10 h-10 text-gold mb-6" />
+                <h4 className="text-xl font-display font-black text-foreground mb-2">{t("Communications Hub", "مركز الاتصالات")}</h4>
+                <p className="text-muted-foreground text-sm font-medium leading-relaxed mb-6">
                    {t("Your official correspondences will be directed to your verified HQ address.", "سيتم توجيه مراسلاتك الرسمية إلى عنوان المقر الرئيسي الذي تم التحقق منه.")}
                 </p>
-                <p className="font-bold text-slate-900 select-all border-b border-primary/20 pb-2 mb-2">{user.email}</p>
+                <p className="font-bold text-foreground select-all border-b border-gold/30 pb-2 mb-2">{user.email}</p>
              </Card>
           </div>
 

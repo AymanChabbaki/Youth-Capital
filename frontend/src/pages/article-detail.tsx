@@ -51,21 +51,21 @@ export default function ArticleDetail() {
   
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-white flex flex-col items-center justify-center">
-        <div className="w-16 h-16 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
-        <p className="mt-4 text-slate-500 font-bold animate-pulse">{t("Loading report...", "جاري تحميل التقرير...")}</p>
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center">
+        <div className="w-16 h-16 border-2 border-gold/20 border-t-gold rounded-full animate-spin" />
+        <p className="mt-4 text-muted-foreground font-bold animate-pulse">{t("Loading report...", "جاري تحميل التقرير...")}</p>
       </div>
     );
   }
 
   if (!article) {
     return (
-      <div className="min-h-screen bg-white flex flex-col items-center justify-center p-6 text-center">
-        <div className="w-20 h-20 bg-slate-50 rounded-3xl flex items-center justify-center mb-6">
-          <Newspaper className="w-10 h-10 text-slate-300" />
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6 text-center">
+        <div className="w-20 h-20 bg-secondary/30 rounded-3xl flex items-center justify-center mb-6">
+          <Newspaper className="w-10 h-10 text-muted-foreground/40" />
         </div>
-        <h2 className="text-2xl font-bold text-slate-900 mb-2">{t("Report Not Found", "التقرير غير موجود")}</h2>
-        <p className="text-slate-500 mb-8 max-w-xs">{t("The article you are looking for might have been archived or moved.", "قد يكون المقال الذي تبحث عنه قد تم أرشفته أو نقله.")}</p>
+        <h2 className="text-2xl font-display font-black text-foreground mb-2">{t("Report Not Found", "التقرير غير موجود")}</h2>
+        <p className="text-muted-foreground mb-8 max-w-xs">{t("The article you are looking for might have been archived or moved.", "قد يكون المقال الذي تبحث عنه قد تم أرشفته أو نقله.")}</p>
         <Link href="/press">
           <Button className="rounded-2xl px-8 h-12 gap-2">
             <ArrowLeft className="w-4 h-4" />
@@ -79,7 +79,7 @@ export default function ArticleDetail() {
   const latestArticles = latestArticlesData?.articles?.filter(a => a.id !== article.id).slice(0, 3) || [];
 
   return (
-    <div className="min-h-screen bg-white pb-32">
+    <div className="min-h-screen bg-background pb-32">
       {/* Article Hero */}
       <div className="relative h-[60vh] lg:h-[75vh] w-full overflow-hidden">
         {article.thumbnailUrl ? (
@@ -89,7 +89,7 @@ export default function ArticleDetail() {
             className="w-full h-full object-cover"
           />
         ) : (
-          <div className="w-full h-full bg-slate-900 flex items-center justify-center">
+          <div className="w-full h-full bg-navy-dark bg-grid-gold flex items-center justify-center">
              <span className="text-white/10 font-black text-[20vw] select-none uppercase">PRESS</span>
           </div>
         )}
@@ -102,7 +102,7 @@ export default function ArticleDetail() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
             >
-              <Badge className="bg-primary hover:bg-primary text-white border-none rounded-lg px-4 py-1.5 mb-6 text-xs font-black tracking-widest uppercase shadow-lg shadow-primary/20">
+              <Badge className="bg-gold hover:bg-gold text-navy-dark border-none rounded-lg px-4 py-1.5 mb-6 text-xs font-black tracking-widest uppercase shadow-lg shadow-primary/20">
                 {article.type}
               </Badge>
               <h1 className="text-4xl md:text-5xl lg:text-7xl font-display font-black text-white mb-8 leading-[1.05] tracking-tight">
@@ -150,35 +150,35 @@ export default function ArticleDetail() {
         <div className="flex flex-col lg:flex-row gap-16">
           <div className="flex-1">
             {/* Breadcrumbs */}
-            <div className="flex items-center gap-2 text-[10px] font-black text-slate-400 mb-12 uppercase tracking-[0.2em] overflow-hidden whitespace-nowrap">
-              <Link href="/" className="hover:text-primary transition-colors">HOME</Link>
+            <div className="flex items-center gap-2 text-[10px] font-black text-muted-foreground mb-12 uppercase tracking-[0.2em] overflow-hidden whitespace-nowrap">
+              <Link href="/" className="hover:text-gold transition-colors">HOME</Link>
               <ChevronRight className="w-3 h-3" />
-              <Link href="/press" className="hover:text-primary transition-colors">PRESS</Link>
+              <Link href="/press" className="hover:text-gold transition-colors">PRESS</Link>
               <ChevronRight className="w-3 h-3" />
-              <span className="text-slate-900 truncate">ARTICLE {article.id}</span>
+              <span className="text-foreground truncate">ARTICLE {article.id}</span>
             </div>
 
             {/* Article Body */}
-            <article className="prose prose-lg prose-slate max-w-none">
-              <div className="text-2xl md:text-3xl text-slate-600 font-bold leading-relaxed mb-16 border-l-8 border-primary pl-8 italic">
+            <article className="prose prose-lg max-w-none">
+              <div className="text-2xl md:text-3xl text-muted-foreground font-bold leading-relaxed mb-16 border-s-8 border-gold ps-8 italic">
                 {isAr ? article.contentAr.slice(0, 150) : article.content.slice(0, 150)}...
               </div>
               
-              <div className="text-xl md:text-2xl text-slate-800 leading-[1.8] font-medium whitespace-pre-wrap selection:bg-primary/20">
+              <div className="text-xl md:text-2xl text-foreground/90 leading-[1.8] font-medium whitespace-pre-wrap">
                 {isAr ? article.contentAr : article.content}
               </div>
               
-              <div className="mt-24 p-12 rounded-[48px] bg-slate-950 text-white relative overflow-hidden group shadow-2xl shadow-slate-900/20">
-                 <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 blur-[100px] -mr-32 -mt-32" />
+              <div className="mt-24 p-12 rounded-[3rem] bg-navy-dark text-white relative overflow-hidden group shadow-2xl shadow-navy/20">
+                 <div className="absolute top-0 right-0 w-64 h-64 bg-gold/10 blur-[100px] -mr-32 -mt-32" />
                  <Newspaper className="absolute -bottom-10 -right-10 w-64 h-64 text-white/5 -rotate-12" />
                  <h4 className="text-white font-black text-2xl mb-4 relative z-10 tracking-tight">{t("Stay Informed on Civic Pulse", "ابق على اطلاع بنبض المواطنة")}</h4>
-                 <p className="text-slate-400 leading-relaxed mb-8 font-medium relative z-10 max-w-md">
+                 <p className="text-white/60 leading-relaxed mb-8 font-medium relative z-10 max-w-md">
                    {t("This report is transcribed in our Simulation Archives. Every motion, debate, and law passed is documented for transparency and historical record.", "يتم نسخ هذا التقرير في أرشيف المحاكاة الخاص بنا. يتم توثيق كل اقتراح ومناقشة وقانون تم تمريره من أجل الشفافية والسجلات التاريخية.")}
                  </p>
                  <div className="flex flex-wrap gap-4 relative z-10">
                     <Button 
                       onClick={handleShare}
-                      className="rounded-2xl h-14 px-8 gap-3 bg-white text-slate-950 hover:bg-slate-100 font-black shadow-xl shadow-white/5"
+                      className="rounded-2xl h-14 px-8 gap-3 bg-gold text-navy-dark hover:bg-gold/90 font-black shadow-xl shadow-gold/20"
                     >
                       <Share2 className="w-5 h-5" />
                       {t("Distribute Report", "توزيع التقرير")}
@@ -198,17 +198,17 @@ export default function ArticleDetail() {
 
       {/* Latest Stories Footer */}
       {latestArticles.length > 0 && (
-        <div className="bg-slate-50 py-32 border-t border-slate-100 mt-12">
+        <div className="bg-secondary/20 py-32 border-t border-border/50 mt-12">
           <div className="max-w-7xl mx-auto px-6">
             <div className="flex items-center justify-between mb-20">
               <div className="flex items-center gap-4">
-                 <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center text-primary">
+                 <div className="w-12 h-12 bg-gold/10 rounded-2xl flex items-center justify-center text-gold">
                     <Search className="w-6 h-6" />
                  </div>
-                 <h3 className="text-4xl font-display font-black text-slate-900 tracking-tight">{t("Related Inquiries", "تحقيقات ذات صلة")}</h3>
+                 <h3 className="text-4xl font-display font-black text-foreground tracking-tight">{t("Related Inquiries", "تحقيقات ذات صلة")}</h3>
               </div>
               <Link href="/press">
-                <Button variant="ghost" className="font-bold gap-2 text-primary hover:bg-primary/5 rounded-xl h-12 px-6">
+                <Button variant="ghost" className="font-bold gap-2 text-gold hover:bg-gold/10 rounded-xl h-12 px-6">
                   {t("Back to Portal", "العودة للبوابة")} <ArrowLeft className="w-4 h-4 rotate-180" />
                 </Button>
               </Link>
@@ -219,23 +219,23 @@ export default function ArticleDetail() {
                 <Link key={a.id} href={`/press/${a.id}`}>
                   <motion.div 
                     whileHover={{ y: -8 }}
-                    className="bg-white rounded-[40px] overflow-hidden border border-slate-200 shadow-sm hover:shadow-2xl hover:shadow-slate-200/50 transition-all cursor-pointer group h-full"
+                    className="bg-card rounded-[2.5rem] overflow-hidden border border-border/50 shadow-sm hover:border-gold/40 hover:shadow-2xl hover:shadow-gold/5 transition-all cursor-pointer group h-full"
                   >
                     <div className="h-60 relative overflow-hidden">
                       {a.thumbnailUrl ? (
                         <img src={a.thumbnailUrl} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
                       ) : (
-                        <div className="w-full h-full bg-slate-100 flex items-center justify-center text-slate-300 font-black text-2xl">YC PRESS</div>
+                        <div className="w-full h-full bg-secondary/40 flex items-center justify-center text-muted-foreground/40 font-black text-2xl">YC PRESS</div>
                       )}
-                      <Badge className="absolute top-6 left-6 bg-slate-950 text-white rounded-lg text-[10px] font-black border-none px-4 py-1 tracking-widest uppercase">
+                      <Badge className="absolute top-6 left-6 bg-navy-dark text-gold rounded-lg text-[10px] font-black border-none px-4 py-1 tracking-widest uppercase">
                         {a.type}
                       </Badge>
                     </div>
                     <div className="p-10">
-                       <h4 className="text-2xl font-bold mb-4 line-clamp-2 text-slate-900 group-hover:text-primary transition-colors leading-tight">
+                       <h4 className="text-2xl font-display font-bold mb-4 line-clamp-2 text-foreground group-hover:text-gold transition-colors leading-tight">
                          {isAr ? a.titleAr : a.title}
                        </h4>
-                       <div className="flex items-center gap-3 text-slate-400 text-[10px] font-black uppercase tracking-[0.2em]">
+                       <div className="flex items-center gap-3 text-muted-foreground text-[10px] font-black uppercase tracking-[0.2em]">
                          <Calendar className="w-3.5 h-3.5" />
                          {format(new Date(a.publishedAt), 'MMM dd, yyyy')}
                        </div>
