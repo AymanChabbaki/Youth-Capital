@@ -1,13 +1,57 @@
 @import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@400;600;700;800&family=Cinzel:wght@500;700;800&family=Inter:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
 
+/* Class-driven dark mode: `dark:` utilities follow the .dark class set by the theme switcher */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Runtime theme tokens — toggled by the .dark class the theme switcher sets on <html>.
+   These MUST live outside @theme inline: values inside it are baked into utilities
+   at build time, so class overrides would never apply. */
+:root {
+  --background: hsl(37 33% 94%);
+  --foreground: hsl(216 51% 10%);
+  --card: hsl(0 0% 100%);
+  --card-foreground: hsl(240 21% 15%);
+  --primary: hsl(221 47% 20%);
+  --primary-foreground: hsl(37 33% 94%);
+  --secondary: hsl(216 43% 94%);
+  --secondary-foreground: hsl(221 47% 20%);
+  --accent: hsl(44 55% 54%);
+  --accent-foreground: hsl(0 0% 100%);
+  --destructive: hsl(350 83% 42%);
+  --destructive-foreground: hsl(0 0% 100%);
+  --muted: hsl(225 11% 58%);
+  --muted-foreground: hsl(240 21% 15%);
+  --border: hsl(216 20% 85%);
+  --ring: hsl(44 55% 54%);
+}
+
+.dark {
+  --background: hsl(216 51% 10%);
+  --foreground: hsl(37 33% 94%);
+  --card: hsl(240 21% 15%);
+  --card-foreground: hsl(37 33% 94%);
+  --primary: hsl(44 55% 54%);
+  --primary-foreground: hsl(216 51% 10%);
+  --secondary: hsl(221 47% 20%);
+  --secondary-foreground: hsl(37 33% 94%);
+  --accent: hsl(44 55% 54%);
+  --accent-foreground: hsl(216 51% 10%);
+  --destructive: hsl(350 83% 52%);
+  --destructive-foreground: hsl(0 0% 100%);
+  --muted: hsl(240 21% 25%);
+  --muted-foreground: hsl(225 11% 58%);
+  --border: hsl(240 21% 25%);
+  --ring: hsl(44 55% 54%);
+}
+
 @theme inline {
   --font-display-en: 'Cinzel', serif;
   --font-display-ar: 'Amiri', serif;
   --font-body-en: 'Inter', sans-serif;
   --font-body-ar: 'Cairo', sans-serif;
 
-  /* Brand Colors from Spec */
+  /* Brand Colors from Spec (static across themes) */
   --color-navy: hsl(221 47% 20%);
   --color-navy-dark: hsl(216 51% 10%);
   --color-charcoal: hsl(240 21% 15%);
@@ -18,40 +62,23 @@
   --color-ice-blue: hsl(216 43% 94%);
   --color-slate: hsl(225 11% 58%);
 
-  /* System Mappings */
-  --color-background: var(--color-white);
-  --color-foreground: var(--color-navy-dark);
-  --color-card: hsl(0 0% 100%);
-  --color-card-foreground: var(--color-charcoal);
-  --color-primary: var(--color-navy);
-  --color-primary-foreground: var(--color-white);
-  --color-secondary: var(--color-ice-blue);
-  --color-secondary-foreground: var(--color-navy);
-  --color-accent: var(--color-gold);
-  --color-accent-foreground: hsl(0 0% 100%);
-  --color-destructive: var(--color-rose);
-  --color-destructive-foreground: hsl(0 0% 100%);
-  --color-muted: var(--color-slate);
-  --color-muted-foreground: var(--color-charcoal);
-  --color-border: hsl(216 20% 85%);
-  --color-ring: var(--color-gold);
-}
-
-.dark {
-  --color-background: var(--color-navy-dark);
-  --color-foreground: var(--color-white);
-  --color-card: var(--color-charcoal);
-  --color-card-foreground: var(--color-white);
-  --color-primary: var(--color-gold);
-  --color-primary-foreground: var(--color-navy-dark);
-  --color-secondary: hsl(221 47% 20%);
-  /* Navy */
-  --color-secondary-foreground: var(--color-white);
-  --color-accent: var(--color-gold);
-  --color-accent-foreground: var(--color-navy-dark);
-  --color-border: hsl(240 21% 25%);
-  --color-muted: hsl(240 21% 25%);
-  --color-muted-foreground: var(--color-slate);
+  /* System Mappings — reference the runtime tokens above */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-ring: var(--ring);
 }
 
 @layer base {
