@@ -11,19 +11,30 @@ router.get("/", async (req, res) => {
     const page = parseInt(String(req.query.page || "1"));
     const limit = parseInt(String(req.query.limit || "10"));
     const offset = (page - 1) * limit;
-    let query = db.select().from(articlesTable).$dynamic();
+
+    // Single joined query instead of one author lookup per article (N+1),
+    // and a SQL count instead of loading the whole table — keeps this endpoint
+    // fast enough to survive serverless cold starts on a waking database.
+    let query = db
+      .select({ article: articlesTable, author: usersTable })
+      .from(articlesTable)
+      .leftJoin(usersTable, eq(articlesTable.authorId, usersTable.id))
+      .$dynamic();
     if (typeFilter) {
       query = query.where(eq(articlesTable.type, typeFilter as any));
     }
-    const articles = await query.orderBy(sql`${articlesTable.publishedAt} desc`).limit(limit).offset(offset);
-    const withAuthors = await Promise.all(
-      articles.map(async (a) => {
-        const [author] = await db.select().from(usersTable).where(eq(usersTable.id, a.authorId));
-        return { ...a, author: safeUser(author) };
-      })
-    );
-    const allArticles = await db.select().from(articlesTable);
-    const total = typeFilter ? allArticles.filter((a) => a.type === typeFilter).length : allArticles.length;
+    const rows = await query.orderBy(sql`${articlesTable.publishedAt} desc`).limit(limit).offset(offset);
+    const withAuthors = rows.map(({ article, author }) => ({
+      ...article,
+      author: author ? safeUser(author) : null,
+    }));
+
+    let countQuery = db.select({ count: sql<number>`count(*)::int` }).from(articlesTable).$dynamic();
+    if (typeFilter) {
+      countQuery = countQuery.where(eq(articlesTable.type, typeFilter as any));
+    }
+    const [{ count: total }] = await countQuery;
+
     res.json({ articles: withAuthors, total, page, limit });
   } catch (err) {
     req.log.error({ err }, "Get articles error");
