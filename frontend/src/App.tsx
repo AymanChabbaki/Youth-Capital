@@ -27,6 +27,7 @@ const About = lazy(() => import("@/pages/about"));
 const Rules = lazy(() => import("@/pages/rules"));
 const Privacy = lazy(() => import("@/pages/privacy"));
 const NotFound = lazy(() => import("@/pages/not-found"));
+const Linktree = lazy(() => import("@/pages/linktree"));
 
 const queryClient = new QueryClient();
 
@@ -52,8 +53,9 @@ function Router() {
   return (
     <Suspense fallback={<PageLoader />}>
       <Switch>
-        {/* Admin routes without the global layout shell */}
+        {/* Standalone routes without the global layout shell */}
         <Route path="/admin" component={Admin} />
+        <Route path="/linktree" component={Linktree} />
 
         {/* Standard routes with the global layout (Navbar/Footer) */}
         <Route>
