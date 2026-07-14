@@ -98,18 +98,18 @@
     "picture": "/images/team/marwa.png"
   },
   {
-    "nameEn": "Nassima",
-    "nameAr": "نسيمة",
+    "nameEn": "Nassima SADIK",
+    "nameAr": "نسيمة صديق",
     "roleEn": "Head of PR",
     "roleAr": "رئيس العلاقات العامة",
     "tier": "ops",
-    "descEn": "Leads communication with external media partners, VIP invitees, and manages official public relations campaigns.",
-    "descAr": "تقود التواصل مع الشركاء الإعلاميين الخارجيين والضيوف رفيعي المستوى وتدير حملات العلاقات العامة الرسمية.",
+    "descEn": "A versatile young professional holding a Master’s degree in Microbiology and Biological Engineering, with experience in scientific research, event planning, public relations, and project management. Passionate about innovation, sustainable development, and community engagement, I combine scientific rigor and leadership with excellent interpersonal skills.",
+    "descAr": "محترفة شابة متعددة المهارات حاصلة على درجة الماجستير في علم الأحياء الدقيقة والهندسة البيولوجية، ولديها خبرة في البحث العلمي، تخطيط الفعاليات، العلاقات العامة، وإدارة المشاريع. شغوفة بالابتكار، التنمية المستدامة، والمشاركة المجتمعية، أجمع بين الدقة العلمية والقيادة مع مهارات تواصل ممتازة.",
     "accent": "from-teal-400 to-emerald-600",
     "glowColor": "rgba(20, 184, 166, 0.2)",
     "missionsEn": ["Media Partnerships", "PR Campaigns", "Institutional Outreach"],
     "missionsAr": ["الشراكات الإعلامية", "حملات العلاقات العامة", "التواصل المؤسساتي"],
-    "picture": "/images/team/nassima.png"
+    "picture": "/images/team/nassima.jpeg"
   },
   {
     "nameEn": "Chaimae",
