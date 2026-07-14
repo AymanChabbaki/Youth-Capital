@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useLanguage } from "@/hooks/use-language";
 import {
@@ -16,6 +16,7 @@ import {
   CheckCircle, Clock, XCircle, Search, ChevronRight, Zap,
   Globe, BarChart3, PieChart as PieChartIcon, UserCheck, Siren,
   MapPin, Landmark, LogOut, Plus, Edit, Trash2,
+  ImagePlus, Loader2, X as XIcon,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
@@ -25,6 +26,135 @@ import {
 } from "recharts";
 
 const COLORS = ["#1B2A4A", "#C9A84C", "#C41230", "#4A7FA5", "#6B8E5A", "#8A5AA0"];
+
+// Uploads an image to Cloudinary (unsigned preset) and exposes the resulting
+// URL through a hidden input, so it flows through the modal's FormData submit.
+function ThumbnailUploader({ name, defaultValue }: { name: string; defaultValue?: string }) {
+  const { t } = useLanguage();
+  const { toast } = useToast();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [url, setUrl] = useState(defaultValue || "");
+  const [isUploading, setIsUploading] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+
+  const uploadFile = async (file: File) => {
+    if (!file.type.startsWith("image/")) {
+      toast({ title: t("Images only", "الصور فقط"), variant: "destructive" });
+      return;
+    }
+
+    const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
+    const uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
+    if (!cloudName || cloudName === "your_cloud_name" || !uploadPreset) {
+      toast({
+        title: t("Cloudinary Not Configured", "Cloudinary غير مهيأ"),
+        description: t("Set VITE_CLOUDINARY_CLOUD_NAME and VITE_CLOUDINARY_UPLOAD_PRESET in your environment.", "عيّن VITE_CLOUDINARY_CLOUD_NAME و VITE_CLOUDINARY_UPLOAD_PRESET في بيئتك."),
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsUploading(true);
+    const body = new FormData();
+    body.append("file", file);
+    body.append("upload_preset", uploadPreset);
+
+    try {
+      const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, { method: "POST", body });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error?.message || "Upload rejected");
+      if (data.secure_url) {
+        setUrl(data.secure_url);
+        toast({ title: t("Thumbnail Uploaded", "تم رفع الصورة") });
+      }
+    } catch (err: any) {
+      console.error("Cloudinary upload error:", err);
+      toast({
+        title: t("Upload Failed", "فشل الرفع"),
+        description: err?.message,
+        variant: "destructive",
+      });
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  return (
+    <div className="space-y-2">
+      <input type="hidden" name={name} value={url} />
+      <input
+        type="file"
+        ref={fileInputRef}
+        accept="image/*"
+        className="hidden"
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file) uploadFile(file);
+          e.target.value = "";
+        }}
+      />
+
+      {url ? (
+        <div className="relative group rounded-2xl overflow-hidden border border-border/50 h-32">
+          <img src={url} alt="Thumbnail preview" className="w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-navy-dark/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="px-3 py-1.5 rounded-xl bg-gold text-navy-dark text-xs font-black flex items-center gap-1.5"
+            >
+              <ImagePlus className="w-3.5 h-3.5" /> {t("Replace", "استبدال")}
+            </button>
+            <button
+              type="button"
+              onClick={() => setUrl("")}
+              className="px-3 py-1.5 rounded-xl bg-white/10 border border-white/20 text-white text-xs font-black flex items-center gap-1.5"
+            >
+              <XIcon className="w-3.5 h-3.5" /> {t("Remove", "إزالة")}
+            </button>
+          </div>
+          {isUploading && (
+            <div className="absolute inset-0 bg-navy-dark/70 flex items-center justify-center">
+              <Loader2 className="w-6 h-6 text-gold animate-spin" />
+            </div>
+          )}
+        </div>
+      ) : (
+        <button
+          type="button"
+          onClick={() => fileInputRef.current?.click()}
+          onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+          onDragLeave={() => setIsDragging(false)}
+          onDrop={(e) => {
+            e.preventDefault();
+            setIsDragging(false);
+            const file = e.dataTransfer.files?.[0];
+            if (file) uploadFile(file);
+          }}
+          disabled={isUploading}
+          className={`w-full h-32 rounded-2xl border-2 border-dashed flex flex-col items-center justify-center gap-2 transition-all ${
+            isDragging
+              ? "border-gold bg-gold/10"
+              : "border-border/60 hover:border-gold/50 hover:bg-gold/[0.04] text-muted-foreground"
+          }`}
+        >
+          {isUploading ? (
+            <>
+              <Loader2 className="w-6 h-6 text-gold animate-spin" />
+              <span className="text-xs font-black uppercase tracking-widest text-gold">{t("Uploading...", "جاري الرفع...")}</span>
+            </>
+          ) : (
+            <>
+              <ImagePlus className="w-6 h-6" />
+              <span className="text-xs font-bold">{t("Click or drop an image", "انقر أو أسقط صورة")}</span>
+              <span className="text-[10px] uppercase tracking-widest opacity-60">{t("Stored on Cloudinary", "تُخزن على Cloudinary")}</span>
+            </>
+          )}
+        </button>
+      )}
+    </div>
+  );
+}
 
 const MONTHLY_ACTIVITY = [
   { month: "Oct", posts: 18, users: 3 },
@@ -879,20 +1009,18 @@ export default function Admin() {
                           <Input name="titleAr" defaultValue={editingArticle?.titleAr} required dir="rtl" className="rounded-xl border-border/50" />
                         </div>
                       </div>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <label className="text-xs font-black text-muted-foreground uppercase tracking-widest">{t("Article Type", "نوع المقال")}</label>
-                          <Select name="type" defaultValue={editingArticle?.type || "news"} className="rounded-xl border-border/50">
-                            <option value="news">{t("News", "أخبار")}</option>
-                            <option value="announcement">{t("Announcement", "إعلان")}</option>
-                            <option value="decree">{t("Official Decree", "مرسوم رسمي")}</option>
-                            <option value="report">{t("Insight Report", "تقرير")}</option>
-                          </Select>
-                        </div>
-                        <div className="space-y-2">
-                          <label className="text-xs font-black text-muted-foreground uppercase tracking-widest">{t("Thumbnail URL", "رابط الصورة")}</label>
-                          <Input name="thumbnailUrl" defaultValue={editingArticle?.thumbnailUrl} placeholder="https://..." className="rounded-xl border-border/50" />
-                        </div>
+                      <div className="space-y-2">
+                        <label className="text-xs font-black text-muted-foreground uppercase tracking-widest">{t("Article Type", "نوع المقال")}</label>
+                        <Select name="type" defaultValue={editingArticle?.type || "news"} className="rounded-xl border-border/50">
+                          <option value="news">{t("News", "أخبار")}</option>
+                          <option value="announcement">{t("Announcement", "إعلان")}</option>
+                          <option value="decree">{t("Official Decree", "مرسوم رسمي")}</option>
+                          <option value="report">{t("Insight Report", "تقرير")}</option>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-xs font-black text-muted-foreground uppercase tracking-widest">{t("Thumbnail", "الصورة المصغرة")}</label>
+                        <ThumbnailUploader key={editingArticle?.id ?? "new"} name="thumbnailUrl" defaultValue={editingArticle?.thumbnailUrl} />
                       </div>
                       <div className="space-y-2">
                         <label className="text-xs font-black text-muted-foreground uppercase tracking-widest">{t("Content (English)", "المحتوى (إنجليزي)")}</label>
