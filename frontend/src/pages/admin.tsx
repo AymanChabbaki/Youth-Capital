@@ -1011,11 +1011,10 @@ export default function Admin() {
                       </div>
                       <div className="space-y-2">
                         <label className="text-xs font-black text-muted-foreground uppercase tracking-widest">{t("Article Type", "نوع المقال")}</label>
-                        <Select name="type" defaultValue={editingArticle?.type || "news"} className="rounded-xl border-border/50">
-                          <option value="news">{t("News", "أخبار")}</option>
-                          <option value="announcement">{t("Announcement", "إعلان")}</option>
-                          <option value="decree">{t("Official Decree", "مرسوم رسمي")}</option>
-                          <option value="report">{t("Insight Report", "تقرير")}</option>
+                        {/* Values must match the article_type Postgres enum: simulation | platform */}
+                        <Select name="type" defaultValue={editingArticle?.type || "simulation"} className="rounded-xl border-border/50">
+                          <option value="simulation">{t("Simulation News", "أخبار المحاكاة")}</option>
+                          <option value="platform">{t("Platform Announcement", "إعلان المنصة")}</option>
                         </Select>
                       </div>
                       <div className="space-y-2">
