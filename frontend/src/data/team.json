@@ -196,18 +196,18 @@
     "picture": "/images/team/othmane.jpeg"
   },
   {
-    "nameEn": "Youssouf",
-    "nameAr": "يوسف",
+    "nameEn": "Youssouf Gourma",
+    "nameAr": "يوسف غورما",
     "roleEn": "General Advisor",
     "roleAr": "مستشار عام",
     "tier": "advisors",
-    "descEn": "Provides strategic mentorship to executive board members and reviews educational curricula.",
-    "descAr": "يقدم التوجيه الاستراتيجي لأعضاء المجلس التنفيذي ويراجع المناهج التعليمية.",
+    "descEn": "Master’s Student in Corporate Law and Litigation, with a strong focus on civic engagement, youth leadership and social impact.",
+    "descAr": "طالب ماجستير في القانون التجاري والتقاضي، مع تركيز قوي على المشاركة المدنية، القيادة الشبابية، والأثر الاجتماعي.",
     "accent": "from-purple-400 to-fuchsia-600",
     "glowColor": "rgba(168, 85, 247, 0.15)",
     "missionsEn": ["Executive Mentorship", "Curriculum Review", "Strategic Advice"],
     "missionsAr": ["الإرشاد التنفيذي", "مراجعة المناهج", "المشورة الاستراتيجية"],
-    "picture": "/images/team/youssouf.png"
+    "picture": "/images/team/youssouf.jpeg"
   },
   {
     "nameEn": "Sara",
