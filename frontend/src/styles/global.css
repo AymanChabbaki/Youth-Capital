@@ -1146,7 +1146,8 @@ html[dir="ltr"] .step::before {
   gap: 1.4rem;
   padding: 1.1rem 0;
   border-radius: 26px;
-  background: hsl(222 46% 15%);
+  background: #fff; /* was hsl(222 46% 15%) navy, now matches the main content card */
+  border: 1px solid var(--color-border);
   overflow-y: auto;
 }
 
@@ -1157,7 +1158,7 @@ html[dir="ltr"] .step::before {
   display: grid;
   place-items: center;
   color: #fff;
-  background: var(--gradient-primary);
+  background: #6659ea; /* light purple, was var(--gradient-primary) */
   flex-shrink: 0;
   text-decoration: none;
 }
@@ -1178,20 +1179,20 @@ html[dir="ltr"] .step::before {
   width: 42px;
   height: 42px;
   border-radius: 13px;
-  color: hsl(0 0% 100% / 0.5);
+  color: hsl(222 20% 60%); /* was white/0.5 — needs to read on white now, not navy */
   text-decoration: none;
   cursor: pointer;
   transition: var(--transition-smooth);
 }
 
 a.sidebar-item:hover {
-  color: #fff;
-  background: hsl(0 0% 100% / 0.08);
+  color: hsl(222 46% 18%);
+  background: hsl(222 46% 15% / 0.06);
 }
 
 .sidebar-item.active {
-  background: #fff;
-  color: hsl(222 46% 18%);
+  background: hsl(249 76% 63% / 0.12);
+  color: #6659ea;
 }
 
 .sidebar-item.disabled {
@@ -1240,50 +1241,112 @@ a.sidebar-item:hover {
 .pen-nav {
   position: absolute;
   left: 16%;
-  top: 12%;
-  width: 39%;
-  height: 76%;
+  top: 45%; /* pushed up a little from center */
+  transform: translateY(-50%);
+  width: 43%; /* nudged back down a bit from 46% */
+  height: auto; /* shrink-wraps to the pills' height instead of stretching to 76% of the pen */
   display: flex;
   align-items: center;
   justify-content: space-between;
+  border-radius: var(--radius-control);
   pointer-events: auto;
 }
 
 .pen-nav-item {
+  position: relative; /* containing block for the .pen-nav-label overlay */
   display: flex;
   align-items: center;
   justify-content: center;
-  color: hsl(0 0% 100% / 0.75);
+  background: transparent; /* no box at rest — was #fff */
+  color: #fff;
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.5em 0.6em; /* icon-only footprint at rest — never changes on hover */
+  border-radius: var(--radius-control);
+  text-decoration: none;
   cursor: pointer;
-  transition: var(--transition-smooth);
 }
 
-a.pen-nav-item:hover {
+.pen-nav-item svg {
+  flex-shrink: 0;
+}
+
+/* Positioned out of flow so revealing it never resizes the flex item —
+   nothing else in the space-between row shifts when this appears. */
+.pen-nav-label {
+  position: absolute;
+  top: 0;
+  left: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  padding: 0 0.6em 0 0.4em;
+  background: #6659ea;
+  color: #fff;
+  border-radius: 0 var(--radius-control) var(--radius-control) 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.pen-nav-item:hover .pen-nav-label {
+  opacity: 1;
+}
+
+.pen-nav-item:hover {
+  background: #6659ea; /* light purple, flat — no gradient */
+  color: #fff;
+  border-radius: var(--radius-control) 0 0 var(--radius-control); /* flat on the side that joins the label */
+}
+
+/* Overview and About sit at the navy section's edges — shift left on
+   hover (transform only, doesn't affect layout) so the label that pops
+   out to the right stays inside the navy barrel instead of spilling
+   onto the gold band / cap. */
+.pen-nav-item-edge:hover {
+  transform: translateX(-17px);
+}
+
+.pen-signin:hover {
+  background: #6659ea; /* light purple, flat — no gradient */
+  color: #fff;
+}
+
+a.pen-nav-item.active {
+  background: #6659ea; /* light purple, was var(--gradient-primary) */
   color: #fff;
 }
 
 .pen-nav-item.disabled {
   cursor: default;
-  opacity: 0.4;
 }
 
 .pen-signin {
   position: absolute;
-  left: 74%;
-  top: 0;
-  width: 23%;
-  height: 100%;
-  display: flex;
+  left: 76%; /* nudged back left a little */
+  top: 45%; /* matches .pen-nav's push up */
+  transform: translateY(-50%);
+  width: auto;
+  height: auto;
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
+  gap: 0.4em;
+  background: transparent; /* no box at rest — was #fff */
   color: #fff;
-  font-family: var(--font-mono);
-  font-size: 0.62rem;
+  font-family: var(--font-body);
+  font-size: 0.72rem;
   font-weight: 700;
-  letter-spacing: 0.04em;
+  padding: 0.5em 0.7em;
+  border-radius: var(--radius-control);
   text-decoration: none;
   text-align: center;
+  white-space: nowrap;
   pointer-events: auto;
+}
+
+.pen-signin svg {
+  flex-shrink: 0;
 }
 
 .topbar-search {
@@ -1344,6 +1407,66 @@ a.pen-nav-item:hover {
 .topbar-signin:hover {
   box-shadow: var(--shadow-glow);
   filter: brightness(1.05);
+}
+
+/* ═══ second nav bar — pill-style in-section sub-nav, not on the pen ═══ */
+
+.section-nav {
+  position: absolute; /* out of flow — doesn't push .wireframe's other content around */
+  top: -70px;
+  left: 0.4rem;
+  z-index: 52; /* above .debug-square-2's 51, the highest of the 3 debug boxes */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.3rem;
+  padding: 0.4rem;
+  width: calc(38% + 10px); /* matches the header tab beside the pen, same formula as .platform-content::before, widened further */
+  background: hsl(222 46% 15%); /* same navy as .sidebar */
+  border-radius: 999px;
+}
+
+/* Sits 30px below .section-nav's bottom edge (top:-70px + ~46px rendered
+   height + 30px gap), same left offset and width, out of flow like the
+   bar itself so it can't push or touch anything else. */
+.section-nav-divider {
+  position: absolute;
+  top: 6px;
+  left: 0.4rem;
+  width: calc(38% + 10px);
+  height: 2px;
+  background: #caa849;
+}
+
+.section-nav-item {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  border: none;
+  background: transparent;
+  color: hsl(0 0% 100% / 0.6);
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 0.6em 1em;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+}
+
+.section-nav-item:hover {
+  color: hsl(0 0% 100% / 0.9);
+}
+
+.section-nav-item.active {
+  background: #6659ea; /* sampled purple */
+  color: #fff;
+  box-shadow: 0 4px 14px hsl(249 76% 63% / 0.35);
+}
+
+.section-nav-plus {
+  font-weight: 700;
 }
 
 /* The "folder tab" shape, built additively instead of by cutting a notch:
@@ -1509,6 +1632,306 @@ a.pen-nav-item:hover {
   height: 100%;
   box-sizing: border-box;
   padding: 1.2rem 1.6rem;
+}
+
+/* ═══ overview — global stats row (guest + logged-in) ═══ */
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  align-items: start; /* each card is only as tall as its own content — no stretching, no fixed height */
+  gap: 1rem;
+}
+
+.stat-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  height: 255px;
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  padding: 1.1rem 1.2rem;
+  text-decoration: none;
+  color: inherit;
+  box-shadow: var(--shadow-card);
+  transition: var(--transition-smooth);
+}
+
+.stat-card:hover {
+  transform: translateY(-3px);
+  border-color: hsl(249 76% 63% / 0.35);
+  box-shadow: 0 10px 28px hsl(249 76% 63% / 0.14);
+}
+
+.stat-card-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+  display: grid;
+  place-items: center;
+  color: #6659ea;
+  background: hsl(249 76% 63% / 0.12);
+}
+
+.stat-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.stat-card-label {
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: var(--color-text-primary);
+  padding-bottom: 0.2rem;
+  border-bottom: 2px solid #caa849;
+}
+
+.stat-card-value {
+  text-align: center;
+  margin-top: -8px; /* pulls it up so it lands ~y=210 across all cards, was y=218-220 */
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--color-text-primary);
+  font-family: var(--font-display);
+}
+
+.stat-card-sub {
+  font-size: 0.72rem;
+  color: var(--color-text-muted);
+}
+
+.stat-card-locked {
+  gap: 0.5rem;
+}
+
+.stat-card-detail {
+  align-self: flex-end;
+  margin-top: auto;
+  margin-bottom: -12.6px; /* .stat-card has 1.1rem (17.6px) bottom padding; this pulls it in to leave exactly 5px */
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #6659ea;
+}
+
+.stat-card-top-label {
+  align-self: center;
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-primary);
+  margin-top: 0.3rem;
+  padding-bottom: 0.2rem;
+  border-bottom: 2px solid #caa849;
+}
+
+.stat-card-top-label-tight {
+  margin-top: -0.1rem; /* pulls "PROJECT" up closer to the number above it */
+}
+
+.stat-card-split {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.15rem;
+}
+
+.stat-card-split:has(.stat-card-metric) {
+  gap: 0.9rem; /* a bit more room between the Intern / Extern groups specifically */
+}
+
+.stat-card-split + .stat-card-split {
+  margin-top: -0.15rem; /* pulls the second avatar row (e.g. Salma) up closer to the row above it */
+}
+
+.stat-card-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: hsl(222 46% 15%); /* same navy as .sidebar */
+  color: #fff;
+  border-radius: 999px;
+  padding: 0.3rem 0.7rem;
+}
+
+.stat-card-avatar {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: block;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: #6659ea; /* fallback fill if the image fails to load */
+}
+
+.stat-card-pill-lg {
+  gap: 0.45rem;
+  padding: 0.35rem 0.9rem;
+}
+
+.stat-card-pill-lg .stat-card-avatar {
+  width: 28px;
+  height: 28px;
+}
+
+.stat-card-pill-lg .stat-card-pill-label {
+  font-size: 0.8rem;
+}
+
+.stat-card-pill-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.stat-card-pill-subname {
+  font-size: 0.65rem;
+  font-weight: 500;
+  color: hsl(220 10% 75%); /* light grey */
+}
+
+.stat-card-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.4rem;
+}
+
+.stat-card-stack .stat-card-pill:nth-child(2) {
+  margin-left: 30px;
+  margin-top: 5px;
+}
+
+.stat-card-pill-value {
+  font-size: 0.78rem;
+  font-weight: 800;
+  font-family: var(--font-display);
+  color: #fff;
+}
+
+.stat-card-metric {
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+  gap: 0.3rem;
+}
+
+.stat-card-metric-value {
+  font-size: 0.95rem;
+  font-weight: 800;
+  font-family: var(--font-display);
+  color: var(--color-text-primary);
+}
+
+.stat-card-pill-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+/* The Morocco visual — a stylized sphere with an overlay callout, in the
+   same reference-image spirit as a globe card, without a WebGL dependency. */
+.stat-card-map {
+  position: relative;
+  overflow: hidden;
+  min-height: 220px;
+  padding: 0;
+}
+
+.stat-card-map-globe-wrap {
+  position: absolute;
+  top: -8%;
+  right: -12%;
+  width: 220px;
+  height: 220px;
+}
+
+/* Lives in the white space the globe doesn't cover (it's pinned to the
+   right). Fades in only while the globe's rotation has the Morocco marker
+   facing forward — see Globe.tsx's onFacingChange. */
+.stat-card-map-stat {
+  position: absolute;
+  top: 1.1rem;
+  left: 1.2rem;
+  max-width: 42%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+  pointer-events: none;
+}
+
+.stat-card-map-stat.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.stat-card-map-stat-value {
+  font-size: 1.15rem;
+  font-weight: 800;
+  font-family: var(--font-display);
+  color: #caa849; /* gold */
+  line-height: 1.1;
+}
+
+.stat-card-map-stat-label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.stat-card-map-footer {
+  margin-top: auto; /* pushes the whole row — overlay + sign-in link — to the bottom */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-left: 0.6rem; /* pushed further left/down than the default 0.9rem card padding */
+  margin-right: 0.9rem;
+  margin-bottom: 5px;
+}
+
+.stat-card-map-overlay {
+  position: relative;
+  flex-shrink: 0; /* don't let the sign-in link's space-between squeeze this and wrap its text */
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #fff;
+  border-radius: var(--radius-control);
+  padding: 0.6rem 0.8rem;
+  box-shadow: var(--shadow-card);
+  color: #6659ea;
+  white-space: nowrap;
+}
+
+.stat-card-map .stat-card-detail {
+  /* now a flex sibling of .stat-card-map-overlay inside .stat-card-map-footer,
+     which already handles the bottom margin for both of them */
+  margin-top: 0;
+  margin-right: 0;
+  margin-bottom: 0;
+  flex-shrink: 0;
+}
+
+.stat-card-map-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.stat-card-map-value {
+  font-size: 0.7rem;
+  color: var(--color-text-muted);
 }
 
 /* One shared grid (not two independently-stacking columns) so every row

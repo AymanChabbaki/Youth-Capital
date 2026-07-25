@@ -236,3 +236,30 @@ export const LogInIcon = (p: P) => (
     <path d="M20 12H9" />
   </I>
 );
+
+/** Money raised — a wallet. */
+export const WalletIcon = (p: P) => (
+  <I {...p}>
+    <path d="M3 7a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v2" />
+    <rect x="3" y="7" width="18" height="13" rx="2" />
+    <path d="M16 13.5h3.5" opacity="0.7" />
+    <circle cx="16" cy="13.5" r="0.9" fill="currentColor" stroke="none" />
+  </I>
+);
+
+/** Money spent — coins changing hands. */
+export const CoinsIcon = (p: P) => (
+  <I {...p}>
+    <circle cx="9" cy="9" r="6" />
+    <path d="M14.5 11a6 6 0 1 0-3.5 8.4" opacity="0.7" />
+    <circle cx="9" cy="9" r="6" />
+  </I>
+);
+
+/** A map pin. */
+export const PinIcon = (p: P) => (
+  <I {...p}>
+    <path d="M12 21s7-6.3 7-11.5A7 7 0 0 0 5 9.5C5 14.7 12 21 12 21z" />
+    <circle cx="12" cy="9.5" r="2.3" />
+  </I>
+);

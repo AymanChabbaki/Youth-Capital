@@ -21,6 +21,13 @@ const ar = {
     searchPlaceholder: "ابحث عن فكرة...",
     notifications: "الإشعارات",
     signIn: "تسجيل الدخول",
+    register: "إنشاء حساب",
+    pen: {
+      overview: "نظرة عامة",
+      projects: "المشاريع",
+      events: "الفعاليات",
+      about: "عن المنصة",
+    },
   },
   status: {
     draft: "مسودة",
@@ -235,6 +242,13 @@ const fr: Translation = {
     searchPlaceholder: "Rechercher une idée...",
     notifications: "Notifications",
     signIn: "Connexion",
+    register: "Inscription",
+    pen: {
+      overview: "Aperçu",
+      projects: "Projets",
+      events: "Événements",
+      about: "À propos",
+    },
   },
   status: {
     draft: "Brouillon",
@@ -447,6 +461,13 @@ const en: Translation = {
     searchPlaceholder: "Search an idea...",
     notifications: "Notifications",
     signIn: "Sign in",
+    register: "Register",
+    pen: {
+      overview: "Overview",
+      projects: "Projects",
+      events: "Events",
+      about: "About",
+    },
   },
   status: {
     draft: "Draft",
