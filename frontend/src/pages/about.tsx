@@ -397,22 +397,21 @@ export default function About() {
                   </div>
                 </div>
 
-                {/* TIER 4: Operations & Departments (Branching to 5 nodes) */}
+                {/* TIER 4: Operations & Departments (Branching to 4 nodes) */}
                 <div className="w-full pt-8 flex flex-col items-center">
                   <span className="px-3 py-1 bg-teal-500/10 text-teal-600 border border-teal-500/20 text-[9px] font-black uppercase tracking-widest rounded-full dark:text-teal-400 mb-6 z-10">
                     {t("OPERATIONS & PROJECTS", "العمليات والمشاريع")}
                   </span>
 
-                  {/* Horizontal Bridge for 5 columns */}
+                  {/* Horizontal Bridge for 4 columns */}
                   <div className="w-full h-0.5 bg-border relative hidden lg:block">
-                    <div className="absolute left-[10%] w-0.5 h-6 bg-border" />
-                    <div className="absolute left-[30%] w-0.5 h-6 bg-border" />
-                    <div className="absolute left-[50%] w-0.5 h-6 bg-border" />
-                    <div className="absolute left-[70%] w-0.5 h-6 bg-border" />
-                    <div className="absolute left-[90%] w-0.5 h-6 bg-border" />
+                    <div className="absolute left-[12.5%] w-0.5 h-6 bg-border" />
+                    <div className="absolute left-[37.5%] w-0.5 h-6 bg-border" />
+                    <div className="absolute left-[62.5%] w-0.5 h-6 bg-border" />
+                    <div className="absolute left-[87.5%] w-0.5 h-6 bg-border" />
                   </div>
 
-                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 w-full justify-items-center gap-4 lg:gap-4 pt-6 pb-8">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 w-full justify-items-center gap-4 lg:gap-6 pt-6 pb-8">
                     {team.filter(m => m.tier === "ops").map((m) => (
                       <div key={m.nameEn} className="flex flex-col items-center relative">
                         <motion.div 
