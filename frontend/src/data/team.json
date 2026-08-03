@@ -154,18 +154,18 @@
     "picture": "/images/team/imane.png"
   },
   {
-    "nameEn": "Oumaima",
-    "nameAr": "أميمة",
+    "nameEn": "Oumaima Hilal",
+    "nameAr": "أميمة هلال",
     "roleEn": "General Advisor",
     "roleAr": "مستشار عام",
     "tier": "advisors",
-    "descEn": "Provides strategic mentorship to executive board members and reviews educational curricula.",
-    "descAr": "تقدم التوجيه الاستراتيجي لأعضاء المجلس التنفيذي وتراجع المناهج التعليمية.",
+    "descEn": "Oumayma Hilal is a tourism researcher, university educator, and community-based tourism specialist with international experience across Morocco, the United Kingdom, the United States, and the MENA region. A Fulbright Joint-Supervision Scholar at Arizona State University, her work focuses on tourism resilience, sustainable destination development, and community-led innovation. She has collaborated with organizations including the Porter Voice Collective, the Jane Goodall Institute, and Smithsonian Journeys, and is committed to advancing inclusive and resilient tourism through research, education, and community engagement.",
+    "descAr": "باحثة في مجال السياحة، وأستاذة جامعية، ومتخصصة في السياحة المجتمعية، وتتمتع بخبرة دولية في المغرب والمملكة المتحدة والولايات المتحدة ومنطقة الشرق الأوسط وشمال إفريقيا. حاصلة على منحة فولبرايت للإشراف المشترك في جامعة ولاية أريزونا، وتركز أبحاثها على مرونة السياحة، وتطوير الوجهات السياحية المستدامة، والابتكار بقيادة المجتمع. تعاونت مع مؤسسات منها Porter Voice Collective، ومعهد جين جودال، وSmithsonian Journeys، وتلتزم بتعزيز السياحة الشاملة والمرنة من خلال البحث والتعليم وإشراك المجتمع.",
     "accent": "from-purple-400 to-fuchsia-600",
     "glowColor": "rgba(168, 85, 247, 0.15)",
-    "missionsEn": ["Executive Mentorship", "Curriculum Review", "Strategic Advice"],
-    "missionsAr": ["الإرشاد التنفيذي", "مراجعة المناهج", "المشورة الاستراتيجية"],
-    "picture": "/images/team/oumaima.png"
+    "missionsEn": ["Tourism Research", "Community Engagement", "Sustainable Tourism Development", "Educational Programs", "Institutional Partnerships"],
+    "missionsAr": ["البحث السياحي", "إشراك المجتمع", "تطوير السياحة المستدامة", "برامج تعليمية", "الشراكات المؤسساتية"],
+    "picture": "/images/team/oumaima.jpeg"
   },
   {
     "nameEn": "Othmane El AABOUDI",
