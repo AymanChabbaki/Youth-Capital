@@ -3,11 +3,11 @@ import { useLanguage } from "@/hooks/use-language";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Button, Input, Select, Textarea, Label, Card } from "@/components/ui-custom";
+import { Button, Input, Select, Label, Card } from "@/components/ui-custom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRegister, useSubmitRoleApplication } from "@workspace/api-client-react";
 import { useToast } from "@/hooks/use-toast";
-import { CheckCircle2, Fingerprint, Globe, Eye, EyeOff } from "lucide-react";
+import { CheckCircle2, Fingerprint, Eye, EyeOff } from "lucide-react";
 import { Link } from "wouter";
 
 function passwordStrength(pw: string): number {
@@ -20,45 +20,37 @@ function passwordStrength(pw: string): number {
   return Math.min(score, 4);
 }
 
-const MOROCCAN_REGIONS = [
-  "Tanger-Tétouan-Al Hoceïma",
-  "L'Oriental",
-  "Fès-Meknès",
-  "Rabat-Salé-Kénitra",
-  "Béni Mellal-Khénifra",
-  "Casablanca-Settat",
-  "Marrakech-Safi",
-  "Drâa-Tafilalet",
-  "Souss-Massa",
-  "Guelmim-Oued Noun",
-  "Laâyoune-Sakia El Hamra",
-  "Dakhla-Oued Ed-Dahab",
-  "Moroccan Diaspora / الجالية المغربية",
+const INTERESTS_OPTIONS = [
+  "Politics",
+  "Climate & Environment",
+  "Entrepreneurship",
+  "Tech & Innovation",
+  "Education",
+  "Law",
+  "Economy",
+  "Culture & Cultural Dialogue"
 ];
 
-const getApplySchema = (step: number) => z.object({
+const applySchema = z.object({
   fullName: z.string().min(2, "Full name is required"),
-  fullNameAr: z.string().optional(),
   email: z.string().email("Invalid email address"),
+  phone: z.string().optional(),
+  gender: z.string().min(1, "Gender is required"),
+  age: z.coerce.number().min(12, "Invalid age").max(100, "Invalid age"),
   password: z.string().min(8, "Password must be at least 8 characters"),
-  preferredRole: z.enum(["minister", "mp", "local_council", "diaspora_rep"]),
-  region: step >= 2 ? z.string().min(1, "Region is required") : z.string().optional().or(z.literal('')),
-  ministryPreference: z.string().optional(),
-  parliamentHouse: z.enum(["house_of_representatives", "house_of_councillors"]).optional(),
-  motivation: step >= 3 ? z.string().min(50, "Please provide a detailed motivation (min 50 chars)") : z.string().optional().or(z.literal('')),
+  
+  status: z.string().min(1, "Status is required"),
+  fieldOfStudy: z.string().min(2, "Field of study is required"),
+  educationLevel: z.string().min(1, "Education level is required"),
+  region: z.string().min(2, "City / Region is required"),
+  country: z.string().min(2, "Country is required"),
+  
+  interests: z.array(z.string()).min(1, "Select at least 1 interest").max(5, "Select up to 5 interests"),
+  
+  preferredRole: z.string().min(1, "Role is required"),
 });
 
-type ApplyFormData = {
-  fullName: string;
-  fullNameAr?: string;
-  email: string;
-  password: string;
-  preferredRole: "minister" | "mp" | "local_council" | "diaspora_rep";
-  region: string;
-  ministryPreference?: string;
-  parliamentHouse?: "house_of_representatives" | "house_of_councillors";
-  motivation: string;
-};
+type ApplyFormData = z.infer<typeof applySchema>;
 
 export default function Apply() {
   const { t } = useLanguage();
@@ -73,19 +65,21 @@ export default function Apply() {
   const applyMutation = useSubmitRoleApplication();
 
   const form = useForm<ApplyFormData>({
-    resolver: (data, context, options) => {
-      return zodResolver(getApplySchema(step))(data, context, options);
-    },
+    resolver: zodResolver(applySchema),
     defaultValues: {
       fullName: "",
-      fullNameAr: "",
       email: "",
+      phone: "",
+      gender: "",
+      age: undefined as any,
       password: "",
-      preferredRole: "mp",
+      status: "",
+      fieldOfStudy: "",
+      educationLevel: "",
       region: "",
-      ministryPreference: "",
-      parliamentHouse: "house_of_representatives",
-      motivation: "",
+      country: "Morocco",
+      interests: [],
+      preferredRole: "",
     }
   });
 
@@ -97,7 +91,6 @@ export default function Apply() {
           email: data.email,
           password: data.password,
           fullName: data.fullName,
-          fullNameAr: data.fullNameAr,
           languagePreference: "en",
         }
       });
@@ -107,9 +100,7 @@ export default function Apply() {
         data: {
           preferredRole: data.preferredRole as any,
           region: data.region,
-          ministryPreference: data.ministryPreference,
-          parliamentHouse: data.parliamentHouse as any,
-          motivation: data.motivation,
+          motivation: `Interests: ${data.interests.join(", ")}\nStatus: ${data.status}\nEducation: ${data.educationLevel} in ${data.fieldOfStudy}`,
         }
       });
 
@@ -124,12 +115,24 @@ export default function Apply() {
   };
 
   const nextStep = async () => {
-    const fieldsToValidate = step === 1 
-      ? ["fullName", "email", "password"] 
-      : ["preferredRole", "region"];
+    let fieldsToValidate: any[] = [];
+    if (step === 1) fieldsToValidate = ["fullName", "email", "phone", "gender", "age", "password"];
+    if (step === 2) fieldsToValidate = ["status", "fieldOfStudy", "educationLevel", "region", "country"];
+    if (step === 3) fieldsToValidate = ["interests"];
       
-    const isValid = await form.trigger(fieldsToValidate as any);
+    const isValid = await form.trigger(fieldsToValidate);
     if (isValid) setStep(step + 1);
+  };
+
+  const toggleInterest = (interest: string) => {
+    const current = form.getValues("interests");
+    if (current.includes(interest)) {
+      form.setValue("interests", current.filter(i => i !== interest), { shouldValidate: true });
+    } else {
+      if (current.length < 5) {
+        form.setValue("interests", [...current, interest], { shouldValidate: true });
+      }
+    }
   };
 
   if (isSuccess) {
@@ -186,13 +189,13 @@ export default function Apply() {
 
   const stepLabels = [
     t("Identity", "الهوية"),
-    t("Role", "الدور"),
-    t("Motivation", "الدوافع"),
+    t("Profile", "الملف الشخصي"),
+    t("Interests", "الاهتمامات"),
+    t("Role", "الدور")
   ];
 
   return (
     <div className="min-h-screen pb-16 bg-background relative overflow-hidden">
-      {/* Dark hero band behind the form */}
       <div className="absolute top-0 left-0 right-0 h-[420px] bg-navy-dark overflow-hidden">
         <div className="absolute inset-0 bg-grid-gold opacity-30" />
         <div className="absolute -top-24 -right-24 w-[420px] h-[420px] bg-primary/25 blur-[120px] rounded-full" />
@@ -214,20 +217,17 @@ export default function Apply() {
           <h1 className="text-4xl md:text-5xl font-display font-black text-white mb-4">
             {t("Join the", "انضم إلى")} <span className="text-gradient-gold">{t("Simulation", "المحاكاة")}</span>
           </h1>
-          <p className="text-white/60">
-            {t("Complete the form below to apply for a role in Youth Capital.", "أكمل النموذج أدناه للتقدم لدور في شباب العاصمة.")}
-          </p>
         </motion.div>
 
         {/* Step Indicator */}
-        <div className="flex items-center justify-center mb-10">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="flex items-center">
+        <div className="flex items-center justify-center mb-10 overflow-x-auto pb-4">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="flex items-center shrink-0">
               <div className="flex flex-col items-center gap-2">
                 <motion.div
                   animate={step === i ? { scale: [1, 1.08, 1] } : {}}
                   transition={{ duration: 2, repeat: Infinity }}
-                  className={`w-11 h-11 rounded-2xl flex items-center justify-center font-black transition-all duration-500 ${
+                  className={`w-9 h-9 md:w-11 md:h-11 rounded-2xl flex items-center justify-center font-black transition-all duration-500 ${
                     step > i
                       ? "bg-gold text-navy-dark shadow-lg shadow-gold/30"
                       : step === i
@@ -235,18 +235,18 @@ export default function Apply() {
                         : "bg-white/10 text-white/50 border border-white/20 backdrop-blur-md"
                   }`}
                 >
-                  {step > i ? <CheckCircle2 className="w-5 h-5" /> : i}
+                  {step > i ? <CheckCircle2 className="w-4 h-4 md:w-5 md:h-5" /> : i}
                 </motion.div>
-                <span className={`text-[10px] font-black uppercase tracking-widest ${step >= i ? "text-gold" : "text-white/40"}`}>
+                <span className={`text-[9px] md:text-[10px] font-black uppercase tracking-widest ${step >= i ? "text-gold" : "text-white/40"}`}>
                   {stepLabels[i - 1]}
                 </span>
               </div>
-              {i < 3 && (
-                <div className="w-14 sm:w-20 h-1 mx-2 mb-6 rounded-full bg-white/10 overflow-hidden">
+              {i < 4 && (
+                <div className="w-8 sm:w-12 md:w-16 h-1 mx-2 mb-6 rounded-full bg-white/10 overflow-hidden">
                   <motion.div
                     initial={false}
                     animate={{ width: step > i ? "100%" : "0%" }}
-                    transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                    transition={{ duration: 0.5 }}
                     className="h-full bg-gradient-to-r from-gold to-gold-pale"
                   />
                 </div>
@@ -255,26 +255,47 @@ export default function Apply() {
           ))}
         </div>
 
-        <Card className="p-8 md:p-10 rounded-[2rem] border border-gold/15 shadow-2xl shadow-navy/10">
+        <Card className="p-6 md:p-10 rounded-[2rem] border border-gold/15 shadow-2xl shadow-navy/10 bg-card">
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <AnimatePresence mode="wait">
+              
+              {/* STEP 1: IDENTITY */}
               {step === 1 && (
                 <motion.div key="step1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
-                  <h3 className="text-xl font-bold mb-4 border-b pb-2">{t("Personal Details", "التفاصيل الشخصية")}</h3>
+                  <h3 className="text-xl font-bold mb-4 border-b border-border pb-2">{t("Step 1 — Identity", "الخطوة 1 — الهوية")}</h3>
+                  
+                  <div>
+                    <Label>{t("Full Name", "الاسم الكامل")}</Label>
+                    <Input {...form.register("fullName")} error={form.formState.errors.fullName?.message} />
+                  </div>
+                  
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <Label>{t("Full Name (English)", "الاسم الكامل (انجليزي)")}</Label>
-                      <Input {...form.register("fullName")} error={form.formState.errors.fullName?.message} />
+                      <Label>{t("Email", "البريد الإلكتروني")}</Label>
+                      <Input type="email" {...form.register("email")} error={form.formState.errors.email?.message} />
                     </div>
                     <div>
-                      <Label>{t("Full Name (Arabic - Optional)", "الاسم الكامل (عربي - اختياري)")}</Label>
-                      <Input {...form.register("fullNameAr")} />
+                      <Label>{t("Phone Number (Optional)", "رقم الهاتف (اختياري)")}</Label>
+                      <Input type="tel" {...form.register("phone")} error={form.formState.errors.phone?.message} />
                     </div>
                   </div>
-                  <div>
-                    <Label>{t("Email Address", "البريد الإلكتروني")}</Label>
-                    <Input type="email" {...form.register("email")} error={form.formState.errors.email?.message} />
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label>{t("Gender", "الجنس")}</Label>
+                      <Select {...form.register("gender")} error={form.formState.errors.gender?.message}>
+                        <option value="">{t("Select Gender", "اختر الجنس")}</option>
+                        <option value="Male">{t("Male", "ذكر")}</option>
+                        <option value="Female">{t("Female", "أنثى")}</option>
+                        <option value="Prefer not to say">{t("Prefer not to say", "أفضل عدم القول")}</option>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label>{t("Age", "العمر")}</Label>
+                      <Input type="number" {...form.register("age")} error={form.formState.errors.age?.message} />
+                    </div>
                   </div>
+
                   <div>
                     <Label>{t("Password", "كلمة المرور")}</Label>
                     <div className="relative">
@@ -288,22 +309,13 @@ export default function Apply() {
                         type="button"
                         onClick={() => setShowPassword(s => !s)}
                         className="absolute end-3 top-[24px] -translate-y-1/2 p-1.5 rounded-lg text-muted-foreground hover:text-gold transition-colors"
-                        aria-label={showPassword ? t("Hide password", "إخفاء كلمة المرور") : t("Show password", "إظهار كلمة المرور")}
                       >
                         {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </button>
                     </div>
-                    {/* Strength meter */}
                     {(() => {
                       const pw = form.watch("password") || "";
                       const score = passwordStrength(pw);
-                      const labels = [
-                        t("Too weak", "ضعيفة جداً"),
-                        t("Weak", "ضعيفة"),
-                        t("Okay", "مقبولة"),
-                        t("Strong", "قوية"),
-                        t("Fortress", "حصينة"),
-                      ];
                       const colors = ["bg-destructive", "bg-destructive", "bg-orange-400", "bg-gold", "bg-green-500"];
                       return pw.length > 0 ? (
                         <div className="mt-2.5">
@@ -312,53 +324,61 @@ export default function Apply() {
                               <div key={i} className={`h-1.5 flex-1 rounded-full transition-colors duration-300 ${i < score ? colors[score] : "bg-border"}`} />
                             ))}
                           </div>
-                          <p className="text-xs text-muted-foreground font-semibold">{labels[score]}</p>
                         </div>
-                      ) : (
-                        <p className="text-xs text-muted-foreground mt-1.5">{t("Minimum 8 characters", "8 أحرف كحد أدنى")}</p>
-                      );
+                      ) : null;
                     })()}
                   </div>
+
                   <Button type="button" onClick={nextStep} className="w-full mt-6">{t("Next Step", "الخطوة التالية")}</Button>
                 </motion.div>
               )}
 
+              {/* STEP 2: PROFILE & STATUS */}
               {step === 2 && (
                 <motion.div key="step2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
-                  <h3 className="text-xl font-bold mb-4 border-b pb-2">{t("Role Selection", "اختيار الدور")}</h3>
+                  <h3 className="text-xl font-bold mb-4 border-b border-border pb-2">{t("Step 2 — Profile & Status", "الخطوة 2 — الملف الشخصي")}</h3>
+                  
                   <div>
-                    <Label>{t("Preferred Role", "الدور المفضل")}</Label>
-                    <Select {...form.register("preferredRole")} error={form.formState.errors.preferredRole?.message}>
-                      <option value="mp">{t("Member of Parliament", "عضو برلمان")}</option>
-                      <option value="minister">{t("Minister", "وزير")}</option>
-                      <option value="local_council">{t("Local Council", "مجلس محلي")}</option>
-                      <option value="diaspora_rep">{t("Diaspora Representative", "ممثل الجالية")}</option>
+                    <Label>{t("Status", "الحالة")}</Label>
+                    <Select {...form.register("status")} error={form.formState.errors.status?.message}>
+                      <option value="">{t("Select Status", "اختر الحالة")}</option>
+                      <option value="Student">Student</option>
+                      <option value="Freelancer">Freelancer</option>
+                      <option value="Entrepreneur">Entrepreneur</option>
+                      <option value="Employed">Employed</option>
+                      <option value="Unemployed">Unemployed</option>
+                      <option value="Other">Other</option>
                     </Select>
                   </div>
+
                   <div>
-                    <Label>{t("Region", "الجهة / المنطقة")}</Label>
-                    <Select {...form.register("region")} error={form.formState.errors.region?.message}>
-                      <option value="">{t("Select a Region", "اختر جهة")}</option>
-                      {MOROCCAN_REGIONS.map(region => (
-                        <option key={region} value={region}>{region}</option>
-                      ))}
+                    <Label>{t("Field of Study / Specialty", "مجال الدراسة / التخصص")}</Label>
+                    <Input {...form.register("fieldOfStudy")} placeholder="Law, Economics, Engineering, etc." error={form.formState.errors.fieldOfStudy?.message} />
+                  </div>
+
+                  <div>
+                    <Label>{t("Education Level", "المستوى التعليمي")}</Label>
+                    <Select {...form.register("educationLevel")} error={form.formState.errors.educationLevel?.message}>
+                      <option value="">{t("Select Education Level", "اختر المستوى")}</option>
+                      <option value="High School">High School</option>
+                      <option value="Bachelor's">Bachelor's</option>
+                      <option value="Master's">Master's</option>
+                      <option value="Doctorate">Doctorate</option>
+                      <option value="Other">Other</option>
                     </Select>
                   </div>
-                  {form.watch("preferredRole") === "mp" && (
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <Label>{t("Parliament House", "مجلس البرلمان")}</Label>
-                      <Select {...form.register("parliamentHouse")}>
-                        <option value="house_of_representatives">{t("House of Representatives", "مجلس النواب")}</option>
-                        <option value="house_of_councillors">{t("House of Councillors", "مجلس المستشارين")}</option>
-                      </Select>
+                      <Label>{t("City / Region", "المدينة / الجهة")}</Label>
+                      <Input {...form.register("region")} error={form.formState.errors.region?.message} />
                     </div>
-                  )}
-                  {form.watch("preferredRole") === "minister" && (
                     <div>
-                      <Label>{t("Ministry Preference", "الوزارة المفضلة")}</Label>
-                      <Input {...form.register("ministryPreference")} placeholder="e.g. Ministry of Health" />
+                      <Label>{t("Country", "البلد")}</Label>
+                      <Input {...form.register("country")} error={form.formState.errors.country?.message} />
                     </div>
-                  )}
+                  </div>
+
                   <div className="flex gap-4 mt-6">
                     <Button type="button" variant="outline" onClick={() => setStep(1)} className="w-full">{t("Back", "رجوع")}</Button>
                     <Button type="button" onClick={nextStep} className="w-full">{t("Next Step", "الخطوة التالية")}</Button>
@@ -366,39 +386,93 @@ export default function Apply() {
                 </motion.div>
               )}
 
+              {/* STEP 3: INTERESTS */}
               {step === 3 && (
                 <motion.div key="step3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
-                  <h3 className="text-xl font-bold mb-4 border-b pb-2">{t("Motivation", "خطاب التحفيز")}</h3>
-                  <div>
-                    <Label>{t("Why do you want this role?", "لماذا تريد هذا الدور؟")}</Label>
-                    <Textarea
-                      {...form.register("motivation")}
-                      placeholder={t("Write at least 50 characters explaining your goals and qualifications...", "اكتب ما لا يقل عن 50 حرفًا تشرح فيها أهدافك ومؤهلاتك...")}
-                      error={form.formState.errors.motivation?.message}
-                      className="h-40"
-                    />
-                    {/* Live character counter */}
-                    {(() => {
-                      const len = (form.watch("motivation") || "").length;
-                      const reached = len >= 50;
-                      const pct = Math.min((len / 50) * 100, 100);
+                  <h3 className="text-xl font-bold mb-2 border-b border-border pb-2">{t("Step 3 — Interests", "الخطوة 3 — الاهتمامات")}</h3>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    {t("Select up to 5 interests that align with your civic goals.", "اختر ما يصل إلى 5 اهتمامات تتماشى مع أهدافك المدنية.")}
+                  </p>
+                  
+                  <div className="flex flex-wrap gap-2 mb-2">
+                    {INTERESTS_OPTIONS.map((interest) => {
+                      const isSelected = form.watch("interests").includes(interest);
                       return (
-                        <div className="mt-2.5 flex items-center gap-3">
-                          <div className="flex-1 h-1.5 bg-border rounded-full overflow-hidden">
-                            <div
-                              className={`h-full rounded-full transition-all duration-300 ${reached ? "bg-green-500" : "bg-gold"}`}
-                              style={{ width: `${pct}%` }}
-                            />
+                        <button
+                          key={interest}
+                          type="button"
+                          onClick={() => toggleInterest(interest)}
+                          className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 border ${
+                            isSelected 
+                              ? "bg-gold/20 border-gold text-gold shadow-sm shadow-gold/10 scale-105" 
+                              : "bg-secondary/50 border-border text-foreground hover:border-gold/50 hover:bg-secondary"
+                          }`}
+                        >
+                          {interest}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  {form.formState.errors.interests && (
+                    <p className="text-sm text-destructive font-medium">{form.formState.errors.interests.message}</p>
+                  )}
+
+                  <div className="flex gap-4 mt-8">
+                    <Button type="button" variant="outline" onClick={() => setStep(2)} className="w-full">{t("Back", "رجوع")}</Button>
+                    <Button type="button" onClick={nextStep} className="w-full">{t("Next Step", "الخطوة التالية")}</Button>
+                  </div>
+                </motion.div>
+              )}
+
+              {/* STEP 4: ROLE SELECTION */}
+              {step === 4 && (
+                <motion.div key="step4" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
+                  <h3 className="text-xl font-bold mb-4 border-b border-border pb-2">{t("Step 4 — Role Selection", "الخطوة 4 — اختيار الدور")}</h3>
+                  
+                  <div className="space-y-3">
+                    {[
+                      {
+                        id: "Active Member",
+                        title: t("Active Member", "عضو نشط"),
+                        desc: t("Participates in Youth Capital's activities, discussions, and votes. The standard membership tier for engaged youth.", "يشارك في أنشطة شباب العاصمة، والمناقشات، والتصويت. مستوى العضوية الأساسي للشباب المتفاعل.")
+                      },
+                      {
+                        id: "Executive Bureau Member",
+                        title: t("Executive Bureau Member", "عضو المكتب التنفيذي"),
+                        desc: t("Part of the executive board; involved in strategic decisions and internal governance of the organization.", "جزء من المكتب التنفيذي؛ يشارك في القرارات الاستراتيجية والحوكمة الداخلية للمنظمة.")
+                      },
+                      {
+                        id: "Ambassador Member",
+                        title: t("Ambassador Member", "عضو سفير"),
+                        desc: t("Represents Youth Capital on specific missions or projects, without a permanent governance role.", "يمثل شباب العاصمة في مهام أو مشاريع محددة، دون دور دائم في الحوكمة.")
+                      }
+                    ].map((role) => {
+                      const isSelected = form.watch("preferredRole") === role.id;
+                      return (
+                        <div 
+                          key={role.id}
+                          onClick={() => form.setValue("preferredRole", role.id, { shouldValidate: true })}
+                          className={`p-4 rounded-2xl border-2 cursor-pointer transition-all duration-300 ${
+                            isSelected 
+                              ? "border-gold bg-gold/5 shadow-md shadow-gold/10" 
+                              : "border-border bg-card hover:border-gold/30 hover:bg-gold/5"
+                          }`}
+                        >
+                          <div className="flex items-center justify-between mb-1">
+                            <h4 className={`font-bold ${isSelected ? "text-gold" : "text-foreground"}`}>{role.title}</h4>
+                            {isSelected && <CheckCircle2 className="w-5 h-5 text-gold" />}
                           </div>
-                          <span className={`text-xs font-bold tabular-nums shrink-0 ${reached ? "text-green-500" : "text-muted-foreground"}`}>
-                            {reached ? `✓ ${len}` : `${len} / 50`}
-                          </span>
+                          <p className="text-xs text-muted-foreground leading-relaxed">{role.desc}</p>
                         </div>
                       );
-                    })()}
+                    })}
                   </div>
-                  <div className="flex gap-4 mt-6">
-                    <Button type="button" variant="outline" onClick={() => setStep(2)} className="w-full">{t("Back", "رجوع")}</Button>
+                  {form.formState.errors.preferredRole && (
+                    <p className="text-sm text-destructive font-medium">{form.formState.errors.preferredRole.message}</p>
+                  )}
+
+                  <div className="flex gap-4 mt-8">
+                    <Button type="button" variant="outline" onClick={() => setStep(3)} className="w-full">{t("Back", "رجوع")}</Button>
                     <Button 
                       type="submit" 
                       variant="gold" 
@@ -410,6 +484,7 @@ export default function Apply() {
                   </div>
                 </motion.div>
               )}
+
             </AnimatePresence>
           </form>
         </Card>
@@ -421,3 +496,4 @@ export default function Apply() {
     </div>
   );
 }
+
