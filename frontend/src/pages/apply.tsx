@@ -3,7 +3,7 @@ import { useLanguage } from "@/hooks/use-language";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Button, Input, Select, Label, Card } from "@/components/ui-custom";
+import { Button, Input, Select, Label, Card, DiscordIcon } from "@/components/ui-custom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRegister, useSubmitRoleApplication } from "@workspace/api-client-react";
 import { useToast } from "@/hooks/use-toast";
@@ -73,7 +73,7 @@ export default function Apply() {
   const [showPassword, setShowPassword] = useState(false);
   const { toast } = useToast();
   
-  const communityLink = import.meta.env.VITE_COMMUNITY_LINK || "https://chat.whatsapp.com/LC5mqBrIPXdLJhK6cLJsmu";
+  const communityLink = import.meta.env.VITE_COMMUNITY_LINK || "https://discord.gg/K87zstYzYE";
 
   const registerMutation = useRegister();
   const applyMutation = useSubmitRoleApplication();
@@ -185,12 +185,12 @@ export default function Apply() {
               <h4 className="font-black text-foreground uppercase tracking-widest text-xs">{t("Mandatory Next Step", "الخطوة التالية الإلزامية")}</h4>
             </div>
             <p className="text-sm font-bold text-muted-foreground leading-relaxed mb-6">
-              {t("To finalize your candidacy, you MUST join our WhatsApp community to stay updated.", "لإكمال ترشيحك، يجب أن تنضم إلى مجتمع الواتساب الخاص بنا للبقاء على اطلاع.")}
+              {t("To finalize your candidacy, you MUST join our Discord community to stay updated.", "لإكمال ترشيحك، يجب أن تنضم إلى مجتمع ديسكورد الخاص بنا للبقاء على اطلاع.")}
             </p>
             <a href={communityLink} target="_blank" rel="noopener noreferrer">
-              <Button variant="primary" className="w-full h-14 rounded-2xl gap-3 shadow-lg text-md font-black bg-[#25D366] hover:bg-[#1DA851] text-white border-none">
-                <img src="/images/whatsapp.png" alt="WhatsApp" className="w-5 h-5" />
-                {t("Join WhatsApp Community", "انضم إلى مجتمع واتساب")}
+              <Button variant="primary" className="w-full h-14 rounded-2xl gap-3 shadow-lg text-md font-black bg-[#5865F2] hover:bg-[#4752C4] text-white border-none">
+                <DiscordIcon className="w-5 h-5" />
+                {t("Join Discord Community", "انضم إلى مجتمع ديسكورد")}
               </Button>
             </a>
           </motion.div>
