@@ -2,7 +2,7 @@ import { Link, useLocation } from "wouter";
 import { motion, AnimatePresence, useScroll, useSpring } from "framer-motion";
 import { useAuth } from "@/hooks/use-auth";
 import { useLanguage } from "@/hooks/use-language";
-import { Button } from "@/components/ui-custom";
+import { Button, DiscordIcon } from "@/components/ui-custom";
 import { 
   Globe, 
   Menu, 
@@ -467,7 +467,7 @@ function Navbar() {
                               ),
                             },
                             { title: "YouTube", href: "https://www.youtube.com/@youthcapitalhq", icon: <Youtube className="w-[18px] h-[18px]" /> },
-                            { title: "WhatsApp", href: "https://chat.whatsapp.com/LC5mqBrIPXdLJhK6cLJsmu", icon: <img src="/images/whatsapp.png" alt="WhatsApp" className="w-[18px] h-[18px]" /> },
+                            { title: "Discord", href: "https://discord.gg/K87zstYzYE", icon: <DiscordIcon className="w-[18px] h-[18px]" /> },
                           ].map(s => (
                             <a
                               key={s.title}
@@ -576,7 +576,7 @@ function Footer() {
       ),
     },
     { title: "YouTube", href: "https://www.youtube.com/@youthcapitalhq", icon: <Youtube className="w-[18px] h-[18px]" /> },
-    { title: "WhatsApp", href: "https://chat.whatsapp.com/LC5mqBrIPXdLJhK6cLJsmu", icon: <img src="/images/whatsapp.png" alt="WhatsApp" className="w-[18px] h-[18px]" /> },
+    { title: "Discord", href: "https://discord.gg/K87zstYzYE", icon: <DiscordIcon className="w-[18px] h-[18px]" /> },
   ];
 
   const columns = [
@@ -703,18 +703,18 @@ function Footer() {
           {/* Community Card */}
           <div className="md:col-span-3">
             <div className="p-6 rounded-3xl bg-white/[0.04] border border-white/10 hover:border-[#25D366]/40 transition-colors duration-300 group text-center md:text-start">
-              <div className="w-12 h-12 rounded-2xl bg-[#25D366]/15 flex items-center justify-center mb-4 mx-auto md:mx-0 group-hover:scale-110 transition-transform duration-300">
-                <img src="/images/whatsapp.png" alt="WhatsApp" className="w-6 h-6" />
+              <div className="w-12 h-12 rounded-2xl bg-[#5865F2]/15 flex items-center justify-center mb-4 mx-auto md:mx-0 group-hover:scale-110 transition-transform duration-300">
+                <DiscordIcon className="w-6 h-6 text-[#5865F2]" />
               </div>
               <h4 className="font-display font-bold text-white mb-2">{t("Live Community", "المجتمع المباشر")}</h4>
               <p className="text-white/50 text-xs leading-relaxed mb-4">
-                {t("Debates, crisis votes, and coordination happen on WhatsApp in real time.", "النقاشات وتصويتات الأزمات والتنسيق تحدث على واتساب في الوقت الفعلي.")}
+                {t("Debates, crisis votes, and coordination happen on Discord in real time.", "النقاشات وتصويتات الأزمات والتنسيق تحدث على ديسكورد في الوقت الفعلي.")}
               </p>
               <a
-                href="https://chat.whatsapp.com/LC5mqBrIPXdLJhK6cLJsmu"
+                href="https://discord.gg/K87zstYzYE"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-[#25D366] text-xs font-black uppercase tracking-widest hover:gap-3 transition-all"
+                className="inline-flex items-center gap-2 text-[#5865F2] text-xs font-black uppercase tracking-widest hover:gap-3 transition-all"
               >
                 {t("Join Now", "انضم الآن")}
                 <ArrowRight className={`w-3.5 h-3.5 ${isAr ? "rotate-180" : ""}`} />

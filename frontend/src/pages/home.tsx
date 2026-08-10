@@ -59,13 +59,20 @@ function ActivityTicker() {
   );
 }
 
+const DiscordIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 127.14 96.36" fill="currentColor" className={className}>
+    <path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a67.58,67.58,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1,105.25,105.25,0,0,0,32.19-16.14c2.64-27.38-4.51-51.11-19.32-72.1M42.56,65.36c-5.36,0-9.8-4.93-9.8-11s4.38-11,9.8-11,9.85,4.92,9.8,11-4.43,11-9.8,11m42,0c-5.36,0-9.8-4.93-9.8-11s4.38-11,9.8-11,9.85,4.92,9.8,11-4.43,11-9.8,11" />
+  </svg>
+);
+
 export default function Home() {
   const { t, isAr } = useLanguage();
   const { data: stats } = useGetPlatformStats();
   const { data: forumsData } = useGetForums();
   const { data: articlesData } = useGetArticles();
   const { data: pollsData } = useGetPolls();
-  const communityLink = import.meta.env.VITE_COMMUNITY_LINK || "https://chat.whatsapp.com/LC5mqBrIPXdLJhK6cLJsmu";
+  const [hasScrolled, setHasScrolled] = useState(false);
+  const communityLink = import.meta.env.VITE_COMMUNITY_LINK || "https://discord.gg/K87zstYzYE";
   const [activeFeature, setActiveFeature] = useState(1);
   const [activeCommunity, setActiveCommunity] = useState(1);
   const [showScrollTop, setShowScrollTop] = useState(false);
@@ -806,10 +813,10 @@ export default function Home() {
         </div>
       </section>
 
-      {/* WhatsApp Community Section */}
-      <section className="py-24 px-4 bg-[#25D366]/5 relative overflow-hidden border-t border-[#25D366]/20">
+      {/* Discord Community Section */}
+      <section className="py-24 px-4 bg-[#5865F2]/5 relative overflow-hidden border-t border-[#5865F2]/20">
         {/* Background blobs */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-[#25D366]/10 rounded-full blur-[100px] z-0" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-[#5865F2]/10 rounded-full blur-[100px] z-0" />
 
         {/* Rising chat bubbles */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden z-0" aria-hidden>
@@ -826,7 +833,7 @@ export default function Home() {
               initial={{ y: 0, opacity: 0 }}
               animate={{ y: [40, -520], opacity: [0, 0.5, 0.5, 0] }}
               transition={{ duration: b.duration, repeat: Infinity, delay: b.delay, ease: "linear" }}
-              className="absolute bottom-0 rounded-full border border-[#25D366]/40 bg-[#25D366]/15"
+              className="absolute bottom-0 rounded-full border border-[#5865F2]/40 bg-[#5865F2]/15"
               style={{ left: b.left, width: b.size, height: b.size }}
             />
           ))}
@@ -837,9 +844,9 @@ export default function Home() {
             initial={{ opacity: 0, scale: 0.9 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
-            className="w-16 h-16 bg-[#25D366] rounded-3xl flex items-center justify-center shadow-lg shadow-[#25D366]/30 mb-8"
+            className="w-16 h-16 bg-[#5865F2] rounded-3xl flex items-center justify-center shadow-lg shadow-[#5865F2]/30 mb-8"
           >
-            <img src="/images/whatsapp.png" alt="WhatsApp" className="w-9 h-9" />
+            <DiscordIcon className="w-9 h-9 text-white" />
           </motion.div>
 
           <motion.h2
@@ -848,7 +855,7 @@ export default function Home() {
             viewport={{ once: true }}
             className="text-3xl md:text-5xl font-display font-black text-foreground mb-6"
           >
-            {t("Join the Community on WhatsApp", "انضم إلى مجتمعنا على واتساب")}
+            {t("Join the Community on Discord", "انضم إلى مجتمعنا على ديسكورد")}
           </motion.h2>
 
           <motion.p
@@ -859,8 +866,8 @@ export default function Home() {
             className="text-muted-foreground text-lg md:text-xl max-w-2xl mb-12 leading-relaxed"
           >
             {t(
-              "Our community is fully active on WhatsApp! Connect with hundreds of other Moroccan youth, join live discussions, vote on real-time crisis scenarios, and coordinate your ministerial efforts directly.",
-              "مجتمعنا نشط بالكامل على واتساب! تواصل مع المئات من الشباب المغربي الآخر، وانضم إلى النقاشات المباشرة، وصوت على سيناريوهات الأزمات في الوقت الفعلي."
+              "Our community is fully active on Discord! Connect with hundreds of other Moroccan youth, join live discussions, vote on real-time crisis scenarios, and coordinate your ministerial efforts directly.",
+              "مجتمعنا نشط بالكامل على ديسكورد! تواصل مع المئات من الشباب المغربي الآخر، وانضم إلى النقاشات المباشرة، وصوت على سيناريوهات الأزمات في الوقت الفعلي."
             )}
           </motion.p>
 
@@ -874,10 +881,10 @@ export default function Home() {
               href={communityLink}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-4 bg-[#25D366] text-white text-xl font-bold px-12 py-5 rounded-[2rem] shadow-[0_8px_0_#1DA851] hover:shadow-[0_6px_0_#1DA851] active:shadow-none active:translate-y-[8px] hover:translate-y-[2px] transition-all transform duration-150 group"
+              className="inline-flex items-center gap-4 bg-[#5865F2] text-white text-xl font-bold px-12 py-5 rounded-[2rem] shadow-[0_8px_0_#4752C4] hover:shadow-[0_6px_0_#4752C4] active:shadow-none active:translate-y-[8px] hover:translate-y-[2px] transition-all transform duration-150 group"
             >
-              <img src="/images/whatsapp.png" alt="WhatsApp" className="w-7 h-7 group-hover:scale-110 transition-transform" />
-              {t("Join WhatsApp Community", "انضم لمجتمع الواتساب")}
+              <DiscordIcon className="w-7 h-7 group-hover:scale-110 transition-transform text-white" />
+              {t("Join Discord Community", "انضم لمجتمع ديسكورد")}
             </a>
           </motion.div>
         </div>
