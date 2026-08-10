@@ -4,7 +4,7 @@ import { z } from "zod";
 import { usersTable } from "./users.js";
 
 export const roleApplicationStatusEnum = pgEnum("role_application_status", ["pending", "approved", "rejected"]);
-export const preferredRoleEnum = pgEnum("preferred_role", ["minister", "mp", "local_council", "diaspora_rep"]);
+export const preferredRoleEnum = pgEnum("preferred_role", ["minister", "mp", "local_council", "diaspora_rep", "Active Member", "Executive Bureau Member", "Ambassador Member"]);
 export const parliamentHouseEnum = pgEnum("parliament_house", ["house_of_representatives", "house_of_councillors"]);
 
 export const roleApplicationsTable = pgTable("role_applications", {
