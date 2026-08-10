@@ -31,7 +31,7 @@ const INTERESTS_OPTIONS = [
   "Culture & Cultural Dialogue"
 ];
 
-const applySchema = z.object({
+const getApplySchema = (step: number) => z.object({
   fullName: z.string().min(2, "Full name is required"),
   email: z.string().email("Invalid email address"),
   phone: z.string().optional(),
@@ -39,18 +39,32 @@ const applySchema = z.object({
   age: z.coerce.number().min(12, "Invalid age").max(100, "Invalid age"),
   password: z.string().min(8, "Password must be at least 8 characters"),
   
-  status: z.string().min(1, "Status is required"),
-  fieldOfStudy: z.string().min(2, "Field of study is required"),
-  educationLevel: z.string().min(1, "Education level is required"),
-  region: z.string().min(2, "City / Region is required"),
-  country: z.string().min(2, "Country is required"),
+  status: step >= 2 ? z.string().min(1, "Status is required") : z.string().optional().or(z.literal('')),
+  fieldOfStudy: step >= 2 ? z.string().min(2, "Field of study is required") : z.string().optional().or(z.literal('')),
+  educationLevel: step >= 2 ? z.string().min(1, "Education level is required") : z.string().optional().or(z.literal('')),
+  region: step >= 2 ? z.string().min(2, "City / Region is required") : z.string().optional().or(z.literal('')),
+  country: step >= 2 ? z.string().min(2, "Country is required") : z.string().optional().or(z.literal('')),
   
-  interests: z.array(z.string()).min(1, "Select at least 1 interest").max(5, "Select up to 5 interests"),
+  interests: step >= 3 ? z.array(z.string()).min(1, "Select at least 1 interest").max(5, "Select up to 5 interests") : z.array(z.string()).optional(),
   
-  preferredRole: z.string().min(1, "Role is required"),
+  preferredRole: step >= 4 ? z.string().min(1, "Role is required") : z.string().optional().or(z.literal('')),
 });
 
-type ApplyFormData = z.infer<typeof applySchema>;
+type ApplyFormData = {
+  fullName: string;
+  email: string;
+  phone?: string;
+  gender: string;
+  age: number;
+  password: string;
+  status: string;
+  fieldOfStudy: string;
+  educationLevel: string;
+  region: string;
+  country: string;
+  interests: string[];
+  preferredRole: string;
+};
 
 export default function Apply() {
   const { t } = useLanguage();
@@ -65,7 +79,9 @@ export default function Apply() {
   const applyMutation = useSubmitRoleApplication();
 
   const form = useForm<ApplyFormData>({
-    resolver: zodResolver(applySchema),
+    resolver: (data, context, options) => {
+      return zodResolver(getApplySchema(step))(data, context, options);
+    },
     defaultValues: {
       fullName: "",
       email: "",
