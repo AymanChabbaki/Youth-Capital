@@ -56,18 +56,18 @@
     "picture": "/images/team/anwar.jpeg"
   },
   {
-    "nameEn": "Basma",
-    "nameAr": "بسمة",
+    "nameEn": "Yassmin Dalil",
+    "nameAr": "ياسمين دليل",
     "roleEn": "Vice-Secrétaire Général",
-    "roleAr": "نائب الكاتب العام",
+    "roleAr": "نائبة الكاتب العام",
     "tier": "admin",
-    "descEn": "Supports the Secretariat General in day-to-day administrative tracking, session drafting, and database maintenance.",
-    "descAr": "تدعم الأمانة العامة في المتابعة الإدارية اليومية، صياغة المحاضر، وصيانة قواعد البيانات.",
+    "descEn": "full-stack developer, member in an politcal party",
+    "descAr": "مطورة شاملة، عضوة في حزب سياسي",
     "accent": "from-blue-400 to-indigo-550",
     "glowColor": "rgba(59, 130, 246, 0.15)",
     "missionsEn": ["Administrative Support", "Session Drafting", "Data Management"],
     "missionsAr": ["الدعم الإداري", "صياغة المحاضر", "إدارة البيانات"],
-    "picture": "/images/team/basma.png"
+    "picture": "/images/team/yassmin.jpg"
   },
   {
     "nameEn": "Oussama",
@@ -84,18 +84,18 @@
     "picture": "/images/team/oussama.png"
   },
   {
-    "nameEn": "Marwa",
-    "nameAr": "مروة",
+    "nameEn": "Yahya najm",
+    "nameAr": "يحيى نجم",
     "roleEn": "Vice-Trésorier",
     "roleAr": "نائب أمين المال",
     "tier": "admin",
-    "descEn": "Assists the Treasurer in transaction tracking, financial reporting, and invoice validation processes.",
-    "descAr": "تساعد أمين المال في تتبع المعاملات، إعداد التقارير المالية، وعمليات التحقق من الفواتير.",
+    "descEn": "full-stack developer",
+    "descAr": "مطور شامل",
     "accent": "from-blue-400 to-indigo-550",
     "glowColor": "rgba(59, 130, 246, 0.15)",
     "missionsEn": ["Expense Tracking", "Financial Reporting", "Invoice Verification"],
     "missionsAr": ["تتبع المصاريف", "التقارير المالية", "التحقق من الفواتير"],
-    "picture": "/images/team/marwa.png"
+    "picture": "/images/team/yahya.png"
   },
   {
     "nameEn": "Nassima SADIK",
@@ -112,20 +112,6 @@
     "picture": "/images/team/nassima.jpeg"
   },
   {
-    "nameEn": "Chaimae",
-    "nameAr": "شيماء",
-    "roleEn": "Communication Manager",
-    "roleAr": "مدير التواصل",
-    "tier": "ops",
-    "descEn": "Coordinates multi-channel outreach, press releases, social campaigns, and public platform announcements.",
-    "descAr": "تنسق التواصل متعدد القنوات، البيانات الصحفية، الحملات الاجتماعية، والإعلانات العامة للمنصة.",
-    "accent": "from-teal-400 to-emerald-600",
-    "glowColor": "rgba(20, 184, 166, 0.2)",
-    "missionsEn": ["Press Releases", "Social Campaigns", "Outreach Coordination"],
-    "missionsAr": ["البيانات الصحفية", "الحملات الاجتماعية", "تنسيق التواصل"],
-    "picture": "/images/team/chaimae.png"
-  },
-  {
     "nameEn": "Aya",
     "nameAr": "آية",
     "roleEn": "Branding Manager",
@@ -140,10 +126,10 @@
     "picture": "/images/team/aya.png"
   },
   {
-    "nameEn": "Yahya najm",
-    "nameAr": "يحيى نجم",
-    "roleEn": "Tech Projects Manager",
-    "roleAr": "مدير المشاريع التقنية",
+    "nameEn": "Basma",
+    "nameAr": "بسمة",
+    "roleEn": "Partnerships Manager",
+    "roleAr": "مدير الشراكات",
     "tier": "ops",
     "descEn": "full-stack developer",
     "descAr": "مطور شامل",
@@ -151,7 +137,7 @@
     "glowColor": "rgba(20, 184, 166, 0.2)",
     "missionsEn": ["Software Architecture", "System Reliability", "Deployment Workflows"],
     "missionsAr": ["بنية البرمجيات", "موثوقية النظام", "سير عمل النشر"],
-    "picture": "/images/team/yahya.png"
+    "picture": "/images/team/basma.png"
   },
   {
     "nameEn": "Imane",
@@ -168,18 +154,18 @@
     "picture": "/images/team/imane.png"
   },
   {
-    "nameEn": "Oumaima",
-    "nameAr": "أميمة",
+    "nameEn": "Oumaima Hilal",
+    "nameAr": "أميمة هلال",
     "roleEn": "General Advisor",
     "roleAr": "مستشار عام",
     "tier": "advisors",
-    "descEn": "Provides strategic mentorship to executive board members and reviews educational curricula.",
-    "descAr": "تقدم التوجيه الاستراتيجي لأعضاء المجلس التنفيذي وتراجع المناهج التعليمية.",
+    "descEn": "Oumayma Hilal is a tourism researcher, university educator, and community-based tourism specialist with international experience across Morocco, the United Kingdom, the United States, and the MENA region. A Fulbright Joint-Supervision Scholar at Arizona State University, her work focuses on tourism resilience, sustainable destination development, and community-led innovation. She has collaborated with organizations including the Porter Voice Collective, the Jane Goodall Institute, and Smithsonian Journeys, and is committed to advancing inclusive and resilient tourism through research, education, and community engagement.",
+    "descAr": "باحثة في مجال السياحة، وأستاذة جامعية، ومتخصصة في السياحة المجتمعية، وتتمتع بخبرة دولية في المغرب والمملكة المتحدة والولايات المتحدة ومنطقة الشرق الأوسط وشمال إفريقيا. حاصلة على منحة فولبرايت للإشراف المشترك في جامعة ولاية أريزونا، وتركز أبحاثها على مرونة السياحة، وتطوير الوجهات السياحية المستدامة، والابتكار بقيادة المجتمع. تعاونت مع مؤسسات منها Porter Voice Collective، ومعهد جين جودال، وSmithsonian Journeys، وتلتزم بتعزيز السياحة الشاملة والمرنة من خلال البحث والتعليم وإشراك المجتمع.",
     "accent": "from-purple-400 to-fuchsia-600",
     "glowColor": "rgba(168, 85, 247, 0.15)",
-    "missionsEn": ["Executive Mentorship", "Curriculum Review", "Strategic Advice"],
-    "missionsAr": ["الإرشاد التنفيذي", "مراجعة المناهج", "المشورة الاستراتيجية"],
-    "picture": "/images/team/oumaima.png"
+    "missionsEn": ["Tourism Research", "Community Engagement", "Sustainable Tourism Development", "Educational Programs", "Institutional Partnerships"],
+    "missionsAr": ["البحث السياحي", "إشراك المجتمع", "تطوير السياحة المستدامة", "برامج تعليمية", "الشراكات المؤسساتية"],
+    "picture": "/images/team/oumaima.jpeg"
   },
   {
     "nameEn": "Othmane El AABOUDI",

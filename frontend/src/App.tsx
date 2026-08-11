@@ -56,6 +56,7 @@ function Router() {
         {/* Standalone routes without the global layout shell */}
         <Route path="/admin" component={Admin} />
         <Route path="/links" component={Linktree} />
+        <Route path="/linktree" component={Linktree} />
 
         {/* Standard routes with the global layout (Navbar/Footer) */}
         <Route>

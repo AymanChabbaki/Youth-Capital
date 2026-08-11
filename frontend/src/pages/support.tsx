@@ -37,7 +37,7 @@ export default function Support() {
   const channels = [
     { icon: Zap, title: t("Fast Response", "استجابة سريعة"), desc: t("Tickets are reviewed within 24 hours by the platform team.", "تتم مراجعة التذاكر خلال 24 ساعة من قبل فريق المنصة.") },
     { icon: BookOpen, title: t("Simulation Rules", "قواعد المحاكاة"), desc: t("Most answers live in the official rulebook.", "معظم الإجابات موجودة في كتاب القواعد الرسمي."), href: "/rules" },
-    { icon: LifeBuoy, title: t("Community Help", "مساعدة المجتمع"), desc: t("Ask fellow delegates in the WhatsApp community.", "اسأل زملاءك المندوبين في مجتمع الواتساب.") },
+    { icon: LifeBuoy, title: t("Community Help", "مساعدة المجتمع"), desc: t("Ask fellow delegates in the Discord community.", "اسأل زملاءك المندوبين في مجتمع ديسكورد.") },
   ];
 
   return (
