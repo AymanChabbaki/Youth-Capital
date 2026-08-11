@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "wouter";
 import { motion } from "framer-motion";
 import { useLanguage } from "@/hooks/use-language";
+import { DiscordIcon } from "@/components/ui-custom";
 import {
   Globe,
   ArrowRight,
@@ -39,11 +40,11 @@ export default function Linktree() {
 
   const socials = [
     {
-      title: t("WhatsApp Community", "مجتمع الواتساب"),
+      title: t("Discord Community", "مجتمع ديسكورد"),
       subtitle: t("Debates & crisis votes happen here", "النقاشات وتصويتات الأزمات تحدث هنا"),
-      href: "https://chat.whatsapp.com/LC5mqBrIPXdLJhK6cLJsmu",
-      icon: <img src="/images/whatsapp.png" alt="" className="w-6 h-6" />,
-      accent: "#25D366",
+      href: "https://discord.gg/K87zstYzYE",
+      icon: <DiscordIcon className="w-6 h-6" />,
+      accent: "#5865F2",
       featured: true,
     },
     {
