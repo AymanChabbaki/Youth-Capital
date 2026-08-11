@@ -5,9 +5,6 @@ import { Globe } from "./Globe";
 import memberAmine from "../../assets/images/member-amine.jpg";
 import memberKarim from "../../assets/images/member-karim.jpg";
 import memberNadia from "../../assets/images/member-nadia.jpg";
-import sponsorMehdi from "../../assets/images/sponsor-mehdi.jpg";
-import sponsorSalma from "../../assets/images/sponsor-salma.jpg";
-import sponsorYoussef from "../../assets/images/sponsor-youssef.jpg";
 
 // Mock numbers — no backend wired yet, just to see the shape of the row.
 const CARDS = [
@@ -21,7 +18,6 @@ const CARDS = [
       { value: "86", label: "Extern" },
     ],
     stack: ["Youth Leadership Summit", "Digital Skills Academy"],
-    sub: "Sign in for details",
     locked: false,
   },
   {
@@ -29,8 +25,8 @@ const CARDS = [
     Icon: HandHeartIcon,
     label: "Sponsors",
     value: "37",
-    note: "on the platform",
-    sub: "Sign in for details",
+    topLabel: "Top",
+    names: ["Youssef El Amrani", "Mehdi Bennis", "Salma Idrissi", "Khadija Ziani"],
     locked: false,
   },
   {
@@ -44,7 +40,6 @@ const CARDS = [
       { name: "Nadia Chraibi", dept: "Marketing", img: memberNadia },
       { name: "Karim Ouazzani", dept: "Design", img: memberKarim },
     ],
-    sub: "Sign in for details",
     locked: false,
   },
   {
@@ -53,10 +48,10 @@ const CARDS = [
     label: "Money raised",
     value: "2.4M MAD",
     topLabel: "Sponsors",
-    people: [
-      { name: "Youssef El Amrani", img: sponsorYoussef },
-      { name: "Mehdi Bennis", img: sponsorMehdi },
-      { name: "Salma Idrissi", img: sponsorSalma },
+    sponsors: [
+      { name: "Youssef", amount: "1M MAD" },
+      { name: "Mehdi", amount: "800K MAD" },
+      { name: "Salma", amount: "600K MAD" },
     ],
     sub: "Sign in for details",
     locked: true,
@@ -73,37 +68,11 @@ const CARDS = [
   },
 ] as const;
 
-// Moroccan cities the gold callout cycles through, one per rotation.
-const MOROCCAN_CITIES = [
-  "Casablanca",
-  "Rabat",
-  "Marrakech",
-  "Fes",
-  "Tangier",
-  "Agadir",
-  "Meknes",
-  "Oujda",
-  "Kenitra",
-  "Tetouan",
-];
+// Same figure as the Members stat card — this hub's member count.
+const HUB_MEMBERS = CARDS.find((c) => c.key === "members")!.value;
 
 export function GlobalStats() {
   const [markerFacing, setMarkerFacing] = useState(false);
-  const [cityIndex, setCityIndex] = useState(0);
-
-  // One city per rotation: it appears while the marker faces forward,
-  // vanishes as the globe keeps turning, and only THEN — once it's gone —
-  // does the next rotation's city get picked, so it's always a fresh one.
-  const handleFacingChange = (facing: boolean) => {
-    setMarkerFacing((prev) => {
-      if (prev && !facing) {
-        setCityIndex((i) => (i + 1) % MOROCCAN_CITIES.length);
-      }
-      return facing;
-    });
-  };
-
-  const currentCity = MOROCCAN_CITIES[cityIndex];
 
   return (
     <div className="stats-grid">
@@ -126,26 +95,9 @@ export function GlobalStats() {
               ))}
             </div>
           )}
-          {"note" in card && (
-            <span className="stat-card-top-label" style={{ marginTop: "-4.2px" }}>
-              {card.note}
-            </span>
-          )}
-          {"chips" in card && (
-            <>
-              {"topLabel" in card && <span className="stat-card-top-label">{card.topLabel}</span>}
-              <div className="stat-card-split">
-                {card.chips.map((chip) => (
-                  <div key={chip} className="stat-card-pill">
-                    <span className="stat-card-pill-label">{chip}</span>
-                  </div>
-                ))}
-              </div>
-            </>
-          )}
           {"people" in card && (
             <>
-              {"topLabel" in card && !("chips" in card) && (
+              {"topLabel" in card && (
                 <span
                   className="stat-card-top-label stat-card-top-label-tight"
                   style={card.key === "members" ? undefined : { marginTop: "-5.6px" }}
@@ -157,14 +109,10 @@ export function GlobalStats() {
                 {card.people.slice(0, 2).map((person) => (
                   <div key={person.name} className="stat-card-pill stat-card-pill-lg">
                     <img className="stat-card-avatar" src={person.img} alt="" />
-                    {"dept" in person ? (
-                      <span className="stat-card-pill-text">
-                        <span className="stat-card-pill-label">{person.dept}</span>
-                        <span className="stat-card-pill-subname">{person.name.split(" ")[0]}</span>
-                      </span>
-                    ) : (
-                      <span className="stat-card-pill-label">{person.name.split(" ")[0]}</span>
-                    )}
+                    <span className="stat-card-pill-text">
+                      <span className="stat-card-pill-label">{person.dept}</span>
+                      <span className="stat-card-pill-subname">{person.name.split(" ")[0]}</span>
+                    </span>
                   </div>
                 ))}
               </div>
@@ -172,14 +120,31 @@ export function GlobalStats() {
                 {card.people.slice(2).map((person) => (
                   <div key={person.name} className="stat-card-pill stat-card-pill-lg">
                     <img className="stat-card-avatar" src={person.img} alt="" />
-                    {"dept" in person ? (
-                      <span className="stat-card-pill-text">
-                        <span className="stat-card-pill-label">{person.dept}</span>
-                        <span className="stat-card-pill-subname">{person.name.split(" ")[0]}</span>
-                      </span>
-                    ) : (
-                      <span className="stat-card-pill-label">{person.name.split(" ")[0]}</span>
-                    )}
+                    <span className="stat-card-pill-text">
+                      <span className="stat-card-pill-label">{person.dept}</span>
+                      <span className="stat-card-pill-subname">{person.name.split(" ")[0]}</span>
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+          {"sponsors" in card && (
+            <>
+              {"topLabel" in card && (
+                <span
+                  className="stat-card-top-label stat-card-top-label-tight"
+                  style={{ marginTop: "-5.6px" }}
+                >
+                  {card.topLabel}
+                </span>
+              )}
+              <div className="stat-card-sponsor-list">
+                {card.sponsors.map((sponsor, index) => (
+                  <div key={sponsor.name} className="stat-card-sponsor-row">
+                    <span className="stat-card-sponsor-rank">{index + 1}</span>
+                    <span className="stat-card-sponsor-name">{sponsor.name}</span>
+                    <span className="stat-card-sponsor-amount">{sponsor.amount}</span>
                   </div>
                 ))}
               </div>
@@ -215,10 +180,11 @@ export function GlobalStats() {
 
       <div className="stat-card stat-card-map">
         <div className={`stat-card-map-stat${markerFacing ? " visible" : ""}`}>
-          <div className="stat-card-map-stat-value">{currentCity}</div>
+          <div className="stat-card-map-stat-value">{HUB_MEMBERS}</div>
+          <div className="stat-card-map-stat-label">Members</div>
         </div>
         <div className="stat-card-map-globe-wrap">
-          <Globe onFacingChange={handleFacingChange} />
+          <Globe onFacingChange={setMarkerFacing} />
         </div>
         <div className="stat-card-map-footer">
           <div className="stat-card-map-overlay">

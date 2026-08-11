@@ -1130,83 +1130,190 @@ html[dir="ltr"] .step::before {
   background: hsl(220 14% 91%);
 }
 
-/* Icon-only navy rail — a floating rounded panel, not a flush full-height
-   labeled panel. Always dark regardless of page theme, same idea as a
-   fixed-color activity bar: the one deliberately dark element on an
-   otherwise light dashboard. */
-.sidebar {
-  position: sticky;
-  top: 0;
+/* Two stacked rounded boxes (big nav rail + a small account box), wrapped
+   in one fixed-position hover target so both widen together and can float
+   above .platform-main without shifting the grid — .platform-shell still
+   reserves the 104px column (see .platform-main's explicit grid-column
+   below), it's just that this element no longer occupies it via normal
+   grid placement once it's position:fixed. */
+.sidebar-col {
+  position: fixed;
+  top: 1rem;
+  inset-inline-start: 1rem; /* logical, not "left" — this app defaults to dir="rtl", where the rail sits on the right */
+  bottom: 1rem;
   width: 72px;
-  height: calc(100vh - 2rem);
-  margin: 1rem;
+  z-index: 60; /* above .section-nav (52) / its gold divider (53) — otherwise they'd poke through the backdrop unblurred */
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: width 0.32s var(--ease-smooth);
+}
+
+.sidebar-col.expanded {
+  width: 220px;
+}
+
+.sidebar,
+.sidebar-account {
+  width: 100%;
+  box-sizing: border-box;
+  border-radius: 26px; /* same corners on both boxes */
+  background: #fff;
+  border: 1px solid var(--color-border);
+  transition: box-shadow 0.32s var(--ease-smooth);
+}
+
+.sidebar-col.expanded .sidebar,
+.sidebar-col.expanded .sidebar-account {
+  box-shadow: 0 24px 60px hsl(222 46% 15% / 0.22);
+}
+
+/* Icon-only at rest, always dark-on-white regardless of page theme, same
+   idea as a fixed-color activity bar: the one deliberately anchored
+   element on an otherwise light dashboard. The bigger of the two boxes —
+   flexes to fill whatever height .sidebar-account (fixed) doesn't use. */
+.sidebar {
+  flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 1.4rem;
   padding: 1.1rem 0;
-  border-radius: 26px;
-  background: #fff; /* was hsl(222 46% 15%) navy, now matches the main content card */
-  border: 1px solid var(--color-border);
   overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* The small box underneath — account/settings/logout. Fixed height (three
+   items) so it stays noticeably smaller than the nav rail above it: about
+   a third of the rail's usual height, well under half. */
+.sidebar-account {
+  flex: 0 0 176px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.9rem 0;
+  overflow: hidden;
 }
 
 .sidebar-mark {
   width: 40px;
   height: 40px;
-  border-radius: 12px;
   display: grid;
   place-items: center;
-  color: #fff;
-  background: #6659ea; /* light purple, was var(--gradient-primary) */
   flex-shrink: 0;
   text-decoration: none;
+  transition: width 0.32s var(--ease-smooth), height 0.32s var(--ease-smooth);
+}
+
+.sidebar-col.expanded .sidebar-mark {
+  width: 100%;
+  height: auto;
+  padding: 0 0.8rem;
+  box-sizing: border-box;
+}
+
+.sidebar-mark-full {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.sidebar-mark-icon {
+  width: 22px;
+  height: auto;
+  display: block;
 }
 
 .sidebar-nav {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.5rem;
+  gap: 2rem;
   flex: 1;
   justify-content: center;
+  width: 100%;
 }
 
 .sidebar-item {
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 0.7rem;
   width: 42px;
   height: 42px;
+  padding: 0 11px; /* (42 - 20 icon)/2 — keeps the icon centered while collapsed */
   border-radius: 13px;
-  color: hsl(222 20% 60%); /* was white/0.5 — needs to read on white now, not navy */
+  background: transparent; /* only the selected/active item gets a box, see .sidebar-item.active */
+  color: hsl(222 46% 15%); /* navy, same as .section-nav's background */
   text-decoration: none;
   cursor: pointer;
-  transition: var(--transition-smooth);
+  box-sizing: border-box;
+  overflow: hidden;
+  white-space: nowrap;
+  transition: var(--transition-smooth), width 0.32s var(--ease-smooth), padding 0.32s var(--ease-smooth);
 }
 
-a.sidebar-item:hover {
-  color: hsl(222 46% 18%);
-  background: hsl(222 46% 15% / 0.06);
+.sidebar-item svg {
+  flex-shrink: 0;
 }
 
+.sidebar-item-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.sidebar-col.expanded .sidebar-item {
+  width: calc(100% - 1.6rem);
+  padding: 0 0.8rem;
+}
+
+.sidebar-col.expanded .sidebar-item-label {
+  opacity: 1;
+  transition: opacity 0.22s ease 0.1s; /* labels fade in just after the width starts opening */
+}
+
+.sidebar-item:hover {
+  background: hsl(249 76% 63% / 0.08);
+}
+
+/* The selected/current item — light purple box, dark purple icon. Same
+   look whether it got there by route (the real nav links) or by click
+   (the not-yet-built stubs, see Sidebar.tsx's selectedStub state). */
 .sidebar-item.active {
-  background: hsl(249 76% 63% / 0.12);
-  color: #6659ea;
+  background: #6659ea; /* purple box */
+  color: #fff; /* white icon on top of it */
 }
 
-.sidebar-item.disabled {
-  cursor: default;
-  opacity: 0.32;
+/* Full-page blur while the rail is expanded — everything except the rail
+   itself reads as dimmed/out-of-focus and unclickable (pointer-events is
+   only enabled while visible, so it doesn't eat clicks at rest). */
+.sidebar-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 55; /* above .section-nav/.debug-square (50-53) too, so the pen's pill nav actually blurs with the rest — below .sidebar-col (60) */
+  background: hsl(222 30% 12% / 0.22);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.32s var(--ease-smooth);
 }
 
-.sidebar-foot {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+.sidebar-backdrop.visible {
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .platform-main {
+  /* .sidebar-col/.sidebar-backdrop are position:fixed now (see .sidebar-col
+     above), so they're excluded from grid placement entirely — without an
+     explicit column, auto-placement would put this, the only remaining
+     grid item, in column 1 instead of 2. */
+  grid-column: 2;
   display: flex;
   flex-direction: column;
   min-width: 0;
@@ -1253,16 +1360,15 @@ a.sidebar-item:hover {
 }
 
 .pen-nav-item {
-  position: relative; /* containing block for the .pen-nav-label overlay */
-  display: flex;
+  display: inline-flex; /* icon + label as one unit, not an absolute overlay pair */
   align-items: center;
-  justify-content: center;
+  gap: 0.2em; /* small, tight gap between icon and text */
   background: transparent; /* no box at rest — was #fff */
   color: #fff;
   font-family: var(--font-body);
   font-size: 0.72rem;
   font-weight: 700;
-  padding: 0.5em 0.6em; /* icon-only footprint at rest — never changes on hover */
+  padding: 0.35em 0.4em; /* smaller footprint than before */
   border-radius: var(--radius-control);
   text-decoration: none;
   cursor: pointer;
@@ -1272,50 +1378,44 @@ a.sidebar-item:hover {
   flex-shrink: 0;
 }
 
-/* Positioned out of flow so revealing it never resizes the flex item —
-   nothing else in the space-between row shifts when this appears. */
 .pen-nav-label {
-  position: absolute;
-  top: 0;
-  left: 100%;
-  height: 100%;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   white-space: nowrap;
-  padding: 0 0.6em 0 0.4em;
-  background: #6659ea;
+  font-family: var(--font-signature);
+  font-size: 1.05rem; /* script faces read much smaller than sans at the same size */
+  font-weight: 400; /* these Google Fonts only ship one weight — 700 forces a synthetic bold that looks off */
   color: #fff;
-  border-radius: 0 var(--radius-control) var(--radius-control) 0;
-  opacity: 0;
   pointer-events: none;
 }
 
-.pen-nav-item:hover .pen-nav-label {
-  opacity: 1;
+.pen-nav-item:hover,
+a.pen-nav-item.active {
+  border-bottom: 1px solid #caa849; /* thin gold underline under icon + text together, matches .pen-signin */
 }
 
-.pen-nav-item:hover {
-  background: #6659ea; /* light purple, flat — no gradient */
-  color: #fff;
-  border-radius: var(--radius-control) 0 0 var(--radius-control); /* flat on the side that joins the label */
-}
-
-/* Overview and About sit at the navy section's edges — shift left on
-   hover (transform only, doesn't affect layout) so the label that pops
-   out to the right stays inside the navy barrel instead of spilling
-   onto the gold band / cap. */
-.pen-nav-item-edge:hover {
+/* Overview and About sit at the navy section's edges — shift left while
+   the label is showing (hover or active) so it stays inside the navy
+   barrel instead of spilling onto the gold band / cap. */
+.pen-nav-item-edge:hover,
+.pen-nav-item-edge.active {
   transform: translateX(-17px);
 }
 
+/* About sits a touch too close to the cap at rest, now that its label is
+   always visible — a small standing nudge left, on top of the bigger
+   hover/active shift above. */
+.pen-nav-item-about {
+  transform: translateX(-16px);
+}
+
 .pen-signin:hover {
-  background: #6659ea; /* light purple, flat — no gradient */
-  color: #fff;
+  color: #fff; /* stays white — no more white-fill/purple-text swap */
+  border-bottom: 1px solid #caa849; /* gold underline under icon + text together, same shape as the nav items */
 }
 
 a.pen-nav-item.active {
-  background: #6659ea; /* light purple, was var(--gradient-primary) */
-  color: #fff;
+  color: #fff; /* stays white — no more white-fill/purple-text swap */
 }
 
 .pen-nav-item.disabled {
@@ -1324,20 +1424,20 @@ a.pen-nav-item.active {
 
 .pen-signin {
   position: absolute;
-  left: 76%; /* nudged back left a little */
+  left: 73%; /* nudged a little further left, closer to the nav pills */
   top: 45%; /* matches .pen-nav's push up */
   transform: translateY(-50%);
   width: auto;
   height: auto;
   display: inline-flex;
   align-items: center;
-  gap: 0.4em;
+  gap: 0.3em;
   background: transparent; /* no box at rest — was #fff */
   color: #fff;
-  font-family: var(--font-body);
-  font-size: 0.72rem;
-  font-weight: 700;
-  padding: 0.5em 0.7em;
+  font-family: var(--font-signature);
+  font-size: 1.3rem; /* script faces read much smaller than sans at the same size */
+  font-weight: 400; /* these Google Fonts only ship one weight — 700 forces a synthetic bold that looks off */
+  padding: 0.35em 0.5em; /* smaller footprint than before */
   border-radius: var(--radius-control);
   text-decoration: none;
   text-align: center;
@@ -1431,8 +1531,9 @@ a.pen-nav-item.active {
    bar itself so it can't push or touch anything else. */
 .section-nav-divider {
   position: absolute;
-  top: 6px;
+  top: -2px;
   left: 0.4rem;
+  z-index: 53; /* above .section-nav's 52 — otherwise the tab squares (z 50/51) clip it now that it overlaps their vertical range */
   width: calc(38% + 10px);
   height: 2px;
   background: #caa849;
@@ -1497,10 +1598,10 @@ a.pen-nav-item.active {
 .platform-content::before {
   content: "";
   position: absolute;
-  top: -84px;
+  top: -78px;
   left: 0;
   width: calc(38% + 50.2px); /* was calc(38% - 9.8px); +60px to track the boxes' 60px push right, keeping the same 25.2px overlap into .debug-square */
-  height: 84px;
+  height: 78px;
   background: #fff;
   border-top-left-radius: 28px;
   border-top-right-radius: 28px;
@@ -1589,10 +1690,10 @@ a.pen-nav-item.active {
 /* TEMPORARY — see Overview.tsx */
 .debug-square-2 {
   position: absolute;
-  top: -84px;
+  top: -78px;
   left: calc(38% - 59px); /* nudged 40px, then another 60px right */
   width: 84px;
-  height: 84px;
+  height: 78px;
   background: #fff;
   border-top-left-radius: 0;
   border-top-right-radius: 28px;
@@ -1603,10 +1704,10 @@ a.pen-nav-item.active {
 
 .debug-square-3 {
   position: absolute;
-  top: -84px;
+  top: -78px;
   left: calc(38% - 59px); /* nudged 40px, then another 60px right */
   width: 84px;
-  height: 84px;
+  height: 78px;
   background: hsl(220 14% 91%);
   border-radius: 0;
   z-index: 50;
@@ -1614,10 +1715,10 @@ a.pen-nav-item.active {
 
 .debug-square {
   position: absolute;
-  top: -84px;
+  top: -78px;
   left: calc(38% + 25px); /* nudged 40px, then another 60px right */
   width: 84px;
-  height: 84px;
+  height: 78px;
   background: linear-gradient(to right, hsl(220 14% 91%) 50%, transparent 50%);
   border-top-left-radius: 0;
   border-top-right-radius: 28px;
@@ -1638,7 +1739,8 @@ a.pen-nav-item.active {
 
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(6, minmax(200px, 240px)); /* fixed 6 columns — all cards, including the globe, stay on one row */
+  justify-content: space-between; /* extra room goes into the gaps, not into stretching each card wider */
   align-items: start; /* each card is only as tall as its own content — no stretching, no fixed height */
   gap: 1rem;
 }
@@ -1797,11 +1899,47 @@ a.pen-nav-item.active {
   color: hsl(220 10% 75%); /* light grey */
 }
 
+.stat-card-sponsor-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  width: 100%;
+  margin-top: 0.15rem;
+}
+
+.stat-card-sponsor-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+}
+
+.stat-card-sponsor-rank {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  width: 1rem;
+  flex-shrink: 0;
+}
+
+.stat-card-sponsor-name {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  flex: 1;
+}
+
+.stat-card-sponsor-amount {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #caa849;
+}
+
 .stat-card-stack {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   gap: 0.4rem;
+  margin-top: 15px;
 }
 
 .stat-card-stack .stat-card-pill:nth-child(2) {
@@ -1842,12 +1980,13 @@ a.pen-nav-item.active {
   position: relative;
   overflow: hidden;
   min-height: 220px;
+  min-width: 0; /* grid items default to min-width:auto — .stat-card-map-overlay's nowrap text was using that to force this card's track wider than its siblings' minmax(200px,240px) */
   padding: 0;
 }
 
 .stat-card-map-globe-wrap {
   position: absolute;
-  top: -8%;
+  top: calc(-8% + 5px);
   right: -12%;
   width: 220px;
   height: 220px;
@@ -1931,6 +2070,177 @@ a.pen-nav-item.active {
 
 .stat-card-map-value {
   font-size: 0.7rem;
+  color: var(--color-text-muted);
+}
+
+/* Rebuild of the reference invoice filter bar, retargeted at Projects —
+   see ProjectFilterBar.tsx for the field mapping rationale. */
+.project-filter-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* right-aligns the last item (search) with .stats-grid's right edge above, same as that grid's own space-between */
+  gap: 2.2rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+
+.project-filter-active {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: hsl(222 46% 15%); /* same navy as .section-nav */
+  white-space: nowrap;
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-control);
+  padding: 0.55rem 0.9rem;
+}
+
+.project-filter-active-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.3rem;
+  height: 1.3rem;
+  padding: 0 0.35rem;
+  border-radius: 999px;
+  background: hsl(249 76% 63% / 0.12);
+  color: hsl(222 46% 15%); /* same navy as .section-nav */
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.project-filter-select-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-width: 150px;
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-control);
+  padding: 0.55rem 0.9rem;
+}
+
+.project-filter-select {
+  appearance: none;
+  border: none;
+  margin: 0;
+  background: transparent;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: hsl(222 46% 15%); /* same navy as .section-nav */
+  padding: 0 1.3rem 0 0;
+  cursor: pointer;
+  flex: 1;
+  text-align: left;
+}
+
+.project-filter-select:hover {
+  /* cancel the global button:hover rule's blue tint/lift/glow */
+  color: hsl(222 46% 15%);
+  border-color: transparent;
+  transform: none;
+  box-shadow: none;
+}
+
+.project-filter-select:focus,
+.project-filter-select:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
+.project-filter-select-wrap:focus-within {
+  outline: none;
+  border-color: var(--color-border);
+}
+
+/* The custom listbox panel — rendered 3px below the control itself, its
+   own separate rounded/shadowed box (not achievable with a native <select>
+   popup, which browsers style outside of CSS's reach). */
+.project-filter-dropdown {
+  position: absolute;
+  top: calc(100% + 3px);
+  left: 0;
+  right: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-control);
+  box-shadow: var(--shadow-card);
+  padding: 0.35rem;
+  min-width: max-content;
+}
+
+.project-filter-option {
+  padding: 0.5rem 0.7rem;
+  border-radius: calc(var(--radius-control) - 0.3rem);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: hsl(222 46% 15%); /* same navy as .section-nav */
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.project-filter-option:hover {
+  background: var(--color-surface-raised);
+}
+
+.project-filter-option.selected {
+  background: #546183;
+  color: #fff; /* kept white here — this sits on a dark bg, navy would be unreadable */
+}
+
+.project-filter-chevron {
+  position: absolute;
+  right: 0.9rem;
+  color: var(--color-text-muted);
+  pointer-events: none;
+}
+
+.project-filter-search {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1 1 530px; /* prefers 530px but shrinks to stay on the same row instead of wrapping under the other filters */
+  min-width: 160px;
+  max-width: 530px;
+  justify-content: flex-end;
+  box-sizing: border-box;
+  border-bottom: 1px solid var(--color-text-muted);
+  padding: 0.55rem 0.1rem;
+}
+
+.project-filter-search:focus-within {
+  border-color: var(--color-text-muted);
+}
+
+.project-filter-search input {
+  border: none;
+  background: transparent;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  color: hsl(222 46% 15%); /* same navy as .section-nav */
+  width: 100%;
+}
+
+.project-filter-search input::placeholder {
+  color: var(--color-text-muted);
+}
+
+.project-filter-search input:focus {
+  outline: none;
+  border-color: transparent;
+  box-shadow: none;
+}
+
+.project-filter-search svg {
+  flex-shrink: 0;
   color: var(--color-text-muted);
 }
 
@@ -2024,13 +2334,43 @@ a.pen-nav-item.active {
     height: auto;
   }
 
-  .sidebar {
+  /* The hover-expand rail is a desktop-only affordance (touch has no
+     hover) — below this width, both boxes fall back to a plain relative,
+     row-laid-out bar and the expand/backdrop behavior is neutralized. */
+  .sidebar-col,
+  .sidebar-col.expanded {
     position: relative;
+    top: auto;
+    left: auto;
+    bottom: auto;
     width: auto;
-    height: auto;
+    flex-direction: row;
+    gap: 0.75rem;
+  }
+
+  .sidebar-backdrop {
+    display: none;
+  }
+
+  .sidebar,
+  .sidebar-account {
+    width: auto;
     margin: 0.75rem;
     flex-direction: row;
     border-radius: 20px;
+  }
+
+  .sidebar-account {
+    flex: none;
+  }
+
+  .sidebar-col.expanded .sidebar-item {
+    width: 42px;
+    padding: 0 11px;
+  }
+
+  .sidebar-col.expanded .sidebar-item-label {
+    opacity: 0;
   }
 
   .sidebar-nav {

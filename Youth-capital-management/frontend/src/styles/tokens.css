@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Alex+Brush&family=Pinyon+Script&family=Sacramento&display=swap");
 
 /*
   Deliberate departure from the live IYA site's rose brand
@@ -54,6 +54,10 @@
   --font-arabic: "Cairo", "Segoe UI", sans-serif;
   --font-body: "Inter", "Cairo", system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  /* Sign in / Register on the pen banner — swap the active family to try the others:
+     "Pinyon Script" (most formal/flourish), "Alex Brush" (bolder, reads better small),
+     "Sacramento" (lighter, more casual). */
+  --font-signature: "Alex Brush", cursive;
 
   --radius-card: 1rem;
   --radius-control: 0.75rem;

@@ -35,17 +35,17 @@ export function Topbar() {
                 to={to}
                 className={`pen-nav-item${pathname === to ? " active" : ""}${edge ? " pen-nav-item-edge" : ""}`}
               >
-                <Icon size={22} strokeWidth={2.5} />
+                <Icon size={18} strokeWidth={1.25} />
                 <span className="pen-nav-label">{label}</span>
               </Link>
             ) : (
               <div
                 key={key}
-                className={`pen-nav-item disabled${edge ? " pen-nav-item-edge" : ""}`}
+                className={`pen-nav-item disabled${edge ? " pen-nav-item-edge" : ""}${key === "about" ? " pen-nav-item-about" : ""}`}
                 title={tr.sidebar.soon}
                 aria-disabled="true"
               >
-                <Icon size={22} strokeWidth={2.5} />
+                <Icon size={18} strokeWidth={1.25} />
                 <span className="pen-nav-label">{label}</span>
               </div>
             );
@@ -53,7 +53,7 @@ export function Topbar() {
         </nav>
 
         <Link to="/login" className="pen-signin">
-          <LogInIcon size={22} strokeWidth={2.5} />
+          <LogInIcon size={18} strokeWidth={1.25} />
           <span>
             {tr.topbar.signIn} / {tr.topbar.register}
           </span>

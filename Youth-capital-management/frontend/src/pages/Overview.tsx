@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { SectionNav } from "../components/layout/SectionNav";
 import { GlobalStats } from "../components/overview/GlobalStats";
+import { ProjectFilterBar } from "../components/overview/ProjectFilterBar";
 
 const PREVIEW_ITEMS = [
   { key: "overview", label: "Overview", plus: true },
@@ -21,8 +22,9 @@ export function Overview() {
       {/* TEMPORARY — SectionNav style preview */}
       <SectionNav items={PREVIEW_ITEMS} activeKey={active} onSelect={setActive} />
 
-      <div style={{ padding: "1.5rem" }}>
+      <div style={{ padding: "0.5rem", marginTop: "0.75rem" }}>
         <GlobalStats />
+        <ProjectFilterBar />
       </div>
     </main>
   );
