@@ -221,6 +221,12 @@ export const SettingsIcon = (p: P) => (
   </I>
 );
 
+export const ChevronDownIcon = (p: P) => (
+  <I {...p}>
+    <path d="m6 9 6 6 6-6" />
+  </I>
+);
+
 export const SearchIcon = (p: P) => (
   <I {...p}>
     <circle cx="11" cy="11" r="7" />
@@ -228,12 +234,29 @@ export const SearchIcon = (p: P) => (
   </I>
 );
 
-/** Sign in / out — a door with an arrow. */
+/** Sign in — a door with an arrow pointing in. */
 export const LogInIcon = (p: P) => (
   <I {...p}>
     <path d="M9 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h3" />
     <path d="M16 16l4-4-4-4" />
     <path d="M20 12H9" />
+  </I>
+);
+
+/** Sign out — the same door, arrow pointing out. */
+export const LogOutIcon = (p: P) => (
+  <I {...p}>
+    <path d="M9 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h3" />
+    <path d="M15 8l4 4-4 4" />
+    <path d="M9 12h10" />
+  </I>
+);
+
+/** A single account/profile — one person. */
+export const UserIcon = (p: P) => (
+  <I {...p}>
+    <circle cx="12" cy="8" r="3.5" />
+    <path d="M5 20c0-3.5 3.1-6 7-6s7 2.5 7 6" />
   </I>
 );
 
