@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useLanguage } from "@/hooks/use-language";
+import { useSeo } from "@/hooks/use-seo";
 import { Link } from "wouter";
 import { 
   Users, 
@@ -59,6 +60,17 @@ function TeamAvatar({ member, className = "w-16 h-16 text-2xl" }: { member: any;
 
 export default function About() {
   const { t, isAr } = useLanguage();
+  useSeo({
+    title: t(
+      "About Youth Capital | Morocco's Youth Governance Simulation",
+      "عن يوث كابيتال | محاكاة الحوكمة للشباب المغربي"
+    ),
+    description: t(
+      "Learn how Youth Capital simulates the Moroccan Parliament, Ministries, and Regional Councils to give young Moroccans hands-on civic and leadership experience.",
+      "تعرف على كيفية محاكاة يوث كابيتال للبرلمان المغربي والوزارات والمجالس الجهوية لمنح الشباب المغربي تجربة مدنية وقيادية عملية."
+    ),
+    path: "/about",
+  });
   const [selectedMember, setSelectedMember] = useState<any>(null);
 
   const pillars = [

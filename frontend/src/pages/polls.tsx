@@ -5,9 +5,18 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, Info, ChevronDown, Scale } from "lucide-react";
 import { Link } from "wouter";
 import { useState } from "react";
+import { useSeo } from "@/hooks/use-seo";
 
 export default function Polls() {
   const { t, isAr } = useLanguage();
+  useSeo({
+    title: t("Civic Polls & Consultations | Youth Capital", "الاستطلاعات المدنية والاستشارات | يوث كابيتال"),
+    description: t(
+      "Vote on live civic consultations and legislative polls in Youth Capital's simulated Moroccan governance platform.",
+      "صوّت في الاستشارات المدنية والاستطلاعات التشريعية المباشرة في منصة يوث كابيتال لمحاكاة الحوكمة المغربية."
+    ),
+    path: "/polls",
+  });
   const { data, isLoading } = useGetPolls();
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
 

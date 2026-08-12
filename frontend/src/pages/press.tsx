@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useLanguage } from "@/hooks/use-language";
+import { useSeo } from "@/hooks/use-seo";
 import { Card, Badge, Button, Input, PageHero, Skeleton } from "@/components/ui-custom";
 import { useGetArticles } from "@workspace/api-client-react";
 import { format } from "date-fns";
@@ -20,6 +21,17 @@ import { useToast } from "@/hooks/use-toast";
 
 export default function Press() {
   const { t, isAr } = useLanguage();
+  useSeo({
+    title: t(
+      "Press & Reports | Youth Capital",
+      "الصحافة والتقارير | يوث كابيتال"
+    ),
+    description: t(
+      "Read the latest briefings and reports from Youth Capital's simulated Moroccan Parliament, Ministries, and Regional Councils.",
+      "اطّلع على أحدث الإيجازات والتقارير من برلمان ووزارات ومجالس يوث كابيتال المغربية المحاكاة."
+    ),
+    path: "/press",
+  });
   const { toast } = useToast();
   const [activeCategory, setActiveCategory] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
