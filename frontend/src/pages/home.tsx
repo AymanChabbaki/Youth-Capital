@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLanguage } from "@/hooks/use-language";
+import { useSeo } from "@/hooks/use-seo";
 import { Button, Card, CountUp, TiltCard, SectionBackdrop } from "@/components/ui-custom";
 import { Link } from "wouter";
 import { useGetPlatformStats, useGetForums, useGetArticles, useGetPolls } from "@workspace/api-client-react";
@@ -67,6 +68,17 @@ const DiscordIcon = ({ className }: { className?: string }) => (
 
 export default function Home() {
   const { t, isAr } = useLanguage();
+  useSeo({
+    title: t(
+      "Youth Capital | Moroccan Youth Governance Simulation",
+      "يوث كابيتال | محاكاة الحوكمة للشباب المغربي"
+    ),
+    description: t(
+      "Youth Capital is Morocco's first digital civic governance simulation. Take a seat in a simulated Parliament, Ministries, and Regional Councils to debate policy, propose bills, and build real leadership skills.",
+      "يوث كابيتال هي أول محاكاة رقمية للحوكمة المدنية في المغرب. احجز مقعدك في برلمان ووزارات ومجالس جهوية افتراضية لمناقشة السياسات واقتراح القوانين وبناء مهارات قيادية حقيقية."
+    ),
+    path: "/",
+  });
   const { data: stats } = useGetPlatformStats();
   const { data: forumsData } = useGetForums();
   const { data: articlesData } = useGetArticles();

@@ -9,6 +9,7 @@ import { useRegister, useSubmitRoleApplication } from "@workspace/api-client-rea
 import { useToast } from "@/hooks/use-toast";
 import { CheckCircle2, Fingerprint, Eye, EyeOff } from "lucide-react";
 import { Link } from "wouter";
+import { useSeo } from "@/hooks/use-seo";
 
 function passwordStrength(pw: string): number {
   let score = 0;
@@ -68,6 +69,14 @@ type ApplyFormData = {
 
 export default function Apply() {
   const { t } = useLanguage();
+  useSeo({
+    title: t("Apply | Youth Capital", "قدّم طلبك | يوث كابيتال"),
+    description: t(
+      "Claim your seat in Youth Capital's Moroccan youth governance simulation as a Minister, MP, Regional Councillor, or Diaspora Representative.",
+      "احجز مقعدك في محاكاة يوث كابيتال للحوكمة الشبابية المغربية كوزير أو برلماني أو مستشار جهوي أو ممثل للجالية."
+    ),
+    path: "/apply",
+  });
   const [step, setStep] = useState(1);
   const [isSuccess, setIsSuccess] = useState(false);
   const [showPassword, setShowPassword] = useState(false);

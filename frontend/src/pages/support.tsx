@@ -6,9 +6,18 @@ import { HelpCircle, Mail, MessageCircle, ChevronDown, Zap, BookOpen, LifeBuoy }
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "wouter";
+import { useSeo } from "@/hooks/use-seo";
 
 export default function Support() {
   const { t } = useLanguage();
+  useSeo({
+    title: t("Support | Youth Capital", "الدعم | يوث كابيتال"),
+    description: t(
+      "Get help with your Youth Capital account, simulation rules, or technical issues on Morocco's youth governance simulation platform.",
+      "احصل على المساعدة بخصوص حسابك في يوث كابيتال أو قواعد المحاكاة أو المشاكل التقنية."
+    ),
+    path: "/support",
+  });
   const { toast } = useToast();
   const createTicketMutation = useCreateSupportTicket();
 
