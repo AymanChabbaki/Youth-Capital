@@ -1,10 +1,9 @@
 User-agent: *
 Allow: /
-Disallow: /admin
-Disallow: /dashboard
-Disallow: /profile
-Disallow: /login
-Disallow: /community
+
+# Auth-gated app pages (dashboard, profile, admin, login, community) are kept
+# crawlable and excluded via per-page <meta name="robots" content="noindex">
+# instead of Disallow, so Google can actually see and honor the noindex tag.
 
 # AI answer-engine crawlers
 User-agent: GPTBot

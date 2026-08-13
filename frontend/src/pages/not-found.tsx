@@ -3,9 +3,16 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui-custom";
 import { useLanguage } from "@/hooks/use-language";
 import { Home, Compass, ArrowRight } from "lucide-react";
+import { useSeo } from "@/hooks/use-seo";
 
 export default function NotFound() {
   const { t, isAr } = useLanguage();
+  useSeo({
+    title: t("Page Not Found | Youth Capital", "الصفحة غير موجودة | يوث كابيتال"),
+    description: t("The page you're looking for doesn't exist.", "الصفحة التي تبحث عنها غير موجودة."),
+    path: typeof window !== "undefined" ? window.location.pathname : "/404",
+    noindex: true,
+  });
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-navy-dark relative overflow-hidden px-4 py-24">

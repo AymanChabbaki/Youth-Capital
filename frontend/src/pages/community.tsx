@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useLanguage } from "@/hooks/use-language";
 import { Card, Badge, Button, Input, Textarea } from "@/components/ui-custom";
+import { useSeo } from "@/hooks/use-seo";
 import { 
   DropdownMenu,
   DropdownMenuTrigger,
@@ -63,6 +64,12 @@ interface Post extends APIPost {
 export default function Community() {
   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
   const { t, isAr } = useLanguage();
+  useSeo({
+    title: t("Community | Youth Capital", "المجتمع | يوث كابيتال"),
+    description: t("Discuss and debate with fellow delegates in the Youth Capital community.", "ناقش وتحاور مع زملائك المندوبين في مجتمع يوث كابيتال."),
+    path: "/community",
+    noindex: true,
+  });
   const { toast } = useToast();
   const [location] = useLocation();
   const [selectedForumId, setSelectedForumId] = useState<number | null>(null);

@@ -9,6 +9,7 @@ import {
   customFetch
 } from "@workspace/api-client-react";
 import { Badge, Button, Input, Textarea, Select } from "@/components/ui-custom";
+import { useSeo } from "@/hooks/use-seo";
 import { Redirect, Link, useLocation } from "wouter";
 import {
   Shield, Users, FileCheck, AlertTriangle, LayoutDashboard,
@@ -208,6 +209,12 @@ function SidebarItem({ icon: Icon, label, active, onClick }: { icon: any; label:
 export default function Admin() {
   const { isAdmin, isLoading, user } = useAuth();
   const { t } = useLanguage();
+  useSeo({
+    title: "Admin | Youth Capital",
+    description: "Youth Capital platform administration.",
+    path: "/admin",
+    noindex: true,
+  });
   const [activeTab, setActiveTab] = useState("overview");
   const [search, setSearch] = useState("");
   const { toast } = useToast();

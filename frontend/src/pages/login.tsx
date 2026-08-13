@@ -9,6 +9,7 @@ import { Link } from "wouter";
 import { useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { Landmark, Gavel, ShieldCheck, ArrowRight, Mail, Lock } from "lucide-react";
+import { useSeo } from "@/hooks/use-seo";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email"),
@@ -17,6 +18,12 @@ const loginSchema = z.object({
 
 export default function Login() {
   const { t, isAr } = useLanguage();
+  useSeo({
+    title: t("Log In | Youth Capital", "تسجيل الدخول | يوث كابيتال"),
+    description: t("Log in to your Youth Capital account.", "سجّل الدخول إلى حسابك في يوث كابيتال."),
+    path: "/login",
+    noindex: true,
+  });
   const { toast } = useToast();
   const loginMutation = useLogin();
   const queryClient = useQueryClient();

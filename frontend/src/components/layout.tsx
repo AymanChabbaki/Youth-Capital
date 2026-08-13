@@ -343,7 +343,7 @@ function Navbar() {
                   <div className="relative p-[2px] rounded-full bg-gradient-to-tr from-gold via-gold-pale to-gold cursor-pointer hover:shadow-lg hover:shadow-gold/30 hover:scale-105 transition-all duration-300">
                     <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full overflow-hidden bg-background">
                       {user?.avatarUrl ? (
-                        <img src={user.avatarUrl} className="w-full h-full object-cover" />
+                        <img src={user.avatarUrl} alt={user.fullName} className="w-full h-full object-cover" />
                       ) : (
                         <div className="w-full h-full bg-navy-dark flex items-center justify-center text-gold text-xs font-black">
                           {user?.fullName.charAt(0)}

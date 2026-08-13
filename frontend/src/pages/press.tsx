@@ -144,7 +144,7 @@ export default function Press() {
                 className="relative h-[60vh] md:h-[65vh] w-full rounded-[2.5rem] md:rounded-[3rem] overflow-hidden mb-12 cursor-pointer group shadow-2xl shadow-navy/10 border border-border/30"
               >
                 {heroArticle.thumbnailUrl ? (
-                  <img src={heroArticle.thumbnailUrl} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" title={heroArticle.title} />
+                  <img src={heroArticle.thumbnailUrl} alt={heroArticle.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" title={heroArticle.title} />
                 ) : (
                   <div className="w-full h-full bg-navy-dark bg-grid-gold p-20 flex items-center justify-center text-gold/10 font-display font-black text-[10vw]">PRESS</div>
                 )}
@@ -188,7 +188,7 @@ export default function Press() {
                       >
                         <div className="w-full md:w-64 h-48 rounded-3xl overflow-hidden shrink-0 border border-border/50 relative">
                           {article.thumbnailUrl ? (
-                            <img src={article.thumbnailUrl} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" title={article.title} />
+                            <img src={article.thumbnailUrl} alt={article.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" title={article.title} />
                           ) : (
                             <div className="w-full h-full bg-secondary/40 flex items-center justify-center text-muted-foreground/40 font-display font-black">PRESS</div>
                           )}
@@ -234,7 +234,7 @@ export default function Press() {
                         <div className="cursor-pointer group">
                           <div className="h-44 w-full rounded-3xl overflow-hidden mb-6 relative border border-border/40">
                             {article.thumbnailUrl ? (
-                              <img src={article.thumbnailUrl} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" title={article.title} />
+                              <img src={article.thumbnailUrl} alt={article.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" title={article.title} />
                             ) : (
                               <div className="w-full h-full bg-secondary/50 flex items-center justify-center text-muted-foreground/40 font-display font-black">IMAGE</div>
                             )}
