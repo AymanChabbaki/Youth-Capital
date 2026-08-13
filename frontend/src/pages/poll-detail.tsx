@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "wouter";
+import { useSeo } from "@/hooks/use-seo";
 
 // Full-screen gold confetti burst + seal, played once after a successful vote
 function VoteCelebration({ onDone }: { onDone: () => void }) {
@@ -92,6 +93,13 @@ export default function PollDetail() {
     queryKey: [`/api/polls/${pollId}`],
     queryFn: () => customFetch<Poll>(`/api/polls/${pollId}`),
     enabled: !!pollId
+  });
+
+  useSeo({
+    title: poll ? `${isAr ? poll.titleAr : poll.title} | Youth Capital` : t("Consultation Not Found | Youth Capital", "الاستشارة غير موجودة | يوث كابيتال"),
+    description: poll?.description || t("Vote on this civic consultation in Youth Capital's Moroccan governance simulation.", "صوّت في هذه الاستشارة المدنية في محاكاة يوث كابيتال للحوكمة المغربية."),
+    path: `/polls/${pollId ?? ""}`,
+    noindex: !isLoading && (!!error || !poll),
   });
 
   const handleVote = async () => {

@@ -248,7 +248,7 @@ export default function ArticleDetail() {
                   >
                     <div className="h-60 relative overflow-hidden">
                       {a.thumbnailUrl ? (
-                        <img src={a.thumbnailUrl} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                        <img src={a.thumbnailUrl} alt={a.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
                       ) : (
                         <div className="w-full h-full bg-secondary/40 flex items-center justify-center text-muted-foreground/40 font-black text-2xl">YC PRESS</div>
                       )}
