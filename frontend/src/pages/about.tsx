@@ -218,7 +218,7 @@ export default function About() {
             <Reveal direction="left">
               <div className="relative rounded-[2rem] overflow-hidden border border-border/50 shadow-2xl shadow-navy/10 group">
                 <img
-                  src="/images/parliament.png"
+                  src="/images/parliament.webp"
                   alt="Parliament simulation"
                   className="w-full h-80 object-cover group-hover:scale-105 transition-transform duration-700"
                 />

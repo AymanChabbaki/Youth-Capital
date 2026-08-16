@@ -112,9 +112,11 @@ export default function Home() {
           muted
           playsInline
           className="absolute inset-0 w-full h-full object-cover pointer-events-none z-0 opacity-75"
-          poster={`${import.meta.env.BASE_URL}images/hero-bg.png`}
+          poster={`${import.meta.env.BASE_URL}images/hero-bg.webp`}
+          aria-hidden="true"
         >
           <source src={`${import.meta.env.BASE_URL}herobg.mp4`} type="video/mp4" />
+          <track kind="captions" srcLang="en" label="English" src={`${import.meta.env.BASE_URL}captions-empty.vtt`} />
         </video>
         {/* Gradient Overlay */}
         <div className="absolute inset-0 bg-gradient-to-r from-[#0d1828]/75 via-[#0d1828]/40 to-[#1b2a4a]/30 z-0 pointer-events-none" />
@@ -436,7 +438,7 @@ export default function Home() {
                   "صياغة والتصويت على التشريعات التي تعكس قضايا العالم الحقيقي."
                 ),
                 icon: Gavel,
-                img: "parliament.png",
+                img: "parliament.webp",
                 color: "from-blue-900/40 to-blue-800/20"
               },
               {
@@ -448,7 +450,7 @@ export default function Home() {
                   "تولى مسؤولية قطاع، قد الميزانيات، ونفذ السياسات الوطنية."
                 ),
                 icon: Briefcase,
-                img: "hero-bg.png",
+                img: "hero-bg.webp",
                 color: "from-gold/40 to-yellow-900/20"
               },
               {
@@ -460,7 +462,7 @@ export default function Home() {
                   "استجب لحالات الطوارئ الوطنية غير المتوقعة واختبر قيادتك."
                 ),
                 icon: AlertCircle,
-                img: "parliament.png",
+                img: "parliament.webp",
                 color: "from-red-900/40 to-red-800/20"
               }
             ].map((feature, i) => {
@@ -676,18 +678,18 @@ export default function Home() {
                       src={`${import.meta.env.BASE_URL}images/${(() => {
                         const forumObj = forumsData?.forums?.find((f: any) => f.id === activeCommunity);
                         switch (activeCommunity) {
-                          case 1: return "parliament.png";
-                          case 2: return "hero-bg.png";
-                          case 3: return "ministry_finance.png";
-                          case 4: return "ministry_health.png";
-                          case 5: return "ministry_education.png";
-                          case 6: return "regional_council.png";
-                          case 7: return "general_assembly.png";
+                          case 1: return "parliament.webp";
+                          case 2: return "hero-bg.webp";
+                          case 3: return "ministry_finance.webp";
+                          case 4: return "ministry_health.webp";
+                          case 5: return "ministry_education.webp";
+                          case 6: return "regional_council.webp";
+                          case 7: return "general_assembly.webp";
                           default:
-                            if (forumObj?.category === "parliament") return "parliament.png";
-                            if (forumObj?.category === "ministry") return "ministry_finance.png";
-                            if (forumObj?.category === "regional") return "regional_council.png";
-                            return "general_assembly.png";
+                            if (forumObj?.category === "parliament") return "parliament.webp";
+                            if (forumObj?.category === "ministry") return "ministry_finance.webp";
+                            if (forumObj?.category === "regional") return "regional_council.webp";
+                            return "general_assembly.webp";
                         }
                       })()}`}
                       alt="Chamber Preview"

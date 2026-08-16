@@ -375,7 +375,7 @@ function Navbar() {
             {/* Mobile Sheet Trigger */}
             <Sheet>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="lg:hidden rounded-full border border-border/50 bg-secondary/40">
+                <Button variant="ghost" size="icon" className="lg:hidden rounded-full border border-border/50 bg-secondary/40" aria-label={t("Open menu", "افتح القائمة")}>
                   <Menu className="w-5 h-5" />
                 </Button>
               </SheetTrigger>
@@ -888,7 +888,7 @@ function PoliticalHelperChatbot() {
       >
         <div className="relative w-20 h-20 md:w-26 md:h-26 flex items-center justify-center">
           <motion.img
-            src="/chatbot.png"
+            src="/chatbot.webp"
             alt="Political Helper Bot"
             animate={isOpen ? { rotate: 8, scale: 1.05 } : { rotate: 0, scale: 1 }}
             transition={{ type: "spring", stiffness: 260, damping: 18 }}
@@ -916,7 +916,7 @@ function PoliticalHelperChatbot() {
             <div className="absolute inset-0 bg-grid-gold opacity-25 pointer-events-none" />
             <div className="flex items-center gap-3 relative z-10">
               <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-gold/40 bg-navy-dark shadow-lg shadow-gold/10">
-                <img src="/chatbot.png" alt="Helper Bot" className="w-full h-full object-cover" />
+                <img src="/chatbot.webp" alt="Helper Bot" className="w-full h-full object-cover" />
               </div>
               <div>
                 <h4 className="font-display font-bold text-sm text-white">{t("Political Advisor", "المستشار السياسي")}</h4>
@@ -929,6 +929,7 @@ function PoliticalHelperChatbot() {
             <button
               onClick={() => setIsOpen(false)}
               className="p-1 rounded-lg text-muted-foreground hover:text-foreground transition-colors hover:bg-white/5"
+              aria-label={t("Close chat", "إغلاق المحادثة")}
             >
               <X className="w-5 h-5" />
             </button>
