@@ -743,12 +743,16 @@ function Footer() {
   );
 }
 
+const GUEST_QUESTION_LIMIT = 3;
+
 function PoliticalHelperChatbot() {
   const { t, isAr } = useLanguage();
+  const { isAuthenticated } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [isBotHovered, setIsBotHovered] = useState(false);
   const [showGreeting, setShowGreeting] = useState(false);
   const [greetingDismissed, setGreetingDismissed] = useState(false);
+  const [guestBlocked, setGuestBlocked] = useState(false);
 
   // Pop the greeting bubble shortly after load, hide it again after a while
   useEffect(() => {
@@ -770,9 +774,12 @@ function PoliticalHelperChatbot() {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
+  const guestQuestionsUsed = messages.filter((m) => m.role === "user").length;
+  const guestGateActive = !isAuthenticated && (guestBlocked || guestQuestionsUsed >= GUEST_QUESTION_LIMIT);
+
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!input.trim() || isLoading) return;
+    if (!input.trim() || isLoading || guestGateActive) return;
 
     const userMsg = { role: "user" as const, content: input };
     const updated = [...messages, userMsg];
@@ -785,8 +792,26 @@ function PoliticalHelperChatbot() {
       const res = await fetch(`${baseUrl}/api/chat`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ messages: updated })
       });
+      if (res.status === 429) {
+        const data = await res.json().catch(() => null);
+        if (data?.error === "LoginRequired") {
+          setGuestBlocked(true);
+          setMessages([
+            ...updated,
+            {
+              role: "assistant",
+              content: isAr
+                ? "لقد استخدمت أسئلتك المجانية الثلاثة. سجّل الدخول لمتابعة المحادثة مع مستشارك السياسي."
+                : "You've used your 3 free questions. Log in to keep chatting with your Political Advisor."
+            }
+          ]);
+          return;
+        }
+        throw new Error("Rate limited");
+      }
       if (!res.ok) throw new Error("Failed to connect to assistant");
       const data = await res.json();
       if (data?.message) {
@@ -939,22 +964,38 @@ function PoliticalHelperChatbot() {
           </div>
 
           {/* Footer Input Area */}
-          <form onSubmit={handleSend} className="p-3 border-t border-white/10 bg-black/10 flex gap-2">
-            <input
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder={isAr ? "اسأل مستشارك السياسي..." : "Ask your advisor..."}
-              className="flex-1 bg-white/5 border border-white/10 text-xs rounded-xl px-3 py-2.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-accent"
-            />
-            <button
-              type="submit"
-              disabled={isLoading || !input.trim()}
-              className="p-2.5 rounded-xl bg-primary hover:bg-primary/90 text-white transition-all disabled:opacity-50 disabled:hover:bg-primary flex items-center justify-center"
-            >
-              <Send className="w-4 h-4" />
-            </button>
-          </form>
+          {guestGateActive ? (
+            <div className="p-4 border-t border-white/10 bg-black/10 flex flex-col items-center gap-2.5 text-center">
+              <p className="text-[11px] text-muted-foreground leading-relaxed">
+                {t("You've used your 3 free questions. Log in to keep chatting with your Political Advisor.", "لقد استخدمت أسئلتك المجانية الثلاثة. سجّل الدخول لمتابعة المحادثة مع مستشارك السياسي.")}
+              </p>
+              <Link
+                href="/login"
+                onClick={() => setIsOpen(false)}
+                className="text-[10px] font-black text-gold uppercase tracking-widest inline-flex items-center gap-1.5 hover:gap-2.5 transition-all"
+              >
+                {t("Log In to Continue", "سجّل الدخول للمتابعة")}
+                <ArrowRight className={`w-3 h-3 ${isAr ? "rotate-180" : ""}`} />
+              </Link>
+            </div>
+          ) : (
+            <form onSubmit={handleSend} className="p-3 border-t border-white/10 bg-black/10 flex gap-2">
+              <input
+                type="text"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder={isAr ? "اسأل مستشارك السياسي..." : "Ask your advisor..."}
+                className="flex-1 bg-white/5 border border-white/10 text-xs rounded-xl px-3 py-2.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-accent"
+              />
+              <button
+                type="submit"
+                disabled={isLoading || !input.trim()}
+                className="p-2.5 rounded-xl bg-primary hover:bg-primary/90 text-white transition-all disabled:opacity-50 disabled:hover:bg-primary flex items-center justify-center"
+              >
+                <Send className="w-4 h-4" />
+              </button>
+            </form>
+          )}
         </div>
       )}
     </>

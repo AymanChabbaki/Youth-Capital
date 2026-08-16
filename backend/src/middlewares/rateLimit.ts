@@ -25,3 +25,14 @@ export const chatLimiter = rateLimit({
   legacyHeaders: false,
   message: { error: "TooManyRequests", message: "Too many requests, please try again later" },
 });
+
+// Guests get 3 free questions per day (by IP); logged-in users skip this gate
+// entirely and are governed only by chatLimiter above.
+export const chatGuestLimiter = rateLimit({
+  windowMs: 24 * 60 * 60 * 1000,
+  limit: 3,
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: (req) => !!(req as any).user,
+  message: { error: "LoginRequired", message: "Free question limit reached. Log in to keep chatting." },
+});
