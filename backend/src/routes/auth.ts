@@ -1,14 +1,26 @@
 import { Router, type IRouter } from "express";
 import { db, usersTable } from "@workspace/db";
 import { eq } from "drizzle-orm";
-import crypto from "crypto";
+import { z } from "zod";
 import { createSession, destroySession, requireAuth, safeUser } from "../lib/session.js";
+import { hashPassword, verifyPassword, isLegacyHash } from "../lib/password.js";
+import { validateBody } from "../middlewares/validate.js";
+import { authLimiter } from "../middlewares/rateLimit.js";
 
 const router: IRouter = Router();
 
-function hashPassword(password: string): string {
-  return crypto.createHash("sha256").update(password + "ycc_salt_2024").digest("hex");
-}
+const RegisterSchema = z.object({
+  email: z.string().email().max(254),
+  password: z.string().min(8).max(72),
+  fullName: z.string().trim().min(1).max(120),
+  fullNameAr: z.string().trim().max(120).optional(),
+  languagePreference: z.enum(["en", "ar"]).optional(),
+});
+
+const LoginSchema = z.object({
+  email: z.string().email().max(254),
+  password: z.string().min(1).max(72),
+});
 
 const isProd = process.env.NODE_ENV === "production";
 const COOKIE_OPTIONS = {
@@ -18,19 +30,15 @@ const COOKIE_OPTIONS = {
   secure: isProd,
 };
 
-router.post("/register", async (req, res) => {
+router.post("/register", authLimiter, validateBody(RegisterSchema), async (req, res) => {
   try {
     const { email, password, fullName, fullNameAr, languagePreference } = req.body;
-    if (!email || !password || !fullName) {
-      res.status(400).json({ error: "BadRequest", message: "Missing required fields" });
-      return;
-    }
     const existing = await db.select().from(usersTable).where(eq(usersTable.email, email));
     if (existing.length > 0) {
       res.status(409).json({ error: "Conflict", message: "Email already registered" });
       return;
     }
-    const passwordHash = hashPassword(password);
+    const passwordHash = await hashPassword(password);
     const [user] = await db.insert(usersTable).values({
       email,
       passwordHash,
@@ -48,15 +56,11 @@ router.post("/register", async (req, res) => {
   }
 });
 
-router.post("/login", async (req, res) => {
+router.post("/login", authLimiter, validateBody(LoginSchema), async (req, res) => {
   try {
     const { email, password } = req.body;
-    if (!email || !password) {
-      res.status(400).json({ error: "BadRequest", message: "Missing credentials" });
-      return;
-    }
     const [user] = await db.select().from(usersTable).where(eq(usersTable.email, email));
-    if (!user || user.passwordHash !== hashPassword(password)) {
+    if (!user || !(await verifyPassword(password, user.passwordHash))) {
       res.status(401).json({ error: "Unauthorized", message: "Invalid credentials" });
       return;
     }
@@ -64,7 +68,11 @@ router.post("/login", async (req, res) => {
       res.status(403).json({ error: "Forbidden", message: "Account is banned" });
       return;
     }
-    
+    if (isLegacyHash(user.passwordHash)) {
+      const upgraded = await hashPassword(password);
+      await db.update(usersTable).set({ passwordHash: upgraded }).where(eq(usersTable.id, user.id));
+    }
+
     const token = await createSession(user.id);
     res.cookie("session", token, COOKIE_OPTIONS);
     res.json({ user: safeUser(user), token });

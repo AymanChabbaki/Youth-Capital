@@ -1,9 +1,25 @@
 import { Router, type IRouter } from "express";
 import { db, supportTicketsTable, usersTable } from "@workspace/db";
 import { eq } from "drizzle-orm";
+import { z } from "zod";
 import { requireAuth, requireAdmin, safeUser } from "../lib/session.js";
+import { validateBody } from "../middlewares/validate.js";
 
 const router: IRouter = Router();
+
+const TICKET_CATEGORIES = ["technical", "rules", "account", "other"] as const;
+const TICKET_STATUSES = ["open", "in_progress", "resolved", "closed"] as const;
+
+const CreateTicketSchema = z.object({
+  subject: z.string().trim().min(1).max(200),
+  message: z.string().trim().min(1).max(5000),
+  category: z.enum(TICKET_CATEGORIES).optional(),
+});
+
+const UpdateTicketSchema = z.object({
+  status: z.enum(TICKET_STATUSES),
+  adminResponse: z.string().trim().max(5000).optional(),
+});
 
 router.get("/tickets", requireAuth, async (req, res) => {
   try {
@@ -27,7 +43,7 @@ router.get("/tickets", requireAuth, async (req, res) => {
   }
 });
 
-router.post("/tickets", requireAuth, async (req, res) => {
+router.post("/tickets", requireAuth, validateBody(CreateTicketSchema), async (req, res) => {
   try {
     const currentUser = (req as any).user;
     const { subject, message, category } = req.body;
@@ -44,7 +60,7 @@ router.post("/tickets", requireAuth, async (req, res) => {
   }
 });
 
-router.patch("/tickets/:id", requireAuth, requireAdmin, async (req, res) => {
+router.patch("/tickets/:id", requireAuth, requireAdmin, validateBody(UpdateTicketSchema), async (req, res) => {
   try {
     const { status, adminResponse } = req.body;
     const targetIdString = String(req.params.id);
