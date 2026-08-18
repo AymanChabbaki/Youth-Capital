@@ -1,9 +1,20 @@
 import { Router, type IRouter } from "express";
 import { db, forumsTable, postsTable, usersTable, postLikesTable, roleApplicationsTable } from "@workspace/db";
 import { eq, and, isNull, sql } from "drizzle-orm";
+import { z } from "zod";
 import { requireAuth, safeUser } from "../lib/session.js";
+import { validateBody, clampPageParams } from "../middlewares/validate.js";
 
 const router: IRouter = Router();
+
+const CreatePostSchema = z.object({
+  title: z.string().trim().max(200).optional(),
+  content: z.string().trim().min(1).max(10000),
+});
+
+const CreateReplySchema = z.object({
+  content: z.string().trim().min(1).max(10000),
+});
 
 async function getPostStats(postId: number, currentUserId?: number) {
   const [{ count: likesCount }] = await db
@@ -98,11 +109,9 @@ router.get("/forums/:forumId/posts", async (req, res) => {
     const targetForumIdString = String(req.params.forumId);
     const forumId = parseInt(targetForumIdString);
     const currentUser = (req as any).user;
-    const page = parseInt(String(req.query.page || "1"));
-    const limit = parseInt(String(req.query.limit || "20"));
-    const search = typeof req.query.search === 'string' ? req.query.search : "";
+    const { page, limit, offset } = clampPageParams(req);
+    const search = typeof req.query.search === 'string' ? req.query.search.slice(0, 200) : "";
     const sort = typeof req.query.sort === 'string' ? req.query.sort : "newest";
-    const offset = (page - 1) * limit;
 
     const whereClauses = [
       eq(postsTable.forumId, forumId),
@@ -162,16 +171,12 @@ router.get("/forums/:forumId/posts", async (req, res) => {
   }
 });
 
-router.post("/forums/:forumId/posts", requireAuth, async (req, res) => {
+router.post("/forums/:forumId/posts", requireAuth, validateBody(CreatePostSchema), async (req, res) => {
   try {
     const targetForumIdString = String(req.params.forumId);
     const forumId = parseInt(targetForumIdString);
     const currentUser = (req as any).user;
     const { title, content } = req.body;
-    if (!content) {
-      res.status(400).json({ error: "BadRequest", message: "Content is required" });
-      return;
-    }
     const [post] = await db.insert(postsTable).values({
       forumId,
       authorId: currentUser.id,
@@ -230,7 +235,7 @@ router.get("/posts/:postId/replies", async (req, res) => {
   }
 });
 
-router.post("/posts/:postId/replies", requireAuth, async (req, res) => {
+router.post("/posts/:postId/replies", requireAuth, validateBody(CreateReplySchema), async (req, res) => {
   try {
     const targetPostIdString = String(req.params.postId);
     const postId = parseInt(targetPostIdString);
@@ -241,10 +246,6 @@ router.post("/posts/:postId/replies", requireAuth, async (req, res) => {
       return;
     }
     const { content } = req.body;
-    if (!content) {
-      res.status(400).json({ error: "BadRequest", message: "Content required" });
-      return;
-    }
     const [reply] = await db.insert(postsTable).values({
       forumId: parentPost.forumId,
       parentId: postId,

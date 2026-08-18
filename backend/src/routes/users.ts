@@ -1,15 +1,25 @@
 import { Router, type IRouter } from "express";
 import { db, usersTable } from "@workspace/db";
 import { eq } from "drizzle-orm";
+import { z } from "zod";
 import { requireAuth, requireAdmin, safeUser } from "../lib/session.js";
+import { validateBody, clampPageParams } from "../middlewares/validate.js";
+import { optionalHttpUrl } from "../validation/common.js";
 
 const router: IRouter = Router();
 
+const UpdateUserSchema = z.object({
+  fullName: z.string().trim().min(1).max(120).optional(),
+  fullNameAr: z.string().trim().max(120).optional(),
+  languagePreference: z.enum(["en", "ar"]).optional(),
+  bio: z.string().trim().max(1000).optional(),
+  region: z.string().trim().max(120).optional(),
+  avatarUrl: optionalHttpUrl,
+});
+
 router.get("/", requireAuth, requireAdmin, async (req, res) => {
   try {
-    const page = parseInt(String(req.query.page || "1"));
-    const limit = parseInt(String(req.query.limit || "20"));
-    const offset = (page - 1) * limit;
+    const { page, limit, offset } = clampPageParams(req);
     const users = await db.select().from(usersTable).limit(limit).offset(offset);
     const total = await db.select().from(usersTable);
     res.json({ users: users.map(safeUser), total: total.length, page, limit });
@@ -34,7 +44,7 @@ router.get("/:id", requireAuth, async (req, res) => {
   }
 });
 
-router.patch("/:id", requireAuth, async (req, res) => {
+router.patch("/:id", requireAuth, validateBody(UpdateUserSchema), async (req, res) => {
   try {
     const targetIdString = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
     const targetId = parseInt(targetIdString);
@@ -43,14 +53,14 @@ router.patch("/:id", requireAuth, async (req, res) => {
       res.status(403).json({ error: "Forbidden", message: "Cannot edit another user's profile" });
       return;
     }
-    const { fullName, fullNameAr, languagePreference, bio, region } = req.body;
+    const { fullName, fullNameAr, languagePreference, bio, region, avatarUrl } = req.body;
     const updates: any = {};
     if (fullName !== undefined) updates.fullName = fullName;
     if (fullNameAr !== undefined) updates.fullNameAr = fullNameAr;
     if (languagePreference !== undefined) updates.languagePreference = languagePreference;
     if (bio !== undefined) updates.bio = bio;
     if (region !== undefined) updates.region = region;
-    if (req.body.avatarUrl !== undefined) updates.avatarUrl = req.body.avatarUrl;
+    if (avatarUrl !== undefined) updates.avatarUrl = avatarUrl;
     const [updated] = await db.update(usersTable).set(updates).where(eq(usersTable.id, targetId)).returning();
     res.json(safeUser(updated));
   } catch (err: any) {

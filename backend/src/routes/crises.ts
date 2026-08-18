@@ -3,8 +3,18 @@ import { db, crisesTable, usersTable } from "@workspace/db";
 import { safeUser } from "../lib/session.js";
 import { requireAuth, requireAdmin } from "../lib/session.js";
 import { eq } from "drizzle-orm";
+import { z } from "zod";
+import { validateBody } from "../middlewares/validate.js";
 
 const router: IRouter = Router();
+
+const CreateCrisisSchema = z.object({
+  title: z.string().trim().min(1).max(200),
+  titleAr: z.string().trim().max(200).optional(),
+  description: z.string().trim().min(1).max(5000),
+  descriptionAr: z.string().trim().max(5000).optional(),
+  severity: z.enum(["low", "medium", "high", "critical"]),
+});
 
 router.get("/", async (req, res) => {
   try {
@@ -22,7 +32,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.post("/", requireAuth, requireAdmin, async (req, res) => {
+router.post("/", requireAuth, requireAdmin, validateBody(CreateCrisisSchema), async (req, res) => {
   try {
     const currentUser = (req as any).user;
     const { title, titleAr, description, descriptionAr, severity } = req.body;

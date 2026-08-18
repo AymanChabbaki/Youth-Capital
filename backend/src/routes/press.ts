@@ -1,16 +1,30 @@
 import { Router, type IRouter } from "express";
 import { db, articlesTable, usersTable } from "@workspace/db";
 import { eq, sql } from "drizzle-orm";
+import { z } from "zod";
 import { requireAuth, requireAdmin, safeUser } from "../lib/session.js";
+import { validateBody, clampPageParams } from "../middlewares/validate.js";
+import { optionalHttpUrl } from "../validation/common.js";
 
 const router: IRouter = Router();
+
+const ARTICLE_TYPES = ["simulation", "platform"] as const;
+
+const CreateArticleSchema = z.object({
+  title: z.string().trim().min(1).max(200),
+  titleAr: z.string().trim().max(200).optional(),
+  content: z.string().trim().min(1).max(20000),
+  contentAr: z.string().trim().max(20000).optional(),
+  type: z.enum(ARTICLE_TYPES),
+  thumbnailUrl: optionalHttpUrl,
+});
+
+const UpdateArticleSchema = CreateArticleSchema.partial();
 
 router.get("/", async (req, res) => {
   try {
     const typeFilter = req.query.type as string | undefined;
-    const page = parseInt(String(req.query.page || "1"));
-    const limit = parseInt(String(req.query.limit || "10"));
-    const offset = (page - 1) * limit;
+    const { page, limit, offset } = clampPageParams(req, 10);
 
     // Single joined query instead of one author lookup per article (N+1),
     // and a SQL count instead of loading the whole table — keeps this endpoint
@@ -42,7 +56,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.post("/", requireAuth, requireAdmin, async (req, res) => {
+router.post("/", requireAuth, requireAdmin, validateBody(CreateArticleSchema), async (req, res) => {
   try {
     const currentUser = (req as any).user;
     const { title, titleAr, content, contentAr, type, thumbnailUrl } = req.body;
@@ -62,7 +76,7 @@ router.post("/", requireAuth, requireAdmin, async (req, res) => {
   }
 });
 
-router.patch("/:id", requireAuth, requireAdmin, async (req, res) => {
+router.patch("/:id", requireAuth, requireAdmin, validateBody(UpdateArticleSchema), async (req, res) => {
   try {
     const { title, titleAr, content, contentAr, type, thumbnailUrl } = req.body;
     const updates: any = {};

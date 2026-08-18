@@ -23,7 +23,7 @@ export default defineConfig({
   build: {
     outDir: path.resolve(import.meta.dirname, "dist"),
     emptyOutDir: true,
-    sourcemap: false,
+    sourcemap: true,
     chunkSizeWarningLimit: 1000,
     // NOTE: no manualChunks — with route-level React.lazy splitting, forcing
     // node_modules into named chunks creates circular chunk imports that crash
