@@ -1,6 +1,19 @@
 {
   "version": 2,
   "rewrites": [
+    { "source": "/about", "destination": "/about/index.html" },
+    { "source": "/press", "destination": "/press/index.html" },
+    { "source": "/apply", "destination": "/apply/index.html" },
+    { "source": "/events", "destination": "/events/index.html" },
+    { "source": "/polls", "destination": "/polls/index.html" },
+    { "source": "/rules", "destination": "/rules/index.html" },
+    { "source": "/privacy", "destination": "/privacy/index.html" },
+    { "source": "/support", "destination": "/support/index.html" },
+    { "source": "/login", "destination": "/login/index.html" },
+    { "source": "/dashboard", "destination": "/dashboard/index.html" },
+    { "source": "/profile", "destination": "/profile/index.html" },
+    { "source": "/community", "destination": "/community/index.html" },
+    { "source": "/admin", "destination": "/admin/index.html" },
     {
       "source": "/(.*)",
       "destination": "/index.html"
