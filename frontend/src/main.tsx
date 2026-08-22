@@ -1,6 +1,7 @@
 import { createRoot } from "react-dom/client";
 import { setBaseUrl } from "@workspace/api-client-react";
 import { inject } from "@vercel/analytics";
+import { SpeedInsights } from "@vercel/speed-insights/react";
 import App from "./App";
 import "./index.css";
 
@@ -11,4 +12,9 @@ setBaseUrl(import.meta.env.VITE_API_URL || "");
 // Initialize Vercel Web Analytics
 inject();
 
-createRoot(document.getElementById("root")!).render(<App />);
+createRoot(document.getElementById("root")!).render(
+  <>
+    <App />
+    <SpeedInsights />
+  </>
+);
