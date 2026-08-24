@@ -1,7 +1,5 @@
 import { createRoot } from "react-dom/client";
 import { setBaseUrl } from "@workspace/api-client-react";
-import { inject } from "@vercel/analytics";
-import { SpeedInsights } from "@vercel/speed-insights/react";
 import App from "./App";
 import "./index.css";
 
@@ -9,12 +7,4 @@ import "./index.css";
 // The generated API client already includes the '/api' prefix in its paths.
 setBaseUrl(import.meta.env.VITE_API_URL || "");
 
-// Initialize Vercel Web Analytics
-inject();
-
-createRoot(document.getElementById("root")!).render(
-  <>
-    <App />
-    <SpeedInsights />
-  </>
-);
+createRoot(document.getElementById("root")!).render(<App />);
