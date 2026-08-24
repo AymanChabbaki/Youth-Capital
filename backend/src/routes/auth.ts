@@ -6,6 +6,7 @@ import { createSession, destroySession, requireAuth, safeUser } from "../lib/ses
 import { hashPassword, verifyPassword, isLegacyHash } from "../lib/password.js";
 import { validateBody } from "../middlewares/validate.js";
 import { authLimiter } from "../middlewares/rateLimit.js";
+import { optionalLinkedinUrl } from "../validation/common.js";
 
 const router: IRouter = Router();
 
@@ -15,6 +16,8 @@ const RegisterSchema = z.object({
   fullName: z.string().trim().min(1).max(120),
   fullNameAr: z.string().trim().max(120).optional(),
   languagePreference: z.enum(["en", "ar"]).optional(),
+  phone: z.string().trim().max(30).optional(),
+  linkedinUrl: optionalLinkedinUrl,
 });
 
 const LoginSchema = z.object({
@@ -32,7 +35,7 @@ const COOKIE_OPTIONS = {
 
 router.post("/register", authLimiter, validateBody(RegisterSchema), async (req, res) => {
   try {
-    const { email, password, fullName, fullNameAr, languagePreference } = req.body;
+    const { email, password, fullName, fullNameAr, languagePreference, phone, linkedinUrl } = req.body;
     const existing = await db.select().from(usersTable).where(eq(usersTable.email, email));
     if (existing.length > 0) {
       res.status(409).json({ error: "Conflict", message: "Email already registered" });
@@ -45,6 +48,8 @@ router.post("/register", authLimiter, validateBody(RegisterSchema), async (req, 
       fullName,
       fullNameAr: fullNameAr || null,
       languagePreference: languagePreference || "en",
+      phone: phone || null,
+      linkedinUrl: linkedinUrl || null,
     }).returning();
     
     const token = await createSession(user.id);

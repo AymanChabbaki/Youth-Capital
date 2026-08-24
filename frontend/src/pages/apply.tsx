@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Button, Input, Select, Label, Card, DiscordIcon } from "@/components/ui-custom";
 import { motion, AnimatePresence } from "framer-motion";
-import { useRegister, useSubmitRoleApplication } from "@workspace/api-client-react";
+import { customFetch } from "@workspace/api-client-react";
 import { useToast } from "@/hooks/use-toast";
 import { CheckCircle2, Fingerprint, Eye, EyeOff } from "lucide-react";
 import { Link } from "wouter";
@@ -36,10 +36,14 @@ const getApplySchema = (step: number) => z.object({
   fullName: z.string().min(2, "Full name is required"),
   email: z.string().email("Invalid email address"),
   phone: z.string().optional(),
+  linkedinUrl: z.string().optional().refine(
+    (v) => !v || /^https?:\/\/([a-z]{2,3}\.)?linkedin\.com\//i.test(v),
+    "Must be a linkedin.com URL"
+  ),
   gender: z.string().min(1, "Gender is required"),
   age: z.coerce.number().min(12, "Invalid age").max(100, "Invalid age"),
   password: z.string().min(8, "Password must be at least 8 characters"),
-  
+
   status: step >= 2 ? z.string().min(1, "Status is required") : z.string().optional().or(z.literal('')),
   fieldOfStudy: step >= 2 ? z.string().min(2, "Field of study is required") : z.string().optional().or(z.literal('')),
   educationLevel: step >= 2 ? z.string().min(1, "Education level is required") : z.string().optional().or(z.literal('')),
@@ -55,6 +59,7 @@ type ApplyFormData = {
   fullName: string;
   email: string;
   phone?: string;
+  linkedinUrl?: string;
   gender: string;
   age: number;
   password: string;
@@ -84,8 +89,7 @@ export default function Apply() {
   
   const communityLink = import.meta.env.VITE_COMMUNITY_LINK || "https://discord.gg/K87zstYzYE";
 
-  const registerMutation = useRegister();
-  const applyMutation = useSubmitRoleApplication();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<ApplyFormData>({
     resolver: (data, context, options) => {
@@ -95,6 +99,7 @@ export default function Apply() {
       fullName: "",
       email: "",
       phone: "",
+      linkedinUrl: "",
       gender: "",
       age: undefined as any,
       password: "",
@@ -109,24 +114,38 @@ export default function Apply() {
   });
 
   const onSubmit = async (data: ApplyFormData) => {
+    setIsSubmitting(true);
     try {
       // 1. Create User
-      await registerMutation.mutateAsync({
-        data: {
+      await customFetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
           email: data.email,
           password: data.password,
           fullName: data.fullName,
           languagePreference: "en",
-        }
+          phone: data.phone || undefined,
+          linkedinUrl: data.linkedinUrl || undefined,
+        }),
       });
 
       // 2. Submit Application
-      await applyMutation.mutateAsync({
-        data: {
-          preferredRole: data.preferredRole as any,
+      await customFetch("/api/roles/applications", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          preferredRole: data.preferredRole,
           region: data.region,
           motivation: `Interests: ${data.interests.join(", ")}\nStatus: ${data.status}\nEducation: ${data.educationLevel} in ${data.fieldOfStudy}`,
-        }
+          gender: data.gender,
+          age: data.age,
+          country: data.country,
+          occupationStatus: data.status,
+          fieldOfStudy: data.fieldOfStudy,
+          educationLevel: data.educationLevel,
+          interests: data.interests,
+        }),
       });
 
       setIsSuccess(true);
@@ -136,12 +155,14 @@ export default function Apply() {
         description: error?.message || t("Please check your details and try again.", "الرجاء التحقق من بياناتك والمحاولة مرة أخرى."),
         variant: "destructive"
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const nextStep = async () => {
     let fieldsToValidate: any[] = [];
-    if (step === 1) fieldsToValidate = ["fullName", "email", "phone", "gender", "age", "password"];
+    if (step === 1) fieldsToValidate = ["fullName", "email", "phone", "linkedinUrl", "gender", "age", "password"];
     if (step === 2) fieldsToValidate = ["status", "fieldOfStudy", "educationLevel", "region", "country"];
     if (step === 3) fieldsToValidate = ["interests"];
       
@@ -303,6 +324,16 @@ export default function Apply() {
                       <Label>{t("Phone Number (Optional)", "رقم الهاتف (اختياري)")}</Label>
                       <Input type="tel" {...form.register("phone")} error={form.formState.errors.phone?.message} />
                     </div>
+                  </div>
+
+                  <div>
+                    <Label>{t("LinkedIn Profile (Optional)", "الملف الشخصي على لينكدإن (اختياري)")}</Label>
+                    <Input
+                      type="url"
+                      placeholder="https://linkedin.com/in/your-name"
+                      {...form.register("linkedinUrl")}
+                      error={form.formState.errors.linkedinUrl?.message}
+                    />
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -502,7 +533,7 @@ export default function Apply() {
                       type="submit" 
                       variant="gold" 
                       className="w-full"
-                      isLoading={registerMutation.isPending || applyMutation.isPending}
+                      isLoading={isSubmitting}
                     >
                       {t("Submit Application", "تقديم الطلب")}
                     </Button>

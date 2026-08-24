@@ -4,7 +4,7 @@ import { useSeo } from "@/hooks/use-seo";
 import { Button, Card, CountUp, TiltCard, SectionBackdrop } from "@/components/ui-custom";
 import { Link } from "wouter";
 import { useGetPlatformStats, useGetForums, useGetArticles, useGetPolls } from "@workspace/api-client-react";
-import { Users, FileText, Landmark, ShieldAlert, ArrowRight, Gavel, Briefcase, AlertCircle, Target, Zap, ArrowUp } from "lucide-react";
+import { Users, FileText, Landmark, ShieldAlert, ArrowRight, Gavel, Briefcase, Target, Zap, ArrowUp, Leaf } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 // Rotating "live activity" social-proof ticker
@@ -414,16 +414,16 @@ export default function Home() {
               viewport={{ once: true }}
               className="text-3xl md:text-6xl font-display font-black text-foreground mb-4"
             >
-              {t("The Simulation Core", "قلب المحاكاة")}
+              {t("Explore What Matters", "استكشف ما يهمك")}
             </motion.h2>
-            <motion.p 
+            <motion.p
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.1 }}
               className="text-muted-foreground max-w-2xl mx-auto text-base md:text-lg"
             >
-              {t("A technically superior replica of the Moroccan governance system.", "نسخة متطورة تقنياً من نظام الحوكمة المغربي.")}
+              {t("Engage with the topics shaping your future — politics, business, and the planet.", "شارك في المواضيع التي تشكل مستقبلك: السياسة، الأعمال، والكوكب.")}
             </motion.p>
           </div>
 
@@ -431,11 +431,11 @@ export default function Home() {
             {[
               {
                 id: 0,
-                title: t("Parliament", "البرلمان"),
-                shortDesc: t("Legislative Power", "السلطة التشريعية"),
+                title: t("Politics", "السياسة"),
+                shortDesc: t("Civic & Policy", "الشأن العام"),
                 fullDesc: t(
-                  "Draft and vote on legislation mirroring real-world issues. Experience national checks and balances.",
-                  "صياغة والتصويت على التشريعات التي تعكس قضايا العالم الحقيقي."
+                  "Debate policy, follow governance, and engage with the issues shaping society.",
+                  "ناقش السياسات، تابع الحوكمة، وشارك في القضايا التي تشكل المجتمع."
                 ),
                 icon: Gavel,
                 img: "parliament.webp",
@@ -443,11 +443,11 @@ export default function Home() {
               },
               {
                 id: 1,
-                title: t("Ministries", "الوزارات"),
-                shortDesc: t("Executive Branch", "السلطة التنفيذية"),
+                title: t("Entrepreneurship", "ريادة الأعمال"),
+                shortDesc: t("Build & Innovate", "البناء والابتكار"),
                 fullDesc: t(
-                  "Take charge of a sector, lead budgets, and implement national policies that shape the future.",
-                  "تولى مسؤولية قطاع، قد الميزانيات، ونفذ السياسات الوطنية."
+                  "Connect with founders, share ideas, and turn ambition into action.",
+                  "تواصل مع رواد الأعمال، شارك الأفكار، وحوّل الطموح إلى واقع."
                 ),
                 icon: Briefcase,
                 img: "hero-bg.webp",
@@ -455,15 +455,15 @@ export default function Home() {
               },
               {
                 id: 2,
-                title: t("Crises", "الطوارئ"),
-                shortDesc: t("Crisis Response", "إدارة الأزمات"),
+                title: t("Climate", "المناخ"),
+                shortDesc: t("Sustainability", "الاستدامة"),
                 fullDesc: t(
-                  "Respond to emergencies injected by Game Masters. Test your leadership under pressure.",
-                  "استجب لحالات الطوارئ الوطنية غير المتوقعة واختبر قيادتك."
+                  "Champion climate action, sustainability, and environmental awareness.",
+                  "ادعم العمل المناخي والاستدامة والوعي البيئي."
                 ),
-                icon: AlertCircle,
-                img: "parliament.webp",
-                color: "from-red-900/40 to-red-800/20"
+                icon: Leaf,
+                img: "general_assembly.webp",
+                color: "from-green-900/40 to-green-800/20"
               }
             ].map((feature, i) => {
               const isActive = activeFeature === feature.id;
@@ -608,16 +608,16 @@ export default function Home() {
               viewport={{ once: true }}
               className="text-3xl md:text-5xl font-display font-black text-foreground mb-4"
             >
-              {t("Explore Our Chambers", "استكشف غرف النقاش لدينا")}
+              {t("Explore Our Communities", "استكشف مجتمعاتنا")}
             </motion.h2>
-            <motion.p 
+            <motion.p
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.1 }}
               className="text-muted-foreground max-w-2xl text-base md:text-lg"
             >
-              {t("Hover or tap the list items to preview our active simulation hubs and enter your designated chamber.", "مرر المؤشر أو اضغط على عناصر القائمة لمعاينة مراكز المحاكاة النشطة والدخول إلى غرفتك المخصصة.")}
+              {t("Hover or tap the list items to preview our active communities and join the conversation.", "مرر المؤشر أو اضغط على عناصر القائمة لمعاينة مجتمعاتنا النشطة والانضمام إلى النقاش.")}
             </motion.p>
           </div>
 
@@ -692,7 +692,7 @@ export default function Home() {
                             return "general_assembly.webp";
                         }
                       })()}`}
-                      alt="Chamber Preview"
+                      alt="Community Preview"
                       initial={{ opacity: 0, scale: 1.05 }}
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0 }}

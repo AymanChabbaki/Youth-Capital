@@ -17,6 +17,8 @@ export const usersTable = pgTable("users", {
   simulationRole: text("simulation_role"),
   region: text("region"),
   bio: text("bio"),
+  phone: text("phone"),
+  linkedinUrl: text("linkedin_url"),
   languagePreference: languagePreferenceEnum("language_preference").notNull().default("en"),
   status: userStatusEnum("status").notNull().default("active"),
   applicationStatus: applicationStatusEnum("application_status").notNull().default("none"),

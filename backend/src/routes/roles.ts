@@ -18,6 +18,13 @@ const CreateApplicationSchema = z.object({
   parliamentHouse: z.enum(PARLIAMENT_HOUSES).optional(),
   motivation: z.string().trim().min(1).max(4000),
   languagePreference: z.enum(["en", "ar"]).optional(),
+  gender: z.string().trim().max(40).optional(),
+  age: z.coerce.number().int().min(12).max(120).optional(),
+  country: z.string().trim().max(80).optional(),
+  occupationStatus: z.string().trim().max(60).optional(),
+  fieldOfStudy: z.string().trim().max(120).optional(),
+  educationLevel: z.string().trim().max(60).optional(),
+  interests: z.array(z.string().trim().max(60)).max(10).optional(),
 });
 
 const UpdateApplicationSchema = z.object({
@@ -47,7 +54,10 @@ router.get("/applications", requireAuth, requireAdmin, async (req, res) => {
 router.post("/applications", requireAuth, validateBody(CreateApplicationSchema), async (req, res) => {
   try {
     const currentUser = (req as any).user;
-    const { preferredRole, region, ministryPreference, parliamentHouse, motivation, languagePreference } = req.body;
+    const {
+      preferredRole, region, ministryPreference, parliamentHouse, motivation, languagePreference,
+      gender, age, country, occupationStatus, fieldOfStudy, educationLevel, interests,
+    } = req.body;
     const [app] = await db.insert(roleApplicationsTable).values({
       userId: currentUser.id,
       preferredRole,
@@ -56,6 +66,13 @@ router.post("/applications", requireAuth, validateBody(CreateApplicationSchema),
       parliamentHouse: parliamentHouse || null,
       motivation,
       languagePreference: languagePreference || "en",
+      gender: gender || null,
+      age: age ?? null,
+      country: country || null,
+      occupationStatus: occupationStatus || null,
+      fieldOfStudy: fieldOfStudy || null,
+      educationLevel: educationLevel || null,
+      interests: interests?.length ? interests.join(", ") : null,
     }).returning();
     await db.update(usersTable).set({ applicationStatus: "pending" }).where(eq(usersTable.id, currentUser.id));
     const [user] = await db.select().from(usersTable).where(eq(usersTable.id, currentUser.id));
