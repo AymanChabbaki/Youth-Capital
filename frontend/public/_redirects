@@ -1,0 +1,6 @@
+# SPA fallback: Cloudflare Pages serves any exact-matching static file first
+# (including the pre-generated /about/index.html etc. from
+# scripts/generate-static-seo.mjs), so this only catches dynamic client-side
+# routes (e.g. /press/:id) and genuine 404s, same role vercel.json's catch-all
+# rewrite plays on Vercel.
+/*  /index.html  200
