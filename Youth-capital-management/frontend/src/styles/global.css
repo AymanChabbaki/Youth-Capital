@@ -1733,6 +1733,61 @@ a.pen-nav-item.active {
   height: 100%;
   box-sizing: border-box;
   padding: 1.2rem 1.6rem;
+  display: flex;
+  flex-direction: column;
+  /* No overflow constraint here — .section-nav is positioned relative to
+     this element at a negative top offset (see .section-nav), so clipping
+     here would cut it off. .wireframe-body below scrolls instead. */
+}
+
+.wireframe-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0.5rem;
+  margin-top: 0.75rem;
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: hsl(0 0% 0% / 0.25) transparent;
+}
+
+.wireframe-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.wireframe-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.wireframe-body::-webkit-scrollbar-thumb {
+  background: hsl(0 0% 0% / 0.25);
+  border-radius: 999px;
+}
+
+.wireframe-body::-webkit-scrollbar-thumb:hover {
+  background: hsl(0 0% 0% / 0.4);
+}
+
+.project-board-list {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(0 0% 100% / 0.25) transparent;
+}
+
+.project-board-list::-webkit-scrollbar {
+  width: 5px;
+}
+
+.project-board-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.project-board-list::-webkit-scrollbar-thumb {
+  background: hsl(0 0% 100% / 0.25);
+  border-radius: 999px;
+}
+
+.project-board-list::-webkit-scrollbar-thumb:hover {
+  background: hsl(0 0% 100% / 0.4);
 }
 
 /* ═══ overview — global stats row (guest + logged-in) ═══ */
@@ -1932,6 +1987,46 @@ a.pen-nav-item.active {
   font-size: 0.72rem;
   font-weight: 700;
   color: #caa849;
+}
+
+/* Roster grid — deliberately not another pill/capsule: a quiet 2-up grid of
+   initials + first name, so the Sponsors card reads differently from the
+   avatar-pill pattern used on Members / Money raised. */
+.stat-card-roster {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.3rem 0.4rem;
+  width: 100%;
+  margin-top: 0.15rem;
+}
+
+.stat-card-roster-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-width: 0; /* lets the name ellipsis instead of overflowing the grid cell */
+}
+
+.stat-card-roster-avatar {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 0.55rem;
+  font-weight: 800;
+  color: #fff;
+}
+
+.stat-card-roster-name {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .stat-card-stack {
@@ -2242,6 +2337,452 @@ a.pen-nav-item.active {
 .project-filter-search svg {
   flex-shrink: 0;
   color: var(--color-text-muted);
+}
+
+/* Rebuild of the reference dashboard's dark "Unpaid Invoices" list card —
+   same navy as the rest of this app's dark surfaces (.sidebar, .pen-nav),
+   not the reference's near-black. */
+.project-board {
+  background: hsl(222 46% 15%);
+  border-radius: 1.75rem; /* pronounced curve, same scale as .platform-content's 28px */
+  padding: 0.9rem;
+  margin-top: 1rem;
+}
+
+.project-board-tabs-dock {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end; /* notches sit flush with the tabs pill's bottom edge */
+}
+
+.project-board-tabs {
+  position: relative;
+  z-index: 1; /* under the notches, so they can overlap its corners */
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+  background: #fff;
+  border-radius: var(--radius-control);
+  padding: 0.3rem;
+}
+
+/* The concave curve flanking the white tabs pill where it meets the navy
+   box — same "tab" notch trick as browser tab shapes: a small square,
+   overlapping the pill's bottom corner, with a quarter-circle radial-
+   gradient cut out of the corner facing the pill (revealing its white
+   underneath) while the rest of the square paints over that corner in the
+   navy card color — the two curves together read as one smooth S-bend. */
+.project-board-notch {
+  position: relative;
+  z-index: 2;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.project-board-notch-left {
+  margin-right: -16px;
+  background: radial-gradient(circle at top right, transparent 16px, hsl(222 46% 15%) 16px);
+}
+
+.project-board-notch-right {
+  margin-left: -16px;
+  background: radial-gradient(circle at top left, transparent 16px, hsl(222 46% 15%) 16px);
+}
+
+.project-board-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  padding: 0.5em 0.9em;
+  border-radius: calc(var(--radius-control) - 0.2rem);
+  background: transparent;
+  border: none;
+  color: hsl(222 20% 40%);
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.project-board-tab.active {
+  background: #6659ea; /* same purple accent already used across this app */
+  color: #fff;
+}
+
+.project-board-tab-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.4em;
+  height: 1.4em;
+  padding: 0 0.4em;
+  border-radius: 999px;
+  background: hsl(222 20% 90%);
+  color: hsl(222 46% 15%);
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.project-board-tab.active .project-board-tab-count {
+  background: hsl(0 0% 100% / 0.25);
+  color: #fff;
+}
+
+/* Gated preview — a blurred stand-in for the real content (which needs
+   login/role access), with a frosted overlay explaining why. */
+.project-board-gate {
+  position: relative;
+  margin-top: 0.7rem;
+  border-radius: var(--radius-control);
+  overflow: hidden;
+}
+
+.project-board-gate-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: 1rem;
+  filter: blur(6px);
+}
+
+.project-board-gate-row {
+  height: 2.4rem;
+  border-radius: calc(var(--radius-control) - 0.3rem);
+  background: hsl(222 40% 22%);
+}
+
+.project-board-gate-row:nth-child(2) {
+  width: 80%;
+}
+
+.project-board-gate-row:nth-child(3) {
+  width: 60%;
+}
+
+.project-board-gate-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  background: hsl(222 46% 15% / 0.55);
+  backdrop-filter: blur(3px);
+  color: #fff;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+/* Two-pane list + detail body, under the tabs — 1:1 clone of the reference
+   dashboard's row/detail shape (avatar + #code + due + status + amount on
+   the left; 3-column header, item cards, totals footer on the right). */
+.project-board-body {
+  display: flex;
+  gap: 0.7rem;
+  margin-top: 0.7rem;
+  align-items: flex-start;
+}
+
+.project-board-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  flex: 0 0 38%;
+  max-height: 340px;
+  overflow-y: auto;
+}
+
+.project-board-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  text-align: left;
+  background: hsl(222 40% 20%);
+  border: none;
+  border-radius: calc(var(--radius-control) - 0.2rem);
+  padding: 0.5rem 0.7rem;
+  cursor: pointer;
+}
+
+.project-board-row.active {
+  background: #6659ea;
+}
+
+.project-board-row-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 0.6rem;
+  font-weight: 800;
+  color: #fff;
+  background: var(--color-istiqlal-rose);
+}
+
+.project-board-row-main {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+  flex: 1;
+}
+
+.project-board-row-code {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.project-board-row-due {
+  font-size: 0.66rem;
+  font-weight: 500;
+  color: hsl(220 15% 72%);
+  white-space: nowrap;
+}
+
+.project-board-row.active .project-board-row-due {
+  color: hsl(0 0% 100% / 0.75);
+}
+
+.project-board-row-status {
+  flex-shrink: 0;
+  font-size: 0.65rem;
+  font-weight: 700;
+  border-radius: 999px;
+  padding: 0.3em 0.65em;
+  white-space: nowrap;
+}
+
+.project-board-row-status-viewed {
+  color: hsl(0 0% 100% / 0.7);
+  background: hsl(0 0% 100% / 0.12);
+}
+
+.project-board-row-status-unsent {
+  color: hsl(222 46% 15%);
+  background: #fff;
+}
+
+.project-board-row-amount {
+  flex-shrink: 0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.project-board-detail {
+  flex: 1;
+  min-width: 0;
+  background: linear-gradient(135deg, hsl(249 65% 45%), hsl(249 65% 30%));
+  border-radius: calc(var(--radius-control) - 0.2rem);
+  padding: 1rem 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.project-board-detail-label {
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: hsl(0 0% 100% / 0.6);
+}
+
+.project-board-detail-header-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.8rem;
+}
+
+.project-board-detail-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  min-width: 0;
+}
+
+.project-board-detail-code {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: #fff;
+}
+
+.project-board-detail-company {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.project-board-detail-logo {
+  width: 20px;
+  height: 20px;
+  border-radius: 0.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: hsl(0 0% 100% / 0.18);
+  font-size: 0.65rem;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.project-board-detail-customer {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.project-board-detail-customer .project-board-row-avatar {
+  background: hsl(0 0% 100% / 0.2);
+}
+
+.project-board-detail-customer-name {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.project-board-detail-customer-role {
+  display: block;
+  font-size: 0.65rem;
+  font-weight: 500;
+  color: hsl(0 0% 100% / 0.65);
+}
+
+.project-board-detail-items {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.project-board-detail-item {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  background: hsl(0 0% 100% / 0.1);
+  border-radius: calc(var(--radius-control) - 0.3rem);
+  padding: 0.6rem 0.7rem;
+}
+
+.project-board-detail-item-icon {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.6rem;
+  color: hsl(0 0% 100% / 0.6);
+  transform: rotate(-45deg);
+}
+
+.project-board-detail-item-amount {
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: #fff;
+}
+
+.project-board-detail-item-label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: hsl(0 0% 100% / 0.7);
+}
+
+.project-board-detail-item-add {
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  border: 1px dashed hsl(0 0% 100% / 0.35);
+  background: transparent;
+  color: hsl(0 0% 100% / 0.75);
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.project-board-detail-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+}
+
+.project-board-detail-totals {
+  display: flex;
+  gap: 1.2rem;
+}
+
+.project-board-detail-total {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.project-board-detail-total-value {
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: #fff;
+}
+
+.project-board-detail-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.project-board-detail-icon-btn {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: hsl(0 0% 100% / 0.12);
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.project-board-detail-icon-btn:hover {
+  transform: none;
+  box-shadow: none;
+  border-color: transparent;
+  color: #fff;
+}
+
+.project-board-detail-payout {
+  background: #fff;
+  color: hsl(222 46% 15%);
+  border: none;
+  border-radius: 999px;
+  padding: 0.55em 1.2em;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.project-board-detail-payout:hover {
+  transform: none;
+  box-shadow: none;
+  border-color: transparent;
+  color: hsl(222 46% 15%);
 }
 
 /* One shared grid (not two independently-stacking columns) so every row

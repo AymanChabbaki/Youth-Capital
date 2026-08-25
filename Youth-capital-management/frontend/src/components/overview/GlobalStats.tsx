@@ -25,8 +25,13 @@ const CARDS = [
     Icon: HandHeartIcon,
     label: "Sponsors",
     value: "37",
-    topLabel: "Top",
-    names: ["Youssef El Amrani", "Mehdi Bennis", "Salma Idrissi", "Khadija Ziani"],
+    topLabel: "Active",
+    roster: [
+      { name: "Youssef El Amrani" },
+      { name: "Mehdi Bennis" },
+      { name: "Salma Idrissi" },
+      { name: "Khadija Ziani" },
+    ],
     locked: false,
   },
   {
@@ -70,6 +75,15 @@ const CARDS = [
 
 // Same figure as the Members stat card — this hub's member count.
 const HUB_MEMBERS = CARDS.find((c) => c.key === "members")!.value;
+
+// Rotates across the roster avatars — reuses the app's existing accent colors
+// instead of inventing new ones just for this card.
+const ROSTER_COLORS = ["var(--color-istiqlal-rose)", "var(--color-maghreb-gold)", "var(--color-signal-cyan)"];
+
+function initials(name: string) {
+  const parts = name.split(" ");
+  return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase();
+}
 
 export function GlobalStats() {
   const [markerFacing, setMarkerFacing] = useState(false);
@@ -145,6 +159,31 @@ export function GlobalStats() {
                     <span className="stat-card-sponsor-rank">{index + 1}</span>
                     <span className="stat-card-sponsor-name">{sponsor.name}</span>
                     <span className="stat-card-sponsor-amount">{sponsor.amount}</span>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+          {"roster" in card && (
+            <>
+              {"topLabel" in card && (
+                <span
+                  className="stat-card-top-label stat-card-top-label-tight"
+                  style={{ marginTop: "-5.6px" }}
+                >
+                  {card.topLabel}
+                </span>
+              )}
+              <div className="stat-card-roster">
+                {card.roster.map((sponsor, index) => (
+                  <div key={sponsor.name} className="stat-card-roster-chip">
+                    <span
+                      className="stat-card-roster-avatar"
+                      style={{ background: ROSTER_COLORS[index % ROSTER_COLORS.length] }}
+                    >
+                      {initials(sponsor.name)}
+                    </span>
+                    <span className="stat-card-roster-name">{sponsor.name.split(" ")[0]}</span>
                   </div>
                 ))}
               </div>
