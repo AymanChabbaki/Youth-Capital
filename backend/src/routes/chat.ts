@@ -1,8 +1,23 @@
 import { Router } from "express";
+import { z } from "zod";
+import { validateBody } from "../middlewares/validate.js";
+import { chatLimiter, chatGuestLimiter } from "../middlewares/rateLimit.js";
 
 const router = Router();
 
-router.post("/", async (req, res) => {
+const ChatSchema = z.object({
+  messages: z
+    .array(
+      z.object({
+        role: z.enum(["user", "assistant"]),
+        content: z.string().min(1).max(4000),
+      }),
+    )
+    .min(1)
+    .max(30),
+});
+
+router.post("/", chatGuestLimiter, chatLimiter, validateBody(ChatSchema), async (req, res) => {
   try {
     const { messages } = req.body;
     const apiKey = process.env.GROQ_API_KEY;

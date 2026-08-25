@@ -18,6 +18,7 @@ import {
   Fingerprint
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useSeo } from "@/hooks/use-seo";
 import { Link } from "wouter";
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -40,6 +41,12 @@ const MOROCCAN_REGIONS = [
 export default function Profile() {
   const { user } = useAuth();
   const { t, isAr } = useLanguage();
+  useSeo({
+    title: t("My Profile | Youth Capital", "ملفي الشخصي | يوث كابيتال"),
+    description: t("Manage your Youth Capital profile.", "أدر ملفك الشخصي في يوث كابيتال."),
+    path: "/profile",
+    noindex: true,
+  });
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);

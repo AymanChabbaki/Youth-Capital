@@ -5,10 +5,17 @@ import { useGetCrises, useGetPolls } from "@workspace/api-client-react";
 import { AlertTriangle, Vote, MessageSquare, Calendar, User as UserIcon, ShieldCheck, Activity } from "lucide-react";
 import { Link, Redirect } from "wouter";
 import { motion } from "framer-motion";
+import { useSeo } from "@/hooks/use-seo";
 
 export default function Dashboard() {
   const { user, isAuthenticated, isLoading } = useAuth();
   const { t, isAr } = useLanguage();
+  useSeo({
+    title: t("Dashboard | Youth Capital", "لوحة التحكم | يوث كابيتال"),
+    description: t("Your Youth Capital simulation dashboard.", "لوحة محاكاة يوث كابيتال الخاصة بك."),
+    path: "/dashboard",
+    noindex: true,
+  });
   const { data: crisesData } = useGetCrises({ query: { enabled: !isLoading && isAuthenticated } } as any);
   const { data: pollsData } = useGetPolls({ query: { enabled: !isLoading && isAuthenticated } } as any);
 

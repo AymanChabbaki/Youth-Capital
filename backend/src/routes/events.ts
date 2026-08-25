@@ -1,9 +1,27 @@
 import { Router, type IRouter } from "express";
 import { db, eventsTable } from "@workspace/db";
 import { sql, eq } from "drizzle-orm";
+import { z } from "zod";
 import { requireAuth, requireAdmin } from "../lib/session.js";
+import { validateBody } from "../middlewares/validate.js";
+import { optionalHttpUrl } from "../validation/common.js";
 
 const router: IRouter = Router();
+
+const EVENT_TYPES = ["live_session", "vote", "summit", "workshop"] as const;
+
+const CreateEventSchema = z.object({
+  title: z.string().trim().min(1).max(200),
+  titleAr: z.string().trim().max(200).optional(),
+  description: z.string().trim().max(5000).optional(),
+  descriptionAr: z.string().trim().max(5000).optional(),
+  startAt: z.coerce.date(),
+  endAt: z.coerce.date().optional(),
+  meetingUrl: optionalHttpUrl,
+  type: z.enum(EVENT_TYPES),
+});
+
+const UpdateEventSchema = CreateEventSchema.partial();
 
 router.get("/", async (req, res) => {
   try {
@@ -18,7 +36,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.post("/", requireAuth, requireAdmin, async (req, res) => {
+router.post("/", requireAuth, requireAdmin, validateBody(CreateEventSchema), async (req, res) => {
   try {
     const { title, titleAr, description, descriptionAr, startAt, endAt, meetingUrl, type } = req.body;
     const [event] = await db.insert(eventsTable).values({
@@ -26,8 +44,8 @@ router.post("/", requireAuth, requireAdmin, async (req, res) => {
       titleAr,
       description,
       descriptionAr,
-      startAt: new Date(startAt),
-      endAt: endAt ? new Date(endAt) : null,
+      startAt,
+      endAt: endAt || null,
       meetingUrl: meetingUrl || null,
       type,
     }).returning();
@@ -38,7 +56,7 @@ router.post("/", requireAuth, requireAdmin, async (req, res) => {
   }
 });
 
-router.patch("/:id", requireAuth, requireAdmin, async (req, res) => {
+router.patch("/:id", requireAuth, requireAdmin, validateBody(UpdateEventSchema), async (req, res) => {
   try {
     const { title, titleAr, description, descriptionAr, startAt, endAt, meetingUrl, type } = req.body;
     const updates: any = {};
@@ -46,8 +64,8 @@ router.patch("/:id", requireAuth, requireAdmin, async (req, res) => {
     if (titleAr !== undefined) updates.titleAr = titleAr;
     if (description !== undefined) updates.description = description;
     if (descriptionAr !== undefined) updates.descriptionAr = descriptionAr;
-    if (startAt !== undefined) updates.startAt = new Date(startAt);
-    if (endAt !== undefined) updates.endAt = endAt ? new Date(endAt) : null;
+    if (startAt !== undefined) updates.startAt = startAt;
+    if (endAt !== undefined) updates.endAt = endAt || null;
     if (meetingUrl !== undefined) updates.meetingUrl = meetingUrl;
     if (type !== undefined) updates.type = type;
 

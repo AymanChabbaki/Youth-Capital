@@ -2,31 +2,90 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-P0JFJT42W2"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-P0JFJT42W2');
+    </script>
+
     <title>Youth Capital | Moroccan Youth Governance Simulation</title>
     <meta name="description" content="Youth Capital is Morocco's first digital civic governance simulation platform. Experience the Moroccan Parliament, Ministries, and Regional Councils from the inside." />
-    <meta name="keywords" content="Youth Capital, Youth Capital HQ, Youth Capital, Moroccan youth governance simulation, Moroccan Parliament simulation, Aziz Akhannouch, Mohamed El Majidi, Ayman Chabbaki, Morocco politics simulation, Civic Awareness, Youth Empowerment, Morocco Government Simulator" />
-    <meta name="author" content="Youth CapitalHQ" />
+    <meta name="keywords" content="Youth Capital, Moroccan youth governance simulation, Moroccan Parliament simulation, Morocco politics simulation, civic education Morocco, youth empowerment Morocco, Morocco government simulator" />
+    <meta name="author" content="Youth Capital" />
+    <meta name="robots" content="index, follow" />
     <meta name="google-site-verification" content="S9PSL2GDaAGrei3aDVal8HhJqOzxpDo10BTotD5x1AM" />
-    
+    <link rel="canonical" href="https://www.youthcapital.org/" />
+
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://youthcapital.org/" />
+    <meta property="og:url" content="https://www.youthcapital.org/" />
+    <meta property="og:site_name" content="Youth Capital" />
     <meta property="og:title" content="Youth Capital | Moroccan Youth Governance Simulation" />
     <meta property="og:description" content="Join Morocco's first digital civic governance simulation platform. Shape policies, debate in parliament, and build leadership skills." />
-    <meta property="og:image" content="/youth_capital_logo_light.svg" />
+    <meta property="og:image" content="https://www.youthcapital.org/opengraph.jpg" />
+    <meta property="og:locale" content="en" />
+    <meta property="og:locale:alternate" content="ar" />
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:url" content="https://youthcapital.org/" />
+    <meta property="twitter:url" content="https://www.youthcapital.org/" />
     <meta property="twitter:title" content="Youth Capital | Moroccan Youth Governance Simulation" />
     <meta property="twitter:description" content="Join Morocco's first digital civic governance simulation platform. Shape policies, debate in parliament, and build leadership skills." />
-    <meta property="twitter:image" content="/youth_capital_logo_light.svg" />
+    <meta property="twitter:image" content="https://www.youthcapital.org/opengraph.jpg" />
 
-    <link rel="icon" type="image/svg+xml" href="/youth_capital_logo_light.svg" />
+    <!-- Structured data: who Youth Capital is, for search + AI answer engines -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "EducationalOrganization",
+      "name": "Youth Capital",
+      "alternateName": "Youth Capital HQ",
+      "url": "https://www.youthcapital.org/",
+      "logo": "https://www.youthcapital.org/youth_capital_logo_light.svg",
+      "description": "Youth Capital is Morocco's first digital civic governance simulation platform, letting young Moroccans simulate the Parliament, Ministries, and Regional Councils to build leadership and civic skills.",
+      "areaServed": {
+        "@type": "Country",
+        "name": "Morocco"
+      },
+      "sameAs": [
+        "https://x.com/youthcapitalhq",
+        "https://www.facebook.com/youthcapital",
+        "https://www.instagram.com/youthcapitalhq",
+        "https://www.linkedin.com/company/youthcapitalhq",
+        "https://www.tiktok.com/@youthcapitalhq",
+        "https://www.youtube.com/@youthcapitalhq"
+      ]
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "Youth Capital",
+      "url": "https://www.youthcapital.org/"
+    }
+    </script>
+
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="theme-color" content="#1B2A4A" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="%VITE_API_URL%">
+    <link rel="dns-prefetch" href="%VITE_API_URL%">
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"></noscript>
   </head>
   <body>
     <div id="root"></div>

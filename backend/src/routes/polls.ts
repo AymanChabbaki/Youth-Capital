@@ -1,9 +1,38 @@
 import { Router, type IRouter } from "express";
 import { db, pollsTable, pollOptionsTable, pollVotesTable } from "@workspace/db";
 import { eq, and } from "drizzle-orm";
+import { z } from "zod";
 import { requireAuth, requireAdmin } from "../lib/session.js";
+import { validateBody } from "../middlewares/validate.js";
 
 const router: IRouter = Router();
+
+const CreatePollSchema = z.object({
+  title: z.string().trim().min(1).max(200),
+  titleAr: z.string().trim().max(200).optional(),
+  description: z.string().trim().max(2000).optional(),
+  options: z
+    .array(
+      z.object({
+        label: z.string().trim().min(1).max(200),
+        labelAr: z.string().trim().max(200).optional(),
+      }),
+    )
+    .min(2)
+    .max(10),
+  endsAt: z.coerce.date().optional(),
+});
+
+const UpdatePollSchema = z.object({
+  title: z.string().trim().min(1).max(200).optional(),
+  titleAr: z.string().trim().max(200).optional(),
+  description: z.string().trim().max(2000).optional(),
+  endsAt: z.coerce.date().optional(),
+});
+
+const VoteSchema = z.object({
+  optionId: z.string().trim().min(1).max(50),
+});
 
 async function formatPoll(poll: any, userId?: number) {
   const options = await db.select().from(pollOptionsTable).where(eq(pollOptionsTable.pollId, poll.id));
@@ -59,7 +88,7 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-router.post("/", requireAuth, requireAdmin, async (req, res) => {
+router.post("/", requireAuth, requireAdmin, validateBody(CreatePollSchema), async (req, res) => {
   try {
     const currentUser = (req as any).user;
     const { title, titleAr, description, options, endsAt } = req.body;
@@ -67,7 +96,7 @@ router.post("/", requireAuth, requireAdmin, async (req, res) => {
       title,
       titleAr,
       description: description || null,
-      endsAt: endsAt ? new Date(endsAt) : null,
+      endsAt: endsAt || null,
       createdById: currentUser.id,
     }).returning();
     for (let i = 0; i < options.length; i++) {
@@ -86,7 +115,7 @@ router.post("/", requireAuth, requireAdmin, async (req, res) => {
   }
 });
 
-router.post("/:id/vote", requireAuth, async (req, res) => {
+router.post("/:id/vote", requireAuth, validateBody(VoteSchema), async (req, res) => {
   try {
     const currentUser = (req as any).user;
     const pollId = parseInt(req.params.id as string);
@@ -121,7 +150,7 @@ router.post("/:id/vote", requireAuth, async (req, res) => {
   }
 });
 
-router.patch("/:id", requireAuth, requireAdmin, async (req, res) => {
+router.patch("/:id", requireAuth, requireAdmin, validateBody(UpdatePollSchema), async (req, res) => {
   try {
     const pollId = parseInt(req.params.id as string);
     const { title, titleAr, description, endsAt } = req.body;
@@ -131,7 +160,7 @@ router.patch("/:id", requireAuth, requireAdmin, async (req, res) => {
         title,
         titleAr,
         description: description !== undefined ? (description || null) : undefined,
-        endsAt: endsAt !== undefined ? (endsAt ? new Date(endsAt) : null) : undefined,
+        endsAt: endsAt !== undefined ? (endsAt || null) : undefined,
       })
       .where(eq(pollsTable.id, pollId))
       .returning();

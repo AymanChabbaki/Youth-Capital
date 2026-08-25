@@ -5,10 +5,11 @@ import {
   useGetRoleApplications, useUpdateRoleApplication,
   useGetUsers, useTriggerCrisis, useGetPlatformStats,
   useGetCrises, useGetArticles, useGetEvents, useGetPolls,
-  useDeleteUser, useLogout,
+  useLogout,
   customFetch
 } from "@workspace/api-client-react";
 import { Badge, Button, Input, Textarea, Select } from "@/components/ui-custom";
+import { useSeo } from "@/hooks/use-seo";
 import { Redirect, Link, useLocation } from "wouter";
 import {
   Shield, Users, FileCheck, AlertTriangle, LayoutDashboard,
@@ -17,6 +18,7 @@ import {
   Globe, BarChart3, PieChart as PieChartIcon, UserCheck, Siren,
   MapPin, Landmark, LogOut, Plus, Edit, Trash2,
   ImagePlus, Loader2, X as XIcon,
+  Phone, Linkedin, GraduationCap, Briefcase, Tag, Eye, Ban, ShieldCheck,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
@@ -208,6 +210,12 @@ function SidebarItem({ icon: Icon, label, active, onClick }: { icon: any; label:
 export default function Admin() {
   const { isAdmin, isLoading, user } = useAuth();
   const { t } = useLanguage();
+  useSeo({
+    title: "Admin | Youth Capital",
+    description: "Youth Capital platform administration.",
+    path: "/admin",
+    noindex: true,
+  });
   const [activeTab, setActiveTab] = useState("overview");
   const [search, setSearch] = useState("");
   const { toast } = useToast();
@@ -222,7 +230,6 @@ export default function Admin() {
   const { data: pollsData } = useGetPolls({ query: { enabled: !isLoading && isAdmin } } as any);
 
   const updateAppMutation = useUpdateRoleApplication();
-  const deleteUserMutation = useDeleteUser();
   const triggerCrisisMutation = useTriggerCrisis();
   const [crisisForm, setCrisisForm] = useState({ title: "", titleAr: "", description: "", descriptionAr: "", severity: "high" });
 
@@ -233,6 +240,13 @@ export default function Admin() {
   const [isArticleModalOpen, setIsArticleModalOpen] = useState(false);
   const [isEventModalOpen, setIsEventModalOpen] = useState(false);
   const [isPollModalOpen, setIsPollModalOpen] = useState(false);
+
+  // Users CRUD state
+  const [viewingUser, setViewingUser] = useState<any>(null);
+  const [editingUser, setEditingUser] = useState<any>(null);
+  const [isUserModalOpen, setIsUserModalOpen] = useState(false);
+  const [banPendingId, setBanPendingId] = useState<number | null>(null);
+  const [deletePendingId, setDeletePendingId] = useState<number | null>(null);
 
   const logoutMutation = useLogout();
   const [, setLocation] = useLocation();
@@ -353,18 +367,64 @@ export default function Admin() {
   if (isLoading) return null;
   if (!isAdmin) return <Redirect to="/" />;
 
-  const handleBan = async (id: number, name: string) => {
-    if (!window.confirm(t(`Are you sure you want to ban ${name}?`, `هل أنت متأكد أنك تريد حظر ${name}؟`))) return;
-    
+  const handleToggleBan = async (u: any) => {
+    const willBan = u.status !== "banned";
+    if (willBan && !window.confirm(t(`Are you sure you want to ban ${u.fullName}?`, `هل أنت متأكد أنك تريد حظر ${u.fullName}؟`))) return;
+
+    setBanPendingId(u.id);
     try {
-      await deleteUserMutation.mutateAsync({ id });
-      toast({ title: t("User Banned", "تم حظر المستخدم"), variant: "destructive" });
+      await customFetch(`/api/users/${u.id}/${willBan ? "ban" : "unban"}`, { method: "POST" });
+      toast({
+        title: willBan ? t("User Banned", "تم حظر المستخدم") : t("User Unbanned", "تم إلغاء حظر المستخدم"),
+        variant: willBan ? "destructive" : "default",
+      });
       queryClient.invalidateQueries();
     } catch (error: any) {
-      toast({ 
-        title: t("Ban Failed", "فشل الحظر"), 
-        description: error?.message || t("Could not complete the suspension.", "تعذر إكمال التعليق."),
-        variant: "destructive" 
+      toast({
+        title: t("Action Failed", "فشلت العملية"),
+        description: error?.message || t("Could not update the account status.", "تعذر تحديث حالة الحساب."),
+        variant: "destructive"
+      });
+    } finally {
+      setBanPendingId(null);
+    }
+  };
+
+  const handleDeleteUser = async (u: any) => {
+    if (!window.confirm(t(`Permanently delete ${u.fullName}? This cannot be undone.`, `حذف ${u.fullName} نهائياً؟ لا يمكن التراجع عن هذا الإجراء.`))) return;
+    setDeletePendingId(u.id);
+    try {
+      await customFetch(`/api/users/${u.id}`, { method: "DELETE" });
+      toast({ title: t("User Deleted", "تم حذف المستخدم"), variant: "destructive" });
+      queryClient.invalidateQueries();
+    } catch (error: any) {
+      toast({
+        title: t("Deletion Failed", "فشل الحذف"),
+        description: error?.message || t("Could not delete this user.", "تعذر حذف هذا المستخدم."),
+        variant: "destructive"
+      });
+    } finally {
+      setDeletePendingId(null);
+    }
+  };
+
+  const handleSaveUser = async (data: any) => {
+    if (!editingUser) return;
+    try {
+      await customFetch(`/api/users/${editingUser.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      toast({ title: t("User Updated", "تم تحديث المستخدم") });
+      setIsUserModalOpen(false);
+      setEditingUser(null);
+      queryClient.invalidateQueries();
+    } catch (error: any) {
+      toast({
+        title: t("Update Failed", "فشل التحديث"),
+        description: error?.message || t("Could not save changes.", "تعذر حفظ التغييرات."),
+        variant: "destructive"
       });
     }
   };
@@ -684,6 +744,7 @@ export default function Admin() {
 
           {/* ── USERS ── */}
           {activeTab === "users" && (
+            <>
             <div className="bg-card border border-border rounded-2xl overflow-hidden">
               <div className="p-6 border-b border-border flex items-center justify-between gap-4 flex-wrap">
                 <h2 className="font-bold text-lg">{t("All Members", "جميع الأعضاء")} <span className="text-muted-foreground text-sm font-normal">({users.length})</span></h2>
@@ -735,13 +796,38 @@ export default function Admin() {
                             }`}>{u.role}</span>
                         </td>
                         <td className="px-6 py-4 text-right">
-                          <button 
-                            onClick={() => handleBan(u.id, u.fullName)}
-                            disabled={deleteUserMutation.isPending || u.id === user?.id}
-                            className="text-xs font-black text-rose hover:bg-rose/10 px-3 py-1.5 rounded-lg transition-all disabled:opacity-30 uppercase tracking-wider"
-                          >
-                            {deleteUserMutation.isPending ? t("Suspending...", "جار الحظر...") : t("Ban Citizen", "حظر مواطن")}
-                          </button>
+                          <div className="flex items-center justify-end gap-1">
+                            <button
+                              onClick={() => setViewingUser(u)}
+                              title={t("View", "عرض")}
+                              className="p-2 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
+                            >
+                              <Eye className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => { setEditingUser(u); setIsUserModalOpen(true); }}
+                              title={t("Edit", "تعديل")}
+                              className="p-2 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
+                            >
+                              <Edit className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => handleToggleBan(u)}
+                              disabled={banPendingId === u.id || u.id === user?.id}
+                              title={u.status === "banned" ? t("Unban", "إلغاء الحظر") : t("Ban", "حظر")}
+                              className="p-2 rounded-lg text-muted-foreground hover:text-gold hover:bg-gold/10 transition-colors disabled:opacity-30"
+                            >
+                              {u.status === "banned" ? <ShieldCheck className="w-4 h-4" /> : <Ban className="w-4 h-4" />}
+                            </button>
+                            <button
+                              onClick={() => handleDeleteUser(u)}
+                              disabled={deletePendingId === u.id || u.id === user?.id}
+                              title={t("Delete", "حذف")}
+                              className="p-2 rounded-lg text-muted-foreground hover:text-rose hover:bg-rose/10 transition-colors disabled:opacity-30"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -754,6 +840,160 @@ export default function Admin() {
                 )}
               </div>
             </div>
+
+            {/* View User Modal */}
+            {viewingUser && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-navy-dark/60 backdrop-blur-sm animate-in fade-in duration-200" onClick={() => setViewingUser(null)}>
+                <div className="bg-background border border-border rounded-3xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl p-8 animate-in zoom-in-95 duration-200" onClick={(e) => e.stopPropagation()}>
+                  <div className="flex items-center justify-between mb-6">
+                    <h3 className="text-2xl font-bold flex items-center gap-3">
+                      <UserCheck className="w-6 h-6 text-primary" />
+                      {t("Member Profile", "الملف الشخصي للعضو")}
+                    </h3>
+                    <button onClick={() => setViewingUser(null)} className="p-2 rounded-lg text-muted-foreground hover:bg-secondary transition-colors">
+                      <XIcon className="w-5 h-5" />
+                    </button>
+                  </div>
+                  <div className="flex items-center gap-4 mb-6">
+                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center text-white font-bold text-2xl overflow-hidden shrink-0">
+                      {viewingUser.avatarUrl ? <img src={viewingUser.avatarUrl} alt="" className="w-full h-full object-cover" /> : viewingUser.fullName?.[0]}
+                    </div>
+                    <div>
+                      <h4 className="text-lg font-bold">{viewingUser.fullName}</h4>
+                      {viewingUser.fullNameAr && <p className="text-muted-foreground text-sm" dir="rtl">{viewingUser.fullNameAr}</p>}
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4 text-sm mb-4">
+                    <div className="bg-secondary/40 p-3 rounded-xl border border-border">
+                      <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-1">{t("Email", "البريد")}</p>
+                      <p className="font-semibold break-all">{viewingUser.email}</p>
+                    </div>
+                    <div className="bg-secondary/40 p-3 rounded-xl border border-border">
+                      <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-1">{t("Phone", "الهاتف")}</p>
+                      <p className="font-semibold">{viewingUser.phone || "—"}</p>
+                    </div>
+                    <div className="bg-secondary/40 p-3 rounded-xl border border-border">
+                      <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-1">{t("Region", "الجهة")}</p>
+                      <p className="font-semibold">{viewingUser.region || "—"}</p>
+                    </div>
+                    <div className="bg-secondary/40 p-3 rounded-xl border border-border">
+                      <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-1">{t("Simulation Role", "دور المحاكاة")}</p>
+                      <p className="font-semibold">{viewingUser.simulationRole || "—"}</p>
+                    </div>
+                    <div className="bg-secondary/40 p-3 rounded-xl border border-border">
+                      <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-1">{t("Account Role", "دور الحساب")}</p>
+                      <p className="font-semibold capitalize">{viewingUser.role}</p>
+                    </div>
+                    <div className="bg-secondary/40 p-3 rounded-xl border border-border">
+                      <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-1">{t("Status", "الحالة")}</p>
+                      <p className="font-semibold capitalize">{viewingUser.status}</p>
+                    </div>
+                    <div className="bg-secondary/40 p-3 rounded-xl border border-border">
+                      <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-1">{t("Application Status", "حالة الطلب")}</p>
+                      <p className="font-semibold capitalize">{viewingUser.applicationStatus || "—"}</p>
+                    </div>
+                    <div className="bg-secondary/40 p-3 rounded-xl border border-border">
+                      <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-1">{t("Joined", "تاريخ الانضمام")}</p>
+                      <p className="font-semibold">{viewingUser.createdAt ? new Date(viewingUser.createdAt).toLocaleDateString() : "—"}</p>
+                    </div>
+                  </div>
+                  {viewingUser.linkedinUrl && (
+                    <a href={viewingUser.linkedinUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-primary hover:underline mb-4">
+                      <Linkedin className="w-4 h-4" /> {viewingUser.linkedinUrl}
+                    </a>
+                  )}
+                  {viewingUser.bio && (
+                    <div className="bg-secondary/40 p-4 rounded-xl border border-border mb-4">
+                      <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-2">{t("Bio", "نبذة")}</p>
+                      <p className="text-sm text-muted-foreground leading-relaxed">{viewingUser.bio}</p>
+                    </div>
+                  )}
+                  <Button
+                    onClick={() => { setEditingUser(viewingUser); setIsUserModalOpen(true); setViewingUser(null); }}
+                    className="w-full rounded-xl h-12"
+                  >
+                    <Edit className="w-4 h-4 mr-2" /> {t("Edit Member", "تعديل العضو")}
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {/* Edit User Modal */}
+            {isUserModalOpen && editingUser && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-navy-dark/60 backdrop-blur-sm animate-in fade-in duration-200">
+                <div className="bg-background border border-border rounded-3xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl p-8 animate-in zoom-in-95 duration-200">
+                  <h3 className="text-2xl font-bold mb-6 flex items-center gap-3">
+                    <Edit className="w-6 h-6 text-primary" />
+                    {t("Edit Member", "تعديل العضو")}
+                  </h3>
+                  <form onSubmit={(e) => {
+                    e.preventDefault();
+                    const formData = new FormData(e.currentTarget);
+                    const data = Object.fromEntries(formData.entries());
+                    handleSaveUser(data);
+                  }} className="space-y-5">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <label className="text-xs font-black text-muted-foreground uppercase tracking-widest">{t("Full Name", "الاسم الكامل")}</label>
+                        <Input name="fullName" defaultValue={editingUser.fullName} required className="rounded-xl border-border/50" />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-xs font-black text-muted-foreground uppercase tracking-widest">{t("Region", "الجهة")}</label>
+                        <Input name="region" defaultValue={editingUser.region} className="rounded-xl border-border/50" />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <label className="text-xs font-black text-muted-foreground uppercase tracking-widest">{t("Phone", "الهاتف")}</label>
+                        <Input name="phone" defaultValue={editingUser.phone} className="rounded-xl border-border/50" />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-xs font-black text-muted-foreground uppercase tracking-widest">{t("LinkedIn URL", "رابط لينكدإن")}</label>
+                        <Input name="linkedinUrl" defaultValue={editingUser.linkedinUrl} className="rounded-xl border-border/50" />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-xs font-black text-muted-foreground uppercase tracking-widest">{t("Simulation Role", "دور المحاكاة")}</label>
+                      <Input name="simulationRole" defaultValue={editingUser.simulationRole} placeholder="mp, minister, local_council..." className="rounded-xl border-border/50" />
+                    </div>
+                    <div className="grid grid-cols-3 gap-4">
+                      <div className="space-y-2">
+                        <label className="text-xs font-black text-muted-foreground uppercase tracking-widest">{t("Account Role", "دور الحساب")}</label>
+                        <Select name="role" defaultValue={editingUser.role} className="rounded-xl border-border/50">
+                          <option value="user">{t("User", "مستخدم")}</option>
+                          <option value="admin">{t("Admin", "مسؤول")}</option>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-xs font-black text-muted-foreground uppercase tracking-widest">{t("Status", "الحالة")}</label>
+                        <Select name="status" defaultValue={editingUser.status} className="rounded-xl border-border/50">
+                          <option value="active">{t("Active", "نشط")}</option>
+                          <option value="banned">{t("Banned", "محظور")}</option>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-xs font-black text-muted-foreground uppercase tracking-widest">{t("Application", "الطلب")}</label>
+                        <Select name="applicationStatus" defaultValue={editingUser.applicationStatus || "none"} className="rounded-xl border-border/50">
+                          <option value="none">{t("None", "لا يوجد")}</option>
+                          <option value="pending">{t("Pending", "معلق")}</option>
+                          <option value="approved">{t("Approved", "مقبول")}</option>
+                          <option value="rejected">{t("Rejected", "مرفوض")}</option>
+                        </Select>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-xs font-black text-muted-foreground uppercase tracking-widest">{t("Bio", "نبذة")}</label>
+                      <Textarea name="bio" defaultValue={editingUser.bio} className="h-20 rounded-2xl border-border/50" />
+                    </div>
+                    <div className="flex gap-3 pt-2">
+                      <Button type="button" variant="outline" onClick={() => { setIsUserModalOpen(false); setEditingUser(null); }} className="flex-1 rounded-xl h-12">{t("Cancel", "إلغاء")}</Button>
+                      <Button type="submit" className="flex-1 rounded-xl h-12 bg-primary hover:bg-primary/90 text-white font-bold">{t("Save Changes", "حفظ التغييرات")}</Button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            )}
+            </>
           )}
 
           {/* ── APPLICATIONS ── */}
@@ -782,6 +1022,18 @@ export default function Admin() {
                         <div>
                           <h3 className="text-lg font-bold">{app.user?.fullName}</h3>
                           <p className="text-muted-foreground text-sm">{app.user?.email}</p>
+                          <div className="flex items-center gap-3 mt-1">
+                            {(app.user as any)?.phone && (
+                              <a href={`tel:${(app.user as any).phone}`} className="text-xs text-muted-foreground hover:text-primary flex items-center gap-1">
+                                <Phone className="w-3 h-3" /> {(app.user as any).phone}
+                              </a>
+                            )}
+                            {(app.user as any)?.linkedinUrl && (
+                              <a href={(app.user as any).linkedinUrl} target="_blank" rel="noopener noreferrer" className="text-xs text-muted-foreground hover:text-primary flex items-center gap-1">
+                                <Linkedin className="w-3 h-3" /> {t("LinkedIn", "لينكدإن")}
+                              </a>
+                            )}
+                          </div>
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
@@ -793,7 +1045,7 @@ export default function Admin() {
                         </span>
                       </div>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                       <div className="bg-secondary/40 p-4 rounded-xl border border-border">
                         <div className="flex items-center gap-2 mb-2">
                           <MapPin className="w-4 h-4 text-primary" />
@@ -821,7 +1073,58 @@ export default function Admin() {
                           <p className="text-sm font-bold text-foreground capitalize">{app.parliamentHouse?.replace(/_/g, " ") || t("Not Specific", "غير محدد")}</p>
                         </div>
                       )}
+
+                      {(app as any).age && (
+                        <div className="bg-secondary/40 p-4 rounded-xl border border-border">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Calendar className="w-4 h-4 text-primary" />
+                            <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">{t("Age / Gender", "العمر / الجنس")}</span>
+                          </div>
+                          <p className="text-sm font-bold text-foreground">{(app as any).age}{(app as any).gender ? ` · ${(app as any).gender}` : ""}</p>
+                        </div>
+                      )}
+
+                      {(app as any).country && (
+                        <div className="bg-secondary/40 p-4 rounded-xl border border-border">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Globe className="w-4 h-4 text-primary" />
+                            <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">{t("Country", "البلد")}</span>
+                          </div>
+                          <p className="text-sm font-bold text-foreground">{(app as any).country}</p>
+                        </div>
+                      )}
+
+                      {(app as any).occupationStatus && (
+                        <div className="bg-secondary/40 p-4 rounded-xl border border-border">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Briefcase className="w-4 h-4 text-primary" />
+                            <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">{t("Status", "الحالة")}</span>
+                          </div>
+                          <p className="text-sm font-bold text-foreground">{(app as any).occupationStatus}</p>
+                        </div>
+                      )}
+
+                      {((app as any).educationLevel || (app as any).fieldOfStudy) && (
+                        <div className="bg-secondary/40 p-4 rounded-xl border border-border">
+                          <div className="flex items-center gap-2 mb-2">
+                            <GraduationCap className="w-4 h-4 text-primary" />
+                            <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">{t("Education", "التعليم")}</span>
+                          </div>
+                          <p className="text-sm font-bold text-foreground">
+                            {[(app as any).educationLevel, (app as any).fieldOfStudy].filter(Boolean).join(" — ")}
+                          </p>
+                        </div>
+                      )}
                     </div>
+
+                    {(app as any).interests && (
+                      <div className="flex items-center gap-2 flex-wrap mb-6">
+                        <Tag className="w-4 h-4 text-muted-foreground shrink-0" />
+                        {String((app as any).interests).split(",").map((i: string) => i.trim()).filter(Boolean).map((interest: string) => (
+                          <span key={interest} className="px-3 py-1 rounded-full text-xs font-semibold bg-secondary text-muted-foreground">{interest}</span>
+                        ))}
+                      </div>
+                    )}
 
                     <div className="bg-secondary/40 p-6 rounded-[24px] mb-8 border-2 border-border/40">
                       <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-4 flex items-center gap-2">

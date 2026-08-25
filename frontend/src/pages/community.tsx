@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useLanguage } from "@/hooks/use-language";
 import { Card, Badge, Button, Input, Textarea } from "@/components/ui-custom";
+import { useSeo } from "@/hooks/use-seo";
 import { 
   DropdownMenu,
   DropdownMenuTrigger,
@@ -63,6 +64,12 @@ interface Post extends APIPost {
 export default function Community() {
   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
   const { t, isAr } = useLanguage();
+  useSeo({
+    title: t("Community | Youth Capital", "المجتمع | يوث كابيتال"),
+    description: t("Discuss and debate with fellow delegates in the Youth Capital community.", "ناقش وتحاور مع زملائك المندوبين في مجتمع يوث كابيتال."),
+    path: "/community",
+    noindex: true,
+  });
   const { toast } = useToast();
   const [location] = useLocation();
   const [selectedForumId, setSelectedForumId] = useState<number | null>(null);
@@ -189,7 +196,7 @@ export default function Community() {
           </div>
           <div>
             <h1 className="text-xl font-display font-black text-foreground tracking-tight">{t("Civic Pulse", "النبض المدني")}</h1>
-            <p className="text-xs text-muted-foreground font-medium uppercase tracking-widest">{t("Community Chambers", "غرف المجتمع")}</p>
+            <p className="text-xs text-muted-foreground font-medium uppercase tracking-widest">{t("Community Spaces", "غرف المجتمع")}</p>
           </div>
         </div>
 
@@ -216,7 +223,7 @@ export default function Community() {
                 <div className={`text-[10px] uppercase font-bold tracking-tighter mt-0.5 opacity-70 ${
                   selectedForumId === forum.id ? "text-gold" : "text-muted-foreground"
                 }`}>
-                  {forum.postCount} {t("Motions", "مقترحات")}
+                  {forum.postCount} {t("Posts", "منشورات")}
                 </div>
               </div>
               {selectedForumId === forum.id && (
@@ -252,9 +259,9 @@ export default function Community() {
                 <div className="absolute inset-0 bg-gold/10 rounded-[2.5rem] animate-ping opacity-50" />
                 <MessageSquare className="w-10 h-10 text-gold" />
             </div>
-            <h2 className="text-3xl font-display font-black text-foreground mb-4">{t("Enter a Debate Chamber", "ادخل غرفة النقاش")}</h2>
+            <h2 className="text-3xl font-display font-black text-foreground mb-4">{t("Choose a Community", "اختر مجتمعاً")}</h2>
             <p className="text-muted-foreground max-w-sm font-medium leading-relaxed">
-              {t("Select a forum from the sidebar to represent your constituency and engage in the legislative simulation.", "اختر منتدى من القائمة الجانبية لتمثيل دائرتك الانتخابية والمشاركة في محاكاة العمل التشريعي.")}
+              {t("Select a community from the sidebar to join the conversation.", "اختر مجتمعاً من القائمة الجانبية للانضمام إلى النقاش.")}
             </p>
           </motion.div>
         ) : (
@@ -267,11 +274,7 @@ export default function Community() {
                   <div className="flex items-center gap-4 text-muted-foreground text-sm font-medium">
                      <span className="flex items-center gap-1.5">
                        <Users className="w-4 h-4" />
-                       {t("Simulation Members", "أعضاء المحاكاة")}
-                     </span>
-                     <span className="w-1 h-1 bg-border rounded-full" />
-                     <span className="px-2 py-0.5 bg-secondary/50 rounded text-[10px] uppercase font-bold tracking-wider">
-                       {forums.find(f => f.id === selectedForumId)?.category}
+                       {t("Community", "مجتمع")}
                      </span>
                   </div>
                 </div>
@@ -280,7 +283,7 @@ export default function Community() {
                    <div className="relative flex-1 max-w-sm">
                      <Search className="absolute start-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                      <Input 
-                       placeholder={t("Search motions...", "بحث في المقترحات...")}
+                       placeholder={t("Search posts...", "بحث في المنشورات...")}
                        value={searchQuery}
                        onChange={(e) => setSearchQuery(e.target.value)}
                        className="ps-11 h-12 bg-card border-border/50 rounded-2xl shadow-sm focus-visible:ring-gold/30"
@@ -302,7 +305,7 @@ export default function Community() {
                          onClick={() => setSortBy("newest")}
                          className={`rounded-xl py-3 px-4 font-bold flex items-center justify-between cursor-pointer ${sortBy === 'newest' ? 'bg-gold/10 text-gold' : ''}`}
                        >
-                         {t("Newest Motions", "أحدث المقترحات")}
+                         {t("Newest Posts", "أحدث المنشورات")}
                          {sortBy === 'newest' && <div className="w-1.5 h-1.5 bg-gold rounded-full" />}
                        </DropdownMenuItem>
                        <DropdownMenuItem 
@@ -320,7 +323,7 @@ export default function Community() {
                       onClick={() => setIsComposing(!isComposing)}
                       className="gap-3 h-12 px-6 rounded-2xl shadow-xl shadow-gold/20 text-[15px] font-bold shrink-0"
                     >
-                      {isComposing ? t("Cancel", "إلغاء") : <><Plus className="w-5 h-5"/> {t("New Motion", "موضوع جديد")}</>}
+                      {isComposing ? t("Cancel", "إلغاء") : <><Plus className="w-5 h-5"/> {t("New Post", "منشور جديد")}</>}
                    </Button>
                 </div>
               </div>
@@ -334,35 +337,34 @@ export default function Community() {
                   className="overflow-hidden"
                 >
                   <Card className="p-8 border-gold/25 shadow-2xl shadow-gold/5 relative">
-                    <div className="absolute top-4 right-4 text-[10px] uppercase font-bold text-gold tracking-widest">{t("DRAFTING PHASE", "مرحلة الصياغة")}</div>
                     <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
                       <Send className="w-5 h-5 text-gold" />
-                      {t("Propose a New Motion", "اقتراح موضوع جديد")}
+                      {t("Start a New Post", "إنشاء منشور جديد")}
                     </h3>
                     <div className="space-y-5">
-                      <Input 
-                        placeholder={t("Subject line...", "موضوع النقاش...")} 
+                      <Input
+                        placeholder={t("Title (optional)...", "العنوان (اختياري)...")}
                         value={newPostTitle}
                         onChange={(e) => setNewPostTitle(e.target.value)}
                         className="bg-secondary/30 border-none h-14 text-lg font-bold px-6 rounded-2xl"
                       />
-                      <Textarea 
-                        placeholder={t("Elaborate on your proposal... Use evidence-based arguments for better impact.", "اشرح مقترحك بالتفصيل... استخدم حججاً مبنية على أدلة لتأثير أفضل.")}
+                      <Textarea
+                        placeholder={t("Share your thoughts with the community...", "شارك أفكارك مع المجتمع...")}
                         value={newPostContent}
                         onChange={(e) => setNewPostContent(e.target.value)}
                         className="min-h-[150px] bg-secondary/30 border-none text-md leading-relaxed p-6 rounded-2xl"
                       />
                       <div className="flex justify-between items-center bg-secondary/20 p-4 rounded-2xl border border-dashed border-border/50">
                         <p className="text-xs text-muted-foreground font-medium italic">
-                          {t("This proposal will be visible to all members of this chamber.", "سيكون هذا المقترح مرئياً لجميع أعضاء هذه الغرفة.")}
+                          {t("This post will be visible to everyone in this community.", "سيكون هذا المنشور مرئياً لجميع أعضاء هذا المجتمع.")}
                         </p>
-                        <Button 
-                          variant="gold" 
+                        <Button
+                          variant="gold"
                           onClick={handlePostSubmit}
                           disabled={!newPostContent || createPostMutation.isPending}
                           className="h-12 px-8 font-bold shadow-lg shadow-gold/20"
                         >
-                          {t("Publish to Forum", "نشر في المنتدى")}
+                          {t("Publish", "نشر")}
                         </Button>
                       </div>
                     </div>
@@ -384,8 +386,8 @@ export default function Community() {
                   <div className="w-16 h-16 bg-secondary/40 rounded-full flex items-center justify-center mx-auto mb-4">
                     <Plus className="w-8 h-8 text-muted-foreground/40" />
                   </div>
-                  <h3 className="text-xl font-display font-black text-foreground mb-1">{t("Floor is open", "الباب مفتوح")}</h3>
-                  <p className="text-muted-foreground font-medium">{t("No motions have been tabled yet.", "لم يتم طرح أي مقترحات بعد.")}</p>
+                  <h3 className="text-xl font-display font-black text-foreground mb-1">{t("Nothing here yet", "لا يوجد شيء هنا بعد")}</h3>
+                  <p className="text-muted-foreground font-medium">{t("Be the first to share something with this community.", "كن أول من يشارك شيئاً مع هذا المجتمع.")}</p>
                 </div>
               ) : (
                 (postsData.posts as any as Post[]).map(post => (

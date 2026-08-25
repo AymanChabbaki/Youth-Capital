@@ -18,6 +18,7 @@ import {
   Check
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useSeo } from "@/hooks/use-seo";
 
 export default function ArticleDetail() {
   const { id } = useParams<{ id: string }>();
@@ -48,7 +49,31 @@ export default function ArticleDetail() {
   };
   const { data: article, isLoading } = useGetArticle(articleId);
   const { data: latestArticlesData } = useGetArticles({ limit: 4 });
-  
+
+  const articleTitle = article ? (isAr ? article.titleAr : article.title) : t("Report Not Found", "التقرير غير موجود");
+  const articleBody = article ? (isAr ? article.contentAr : article.content) : "";
+  useSeo({
+    title: article ? `${articleTitle} | Youth Capital` : t("Report Not Found | Youth Capital", "التقرير غير موجود | يوث كابيتال"),
+    description: articleBody
+      ? `${articleBody.replace(/\s+/g, " ").slice(0, 155).trim()}…`
+      : t("Read reports from Youth Capital's simulated Moroccan Parliament, Ministries, and Regional Councils.", "اطّلع على تقارير من برلمان ووزارات ومجالس يوث كابيتال المغربية المحاكاة."),
+    path: `/press/${id}`,
+    image: article?.thumbnailUrl,
+    noindex: !isLoading && !article,
+    jsonLd: article
+      ? {
+          "@context": "https://schema.org",
+          "@type": "NewsArticle",
+          headline: articleTitle,
+          image: article.thumbnailUrl ? [article.thumbnailUrl] : undefined,
+          datePublished: article.publishedAt,
+          author: article.author?.fullName ? { "@type": "Person", name: article.author.fullName } : undefined,
+          publisher: { "@type": "Organization", name: "Youth Capital", url: "https://www.youthcapital.org/" },
+          mainEntityOfPage: `https://www.youthcapital.org/press/${id}`,
+        }
+      : undefined,
+  });
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex flex-col items-center justify-center">
@@ -223,7 +248,7 @@ export default function ArticleDetail() {
                   >
                     <div className="h-60 relative overflow-hidden">
                       {a.thumbnailUrl ? (
-                        <img src={a.thumbnailUrl} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                        <img src={a.thumbnailUrl} alt={a.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
                       ) : (
                         <div className="w-full h-full bg-secondary/40 flex items-center justify-center text-muted-foreground/40 font-black text-2xl">YC PRESS</div>
                       )}

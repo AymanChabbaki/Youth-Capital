@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { useLanguage } from "@/hooks/use-language";
+import { useSeo } from "@/hooks/use-seo";
 import { Button, Card, CountUp, TiltCard, SectionBackdrop } from "@/components/ui-custom";
 import { Link } from "wouter";
 import { useGetPlatformStats, useGetForums, useGetArticles, useGetPolls } from "@workspace/api-client-react";
-import { Users, FileText, Landmark, ShieldAlert, ArrowRight, Gavel, Briefcase, AlertCircle, Target, Zap, ArrowUp } from "lucide-react";
+import { Users, FileText, Landmark, ShieldAlert, ArrowRight, Gavel, Briefcase, Target, Zap, ArrowUp, Leaf } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 // Rotating "live activity" social-proof ticker
@@ -67,6 +68,17 @@ const DiscordIcon = ({ className }: { className?: string }) => (
 
 export default function Home() {
   const { t, isAr } = useLanguage();
+  useSeo({
+    title: t(
+      "Youth Capital | Moroccan Youth Governance Simulation",
+      "يوث كابيتال | محاكاة الحوكمة للشباب المغربي"
+    ),
+    description: t(
+      "Youth Capital is Morocco's first digital civic governance simulation. Take a seat in a simulated Parliament, Ministries, and Regional Councils to debate policy, propose bills, and build real leadership skills.",
+      "يوث كابيتال هي أول محاكاة رقمية للحوكمة المدنية في المغرب. احجز مقعدك في برلمان ووزارات ومجالس جهوية افتراضية لمناقشة السياسات واقتراح القوانين وبناء مهارات قيادية حقيقية."
+    ),
+    path: "/",
+  });
   const { data: stats } = useGetPlatformStats();
   const { data: forumsData } = useGetForums();
   const { data: articlesData } = useGetArticles();
@@ -100,9 +112,11 @@ export default function Home() {
           muted
           playsInline
           className="absolute inset-0 w-full h-full object-cover pointer-events-none z-0 opacity-75"
-          poster={`${import.meta.env.BASE_URL}images/hero-bg.png`}
+          poster={`${import.meta.env.BASE_URL}images/hero-bg.webp`}
+          aria-hidden="true"
         >
           <source src={`${import.meta.env.BASE_URL}herobg.mp4`} type="video/mp4" />
+          <track kind="captions" srcLang="en" label="English" src={`${import.meta.env.BASE_URL}captions-empty.vtt`} />
         </video>
         {/* Gradient Overlay */}
         <div className="absolute inset-0 bg-gradient-to-r from-[#0d1828]/75 via-[#0d1828]/40 to-[#1b2a4a]/30 z-0 pointer-events-none" />
@@ -400,16 +414,16 @@ export default function Home() {
               viewport={{ once: true }}
               className="text-3xl md:text-6xl font-display font-black text-foreground mb-4"
             >
-              {t("The Simulation Core", "قلب المحاكاة")}
+              {t("Explore What Matters", "استكشف ما يهمك")}
             </motion.h2>
-            <motion.p 
+            <motion.p
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.1 }}
               className="text-muted-foreground max-w-2xl mx-auto text-base md:text-lg"
             >
-              {t("A technically superior replica of the Moroccan governance system.", "نسخة متطورة تقنياً من نظام الحوكمة المغربي.")}
+              {t("Engage with the topics shaping your future — politics, business, and the planet.", "شارك في المواضيع التي تشكل مستقبلك: السياسة، الأعمال، والكوكب.")}
             </motion.p>
           </div>
 
@@ -417,39 +431,39 @@ export default function Home() {
             {[
               {
                 id: 0,
-                title: t("Parliament", "البرلمان"),
-                shortDesc: t("Legislative Power", "السلطة التشريعية"),
+                title: t("Politics", "السياسة"),
+                shortDesc: t("Civic & Policy", "الشأن العام"),
                 fullDesc: t(
-                  "Draft and vote on legislation mirroring real-world issues. Experience national checks and balances.",
-                  "صياغة والتصويت على التشريعات التي تعكس قضايا العالم الحقيقي."
+                  "Debate policy, follow governance, and engage with the issues shaping society.",
+                  "ناقش السياسات، تابع الحوكمة، وشارك في القضايا التي تشكل المجتمع."
                 ),
                 icon: Gavel,
-                img: "parliament.png",
+                img: "parliament.webp",
                 color: "from-blue-900/40 to-blue-800/20"
               },
               {
                 id: 1,
-                title: t("Ministries", "الوزارات"),
-                shortDesc: t("Executive Branch", "السلطة التنفيذية"),
+                title: t("Entrepreneurship", "ريادة الأعمال"),
+                shortDesc: t("Build & Innovate", "البناء والابتكار"),
                 fullDesc: t(
-                  "Take charge of a sector, lead budgets, and implement national policies that shape the future.",
-                  "تولى مسؤولية قطاع، قد الميزانيات، ونفذ السياسات الوطنية."
+                  "Connect with founders, share ideas, and turn ambition into action.",
+                  "تواصل مع رواد الأعمال، شارك الأفكار، وحوّل الطموح إلى واقع."
                 ),
                 icon: Briefcase,
-                img: "hero-bg.png",
+                img: "hero-bg.webp",
                 color: "from-gold/40 to-yellow-900/20"
               },
               {
                 id: 2,
-                title: t("Crises", "الطوارئ"),
-                shortDesc: t("Crisis Response", "إدارة الأزمات"),
+                title: t("Climate", "المناخ"),
+                shortDesc: t("Sustainability", "الاستدامة"),
                 fullDesc: t(
-                  "Respond to emergencies injected by Game Masters. Test your leadership under pressure.",
-                  "استجب لحالات الطوارئ الوطنية غير المتوقعة واختبر قيادتك."
+                  "Champion climate action, sustainability, and environmental awareness.",
+                  "ادعم العمل المناخي والاستدامة والوعي البيئي."
                 ),
-                icon: AlertCircle,
-                img: "parliament.png",
-                color: "from-red-900/40 to-red-800/20"
+                icon: Leaf,
+                img: "general_assembly.webp",
+                color: "from-green-900/40 to-green-800/20"
               }
             ].map((feature, i) => {
               const isActive = activeFeature === feature.id;
@@ -594,16 +608,16 @@ export default function Home() {
               viewport={{ once: true }}
               className="text-3xl md:text-5xl font-display font-black text-foreground mb-4"
             >
-              {t("Explore Our Chambers", "استكشف غرف النقاش لدينا")}
+              {t("Explore Our Communities", "استكشف مجتمعاتنا")}
             </motion.h2>
-            <motion.p 
+            <motion.p
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.1 }}
               className="text-muted-foreground max-w-2xl text-base md:text-lg"
             >
-              {t("Hover or tap the list items to preview our active simulation hubs and enter your designated chamber.", "مرر المؤشر أو اضغط على عناصر القائمة لمعاينة مراكز المحاكاة النشطة والدخول إلى غرفتك المخصصة.")}
+              {t("Hover or tap the list items to preview our active communities and join the conversation.", "مرر المؤشر أو اضغط على عناصر القائمة لمعاينة مجتمعاتنا النشطة والانضمام إلى النقاش.")}
             </motion.p>
           </div>
 
@@ -664,21 +678,21 @@ export default function Home() {
                       src={`${import.meta.env.BASE_URL}images/${(() => {
                         const forumObj = forumsData?.forums?.find((f: any) => f.id === activeCommunity);
                         switch (activeCommunity) {
-                          case 1: return "parliament.png";
-                          case 2: return "hero-bg.png";
-                          case 3: return "ministry_finance.png";
-                          case 4: return "ministry_health.png";
-                          case 5: return "ministry_education.png";
-                          case 6: return "regional_council.png";
-                          case 7: return "general_assembly.png";
+                          case 1: return "parliament.webp";
+                          case 2: return "hero-bg.webp";
+                          case 3: return "ministry_finance.webp";
+                          case 4: return "ministry_health.webp";
+                          case 5: return "ministry_education.webp";
+                          case 6: return "regional_council.webp";
+                          case 7: return "general_assembly.webp";
                           default:
-                            if (forumObj?.category === "parliament") return "parliament.png";
-                            if (forumObj?.category === "ministry") return "ministry_finance.png";
-                            if (forumObj?.category === "regional") return "regional_council.png";
-                            return "general_assembly.png";
+                            if (forumObj?.category === "parliament") return "parliament.webp";
+                            if (forumObj?.category === "ministry") return "ministry_finance.webp";
+                            if (forumObj?.category === "regional") return "regional_council.webp";
+                            return "general_assembly.webp";
                         }
                       })()}`}
-                      alt="Chamber Preview"
+                      alt="Community Preview"
                       initial={{ opacity: 0, scale: 1.05 }}
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0 }}
