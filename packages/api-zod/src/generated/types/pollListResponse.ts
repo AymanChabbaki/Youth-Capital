@@ -5,7 +5,7 @@
  * Youth CapitalCore API
  * OpenAPI spec version: 0.1.0
  */
-import type { Poll } from "./poll";
+import type { Poll } from "./poll.js";
 
 export interface PollListResponse {
   polls: Poll[];

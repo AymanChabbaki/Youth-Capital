@@ -5,7 +5,7 @@
  * Youth CapitalCore API
  * OpenAPI spec version: 0.1.0
  */
-import type { UpdateRoleApplicationRequestStatus } from "./updateRoleApplicationRequestStatus";
+import type { UpdateRoleApplicationRequestStatus } from "./updateRoleApplicationRequestStatus.js";
 
 export interface UpdateRoleApplicationRequest {
   status: UpdateRoleApplicationRequestStatus;

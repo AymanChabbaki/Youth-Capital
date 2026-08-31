@@ -5,7 +5,7 @@
  * Youth CapitalCore API
  * OpenAPI spec version: 0.1.0
  */
-import type { Article } from "./article";
+import type { Article } from "./article.js";
 
 export interface ArticleListResponse {
   articles: Article[];

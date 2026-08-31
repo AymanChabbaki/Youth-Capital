@@ -5,8 +5,8 @@
  * Youth CapitalCore API
  * OpenAPI spec version: 0.1.0
  */
-import type { PollOption } from "./pollOption";
-import type { PollStatus } from "./pollStatus";
+import type { PollOption } from "./pollOption.js";
+import type { PollStatus } from "./pollStatus.js";
 
 export interface Poll {
   id: number;

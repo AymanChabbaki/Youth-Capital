@@ -5,8 +5,8 @@
  * Youth CapitalCore API
  * OpenAPI spec version: 0.1.0
  */
-import type { CrisisSeverity } from "./crisisSeverity";
-import type { User } from "./user";
+import type { CrisisSeverity } from "./crisisSeverity.js";
+import type { User } from "./user.js";
 
 export interface Crisis {
   id: number;

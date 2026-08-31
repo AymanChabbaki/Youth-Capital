@@ -5,7 +5,7 @@
  * Youth CapitalCore API
  * OpenAPI spec version: 0.1.0
  */
-import type { GetArticlesType } from "./getArticlesType";
+import type { GetArticlesType } from "./getArticlesType.js";
 
 export type GetArticlesParams = {
   type?: GetArticlesType;

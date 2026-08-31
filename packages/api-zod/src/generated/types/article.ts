@@ -5,8 +5,8 @@
  * Youth CapitalCore API
  * OpenAPI spec version: 0.1.0
  */
-import type { ArticleType } from "./articleType";
-import type { User } from "./user";
+import type { ArticleType } from "./articleType.js";
+import type { User } from "./user.js";
 
 export interface Article {
   id: number;

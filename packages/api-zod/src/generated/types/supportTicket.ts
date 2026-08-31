@@ -5,8 +5,8 @@
  * Youth CapitalCore API
  * OpenAPI spec version: 0.1.0
  */
-import type { SupportTicketStatus } from "./supportTicketStatus";
-import type { User } from "./user";
+import type { SupportTicketStatus } from "./supportTicketStatus.js";
+import type { User } from "./user.js";
 
 export interface SupportTicket {
   id: number;

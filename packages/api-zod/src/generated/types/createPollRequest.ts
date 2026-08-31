@@ -5,7 +5,7 @@
  * Youth CapitalCore API
  * OpenAPI spec version: 0.1.0
  */
-import type { CreatePollRequestOptionsItem } from "./createPollRequestOptionsItem";
+import type { CreatePollRequestOptionsItem } from "./createPollRequestOptionsItem.js";
 
 export interface CreatePollRequest {
   title: string;

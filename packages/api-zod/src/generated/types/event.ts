@@ -5,7 +5,7 @@
  * Youth CapitalCore API
  * OpenAPI spec version: 0.1.0
  */
-import type { EventType } from "./eventType";
+import type { EventType } from "./eventType.js";
 
 export interface Event {
   id: number;

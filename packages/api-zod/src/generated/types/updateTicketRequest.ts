@@ -5,7 +5,7 @@
  * Youth CapitalCore API
  * OpenAPI spec version: 0.1.0
  */
-import type { UpdateTicketRequestStatus } from "./updateTicketRequestStatus";
+import type { UpdateTicketRequestStatus } from "./updateTicketRequestStatus.js";
 
 export interface UpdateTicketRequest {
   status: UpdateTicketRequestStatus;

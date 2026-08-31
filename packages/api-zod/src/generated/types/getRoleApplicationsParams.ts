@@ -5,7 +5,7 @@
  * Youth CapitalCore API
  * OpenAPI spec version: 0.1.0
  */
-import type { GetRoleApplicationsStatus } from "./getRoleApplicationsStatus";
+import type { GetRoleApplicationsStatus } from "./getRoleApplicationsStatus.js";
 
 export type GetRoleApplicationsParams = {
   status?: GetRoleApplicationsStatus;

@@ -5,7 +5,7 @@
  * Youth CapitalCore API
  * OpenAPI spec version: 0.1.0
  */
-import type { ForumCategory } from "./forumCategory";
+import type { ForumCategory } from "./forumCategory.js";
 
 export interface Forum {
   id: number;

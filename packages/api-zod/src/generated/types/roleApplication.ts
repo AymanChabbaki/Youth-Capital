@@ -5,8 +5,8 @@
  * Youth CapitalCore API
  * OpenAPI spec version: 0.1.0
  */
-import type { RoleApplicationStatus } from "./roleApplicationStatus";
-import type { User } from "./user";
+import type { RoleApplicationStatus } from "./roleApplicationStatus.js";
+import type { User } from "./user.js";
 
 export interface RoleApplication {
   id: number;

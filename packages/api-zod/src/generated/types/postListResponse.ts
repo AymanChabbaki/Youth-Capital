@@ -5,7 +5,7 @@
  * Youth CapitalCore API
  * OpenAPI spec version: 0.1.0
  */
-import type { Post } from "./post";
+import type { Post } from "./post.js";
 
 export interface PostListResponse {
   posts: Post[];

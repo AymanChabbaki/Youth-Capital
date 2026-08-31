@@ -5,10 +5,10 @@
  * Youth CapitalCore API
  * OpenAPI spec version: 0.1.0
  */
-import type { UserApplicationStatus } from "./userApplicationStatus";
-import type { UserLanguagePreference } from "./userLanguagePreference";
-import type { UserRole } from "./userRole";
-import type { UserStatus } from "./userStatus";
+import type { UserApplicationStatus } from "./userApplicationStatus.js";
+import type { UserLanguagePreference } from "./userLanguagePreference.js";
+import type { UserRole } from "./userRole.js";
+import type { UserStatus } from "./userStatus.js";
 
 export interface User {
   id: number;

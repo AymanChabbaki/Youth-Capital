@@ -5,7 +5,7 @@
  * Youth CapitalCore API
  * OpenAPI spec version: 0.1.0
  */
-import type { UpdateUserRequestLanguagePreference } from "./updateUserRequestLanguagePreference";
+import type { UpdateUserRequestLanguagePreference } from "./updateUserRequestLanguagePreference.js";
 
 export interface UpdateUserRequest {
   fullName?: string;

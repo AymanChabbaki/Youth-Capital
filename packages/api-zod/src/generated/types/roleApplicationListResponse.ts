@@ -5,7 +5,7 @@
  * Youth CapitalCore API
  * OpenAPI spec version: 0.1.0
  */
-import type { RoleApplication } from "./roleApplication";
+import type { RoleApplication } from "./roleApplication.js";
 
 export interface RoleApplicationListResponse {
   applications: RoleApplication[];

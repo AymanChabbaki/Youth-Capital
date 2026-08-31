@@ -5,7 +5,7 @@
  * Youth CapitalCore API
  * OpenAPI spec version: 0.1.0
  */
-import type { Crisis } from "./crisis";
+import type { Crisis } from "./crisis.js";
 
 export interface CrisisListResponse {
   crises: Crisis[];

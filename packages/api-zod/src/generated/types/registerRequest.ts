@@ -5,7 +5,7 @@
  * Youth CapitalCore API
  * OpenAPI spec version: 0.1.0
  */
-import type { RegisterRequestLanguagePreference } from "./registerRequestLanguagePreference";
+import type { RegisterRequestLanguagePreference } from "./registerRequestLanguagePreference.js";
 
 export interface RegisterRequest {
   email: string;

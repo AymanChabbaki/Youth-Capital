@@ -5,7 +5,7 @@
  * Youth CapitalCore API
  * OpenAPI spec version: 0.1.0
  */
-import type { CreateTicketRequestCategory } from "./createTicketRequestCategory";
+import type { CreateTicketRequestCategory } from "./createTicketRequestCategory.js";
 
 export interface CreateTicketRequest {
   subject: string;

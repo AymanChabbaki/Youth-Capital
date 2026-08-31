@@ -5,7 +5,7 @@
  * Youth CapitalCore API
  * OpenAPI spec version: 0.1.0
  */
-import type { CreateArticleRequestType } from "./createArticleRequestType";
+import type { CreateArticleRequestType } from "./createArticleRequestType.js";
 
 export interface CreateArticleRequest {
   /** Optional custom URL slug. Auto-generated from the title when omitted. */

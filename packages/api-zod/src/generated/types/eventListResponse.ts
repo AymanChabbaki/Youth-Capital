@@ -5,7 +5,7 @@
  * Youth CapitalCore API
  * OpenAPI spec version: 0.1.0
  */
-import type { Event } from "./event";
+import type { Event } from "./event.js";
 
 export interface EventListResponse {
   events: Event[];

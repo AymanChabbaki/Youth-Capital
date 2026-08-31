@@ -5,7 +5,7 @@
  * Youth CapitalCore API
  * OpenAPI spec version: 0.1.0
  */
-import type { CreateCrisisRequestSeverity } from "./createCrisisRequestSeverity";
+import type { CreateCrisisRequestSeverity } from "./createCrisisRequestSeverity.js";
 
 export interface CreateCrisisRequest {
   title: string;

@@ -5,7 +5,7 @@
  * Youth CapitalCore API
  * OpenAPI spec version: 0.1.0
  */
-import type { Forum } from "./forum";
+import type { Forum } from "./forum.js";
 
 export interface ForumListResponse {
   forums: Forum[];

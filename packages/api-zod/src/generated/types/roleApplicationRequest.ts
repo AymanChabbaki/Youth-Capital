@@ -5,9 +5,9 @@
  * Youth CapitalCore API
  * OpenAPI spec version: 0.1.0
  */
-import type { RoleApplicationRequestLanguagePreference } from "./roleApplicationRequestLanguagePreference";
-import type { RoleApplicationRequestParliamentHouse } from "./roleApplicationRequestParliamentHouse";
-import type { RoleApplicationRequestPreferredRole } from "./roleApplicationRequestPreferredRole";
+import type { RoleApplicationRequestLanguagePreference } from "./roleApplicationRequestLanguagePreference.js";
+import type { RoleApplicationRequestParliamentHouse } from "./roleApplicationRequestParliamentHouse.js";
+import type { RoleApplicationRequestPreferredRole } from "./roleApplicationRequestPreferredRole.js";
 
 export interface RoleApplicationRequest {
   preferredRole: RoleApplicationRequestPreferredRole;
