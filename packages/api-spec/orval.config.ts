@@ -39,6 +39,9 @@ export default defineConfig({
         },
       },
     },
+    hooks: {
+      afterAllFilesWrite: "node ./scripts/fix-esm-extensions.mjs",
+    },
   },
   zod: {
     input: {
@@ -67,6 +70,9 @@ export default defineConfig({
         useDates: true,
         useBigInt: true,
       },
+    },
+    hooks: {
+      afterAllFilesWrite: "node ./scripts/fix-esm-extensions.mjs",
     },
   },
 });

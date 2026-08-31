@@ -57,10 +57,10 @@ import type {
   UpdateUserRequest,
   User,
   UserListResponse,
-} from "./api.schemas";
+} from "./api.schemas.js";
 
 import { customFetch } from "../custom-fetch";
-import type { ErrorType, BodyType } from "../custom-fetch";
+import type { ErrorType, BodyType } from "../custom-fetch.js";
 
 type AwaitedInput<T> = PromiseLike<T> | T;
 
