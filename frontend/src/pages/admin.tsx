@@ -1313,6 +1313,19 @@ export default function Admin() {
                         </div>
                       </div>
                       <div className="space-y-2">
+                        <label className="text-xs font-black text-muted-foreground uppercase tracking-widest">{t("URL Slug (optional)", "الرابط المختصر (اختياري)")}</label>
+                        <Input
+                          name="slug"
+                          defaultValue={editingArticle?.slug}
+                          placeholder={t("Auto-generated from the title if left blank", "يُنشأ تلقائياً من العنوان إذا تُرك فارغاً")}
+                          className="rounded-xl border-border/50"
+                        />
+                        <p className="text-xs text-muted-foreground">
+                          {t("Shown at youthcapital.org/press/", "يظهر في youthcapital.org/press/")}
+                          <span className="font-mono">{editingArticle?.slug || t("your-slug-here", "الرابط-هنا")}</span>
+                        </p>
+                      </div>
+                      <div className="space-y-2">
                         <label className="text-xs font-black text-muted-foreground uppercase tracking-widest">{t("Article Type", "نوع المقال")}</label>
                         {/* Values must match the article_type Postgres enum: simulation | platform */}
                         <Select name="type" defaultValue={editingArticle?.type || "simulation"} className="rounded-xl border-border/50">

@@ -503,13 +503,13 @@ paths:
     get:
       operationId: getArticle
       tags: [press]
-      summary: Get a single article
+      summary: Get a single article by slug (or legacy numeric id)
       parameters:
         - name: id
           in: path
           required: true
           schema:
-            type: integer
+            type: string
       responses:
         "200":
           description: Article details
@@ -1046,6 +1046,8 @@ components:
       properties:
         id:
           type: integer
+        slug:
+          type: string
         title:
           type: string
         titleAr:
@@ -1068,7 +1070,7 @@ components:
         createdAt:
           type: string
           format: date-time
-      required: [id, title, titleAr, content, contentAr, type, author, publishedAt, createdAt]
+      required: [id, slug, title, titleAr, content, contentAr, type, author, publishedAt, createdAt]
 
     ArticleListResponse:
       type: object
@@ -1088,6 +1090,9 @@ components:
     CreateArticleRequest:
       type: object
       properties:
+        slug:
+          type: string
+          description: Optional custom URL slug. Auto-generated from the title when omitted.
         title:
           type: string
         titleAr:

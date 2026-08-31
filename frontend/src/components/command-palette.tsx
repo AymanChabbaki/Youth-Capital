@@ -114,7 +114,7 @@ export function CommandPalette() {
             <CommandSeparator />
             <CommandGroup heading={t("Press Articles", "المقالات الصحفية")}>
               {articlesData!.articles.slice(0, 5).map((article: any) => (
-                <CommandItem key={`article-${article.id}`} onSelect={() => go(`/press/${article.id}`)} className="gap-3">
+                <CommandItem key={`article-${article.id}`} onSelect={() => go(`/press/${article.slug}`)} className="gap-3">
                   <FileText className="text-gold" />
                   {isAr ? article.titleAr : article.title}
                 </CommandItem>

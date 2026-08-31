@@ -7,6 +7,10 @@ export const articleTypeEnum = pgEnum("article_type", ["simulation", "platform"]
 
 export const articlesTable = pgTable("articles", {
   id: serial("id").primaryKey(),
+  // Nullable for now: existing rows need a one-time backfill (see
+  // scripts/src/backfill-article-slugs.ts) before this can become NOT NULL.
+  // New rows always get one from the create-article route.
+  slug: text("slug").unique(),
   title: text("title").notNull(),
   titleAr: text("title_ar").notNull(),
   content: text("content").notNull(),

@@ -942,7 +942,7 @@ export default function Home() {
                   viewport={{ once: true }}
                   transition={{ delay: 0.08 * idx }}
                 >
-                  <Link href={`/press/${article.id}`}>
+                  <Link href={`/press/${article.slug}`}>
                     <div className="py-8 flex flex-col md:flex-row md:items-center justify-between gap-6 group cursor-pointer">
                       <div className="flex-1 space-y-2">
                         <div className="flex items-center gap-3">

@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation, useParams, Link } from "wouter";
 import { useLanguage } from "@/hooks/use-language";
@@ -25,9 +26,7 @@ export default function ArticleDetail() {
   const { t, isAr } = useLanguage();
   const [, setLocation] = useLocation();
   const { toast } = useToast();
-  
-  const articleId = parseInt(id || "0");
-  
+
   const handleShare = async () => {
     const url = window.location.href;
     try {
@@ -47,18 +46,28 @@ export default function ArticleDetail() {
       console.error(err);
     }
   };
-  const { data: article, isLoading } = useGetArticle(articleId);
+  const { data: article, isLoading } = useGetArticle(id || "");
   const { data: latestArticlesData } = useGetArticles({ limit: 4 });
+
+  // Legacy /press/3-style links still resolve (the API accepts numeric ids
+  // as a fallback), but once loaded we swap the URL to the canonical slug so
+  // the address bar, canonical tag, and any re-share all point at one URL.
+  useEffect(() => {
+    if (article && article.slug && id !== article.slug) {
+      setLocation(`/press/${article.slug}`, { replace: true });
+    }
+  }, [article, id]);
 
   const articleTitle = article ? (isAr ? article.titleAr : article.title) : t("Report Not Found", "التقرير غير موجود");
   const articleBody = article ? (isAr ? article.contentAr : article.content) : "";
+  const canonicalSlug = article?.slug || id;
   useSeo({
     title: article ? `${articleTitle} | Youth Capital` : t("Report Not Found | Youth Capital", "التقرير غير موجود | يوث كابيتال"),
     description: articleBody
       ? `${articleBody.replace(/\s+/g, " ").slice(0, 155).trim()}…`
       : t("Read reports from Youth Capital's simulated Moroccan Parliament, Ministries, and Regional Councils.", "اطّلع على تقارير من برلمان ووزارات ومجالس يوث كابيتال المغربية المحاكاة."),
-    path: `/press/${id}`,
-    image: article?.thumbnailUrl,
+    path: `/press/${canonicalSlug}`,
+    image: article?.thumbnailUrl || undefined,
     noindex: !isLoading && !article,
     jsonLd: article
       ? {
@@ -69,7 +78,7 @@ export default function ArticleDetail() {
           datePublished: article.publishedAt,
           author: article.author?.fullName ? { "@type": "Person", name: article.author.fullName } : undefined,
           publisher: { "@type": "Organization", name: "Youth Capital", url: "https://www.youthcapital.org/" },
-          mainEntityOfPage: `https://www.youthcapital.org/press/${id}`,
+          mainEntityOfPage: `https://www.youthcapital.org/press/${canonicalSlug}`,
         }
       : undefined,
   });
@@ -241,7 +250,7 @@ export default function ArticleDetail() {
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
               {latestArticles.map(a => (
-                <Link key={a.id} href={`/press/${a.id}`}>
+                <Link key={a.id} href={`/press/${a.slug}`}>
                   <motion.div 
                     whileHover={{ y: -8 }}
                     className="bg-card rounded-[2.5rem] overflow-hidden border border-border/50 shadow-sm hover:border-gold/40 hover:shadow-2xl hover:shadow-gold/5 transition-all cursor-pointer group h-full"

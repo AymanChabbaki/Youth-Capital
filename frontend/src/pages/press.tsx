@@ -138,7 +138,7 @@ export default function Press() {
         {heroArticle ? (
           <>
             {/* Hero Article */}
-            <Link href={`/press/${heroArticle.id}`}>
+            <Link href={`/press/${heroArticle.slug}`}>
               <motion.div
                 whileHover={{ y: -8 }}
                 className="relative h-[60vh] md:h-[65vh] w-full rounded-[2.5rem] md:rounded-[3rem] overflow-hidden mb-12 cursor-pointer group shadow-2xl shadow-navy/10 border border-border/30"
@@ -179,7 +179,7 @@ export default function Press() {
 
                 {feedArticles.length > 0 ? (
                   feedArticles.map((article: any) => (
-                    <Link key={article.id} href={`/press/${article.id}`}>
+                    <Link key={article.id} href={`/press/${article.slug}`}>
                       <motion.div
                         initial={{ opacity: 0, y: 24 }}
                         whileInView={{ opacity: 1, y: 0 }}
@@ -230,7 +230,7 @@ export default function Press() {
                   <h3 className="text-2xl font-display font-black text-foreground mb-8 tracking-tight">{t("Featured Stories", "قصص مميزة")}</h3>
                   <div className="space-y-10">
                     {secondaryArticles.map((article: any) => (
-                      <Link key={article.id} href={`/press/${article.id}`}>
+                      <Link key={article.id} href={`/press/${article.slug}`}>
                         <div className="cursor-pointer group">
                           <div className="h-44 w-full rounded-3xl overflow-hidden mb-6 relative border border-border/40">
                             {article.thumbnailUrl ? (

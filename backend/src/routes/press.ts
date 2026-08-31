@@ -1,16 +1,21 @@
 import { Router, type IRouter } from "express";
 import { db, articlesTable, usersTable } from "@workspace/db";
-import { eq, sql } from "drizzle-orm";
+import { eq, ne, and, or, sql } from "drizzle-orm";
 import { z } from "zod";
 import { requireAuth, requireAdmin, safeUser } from "../lib/session.js";
 import { validateBody, clampPageParams } from "../middlewares/validate.js";
 import { optionalHttpUrl } from "../validation/common.js";
+import { slugify, generateUniqueSlug } from "../lib/slug.js";
 
 const router: IRouter = Router();
 
 const ARTICLE_TYPES = ["simulation", "platform"] as const;
 
+const SlugSchema = z.string().trim().min(1).max(100).regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, "Slug must be lowercase letters, numbers, and hyphens only");
+const optionalSlug = SlugSchema.optional().or(z.literal("")).transform((v) => (v ? v : undefined));
+
 const CreateArticleSchema = z.object({
+  slug: optionalSlug,
   title: z.string().trim().min(1).max(200),
   titleAr: z.string().trim().max(200).optional(),
   content: z.string().trim().min(1).max(20000),
@@ -59,8 +64,21 @@ router.get("/", async (req, res) => {
 router.post("/", requireAuth, requireAdmin, validateBody(CreateArticleSchema), async (req, res) => {
   try {
     const currentUser = (req as any).user;
-    const { title, titleAr, content, contentAr, type, thumbnailUrl } = req.body;
+    const { slug, title, titleAr, content, contentAr, type, thumbnailUrl } = req.body;
+
+    const isTaken = async (candidate: string) => {
+      const [existing] = await db.select({ id: articlesTable.id }).from(articlesTable).where(eq(articlesTable.slug, candidate));
+      return !!existing;
+    };
+    let finalSlug: string;
+    if (slug && !(await isTaken(slug))) {
+      finalSlug = slug;
+    } else {
+      finalSlug = await generateUniqueSlug(slug || title, isTaken);
+    }
+
     const [article] = await db.insert(articlesTable).values({
+      slug: finalSlug,
       title,
       titleAr,
       content,
@@ -78,7 +96,9 @@ router.post("/", requireAuth, requireAdmin, validateBody(CreateArticleSchema), a
 
 router.patch("/:id", requireAuth, requireAdmin, validateBody(UpdateArticleSchema), async (req, res) => {
   try {
-    const { title, titleAr, content, contentAr, type, thumbnailUrl } = req.body;
+    const { slug, title, titleAr, content, contentAr, type, thumbnailUrl } = req.body;
+    const articleId = parseInt(Array.isArray(req.params.id) ? req.params.id[0] : req.params.id);
+
     const updates: any = {};
     if (title !== undefined) updates.title = title;
     if (titleAr !== undefined) updates.titleAr = titleAr;
@@ -87,7 +107,18 @@ router.patch("/:id", requireAuth, requireAdmin, validateBody(UpdateArticleSchema
     if (type !== undefined) updates.type = type;
     if (thumbnailUrl !== undefined) updates.thumbnailUrl = thumbnailUrl;
 
-    const articleId = parseInt(Array.isArray(req.params.id) ? req.params.id[0] : req.params.id);
+    if (slug !== undefined) {
+      const [existing] = await db
+        .select({ id: articlesTable.id })
+        .from(articlesTable)
+        .where(and(eq(articlesTable.slug, slug), ne(articlesTable.id, articleId)));
+      if (existing) {
+        res.status(409).json({ error: "Conflict", message: "That slug is already in use by another article" });
+        return;
+      }
+      updates.slug = slug;
+    }
+
     const [updated] = await db
       .update(articlesTable)
       .set(updates)
@@ -126,7 +157,15 @@ router.delete("/:id", requireAuth, requireAdmin, async (req, res) => {
 
 router.get("/:id", async (req, res) => {
   try {
-    const [article] = await db.select().from(articlesTable).where(eq(articlesTable.id, parseInt(req.params.id)));
+    const param = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+    // Accept the slug (canonical, e.g. /press/how-parliament-works) or a
+    // legacy numeric id (e.g. /press/3) so links indexed before the slug
+    // migration keep working.
+    const isNumeric = /^\d+$/.test(param);
+    const condition = isNumeric
+      ? or(eq(articlesTable.slug, param), eq(articlesTable.id, parseInt(param)))
+      : eq(articlesTable.slug, param);
+    const [article] = await db.select().from(articlesTable).where(condition);
     if (!article) {
       res.status(404).json({ error: "NotFound", message: "Article not found" });
       return;
