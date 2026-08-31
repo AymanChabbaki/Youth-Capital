@@ -39,6 +39,16 @@ app.use(
   }),
 );
 app.use(helmet());
+// This is a JSON API, not a page meant for search results — the X-Robots-Tag
+// header (unlike a <meta name="robots"> tag) applies to any content type, so
+// it works here even though nothing we return is HTML.
+app.use((req, res, next) => {
+  res.setHeader("X-Robots-Tag", "noindex, nofollow");
+  next();
+});
+app.get("/robots.txt", (req, res) => {
+  res.type("text/plain").send("User-agent: *\nDisallow: /\n");
+});
 app.use(
   cors({
     origin(origin, callback) {
@@ -57,8 +67,15 @@ app.use(
   }),
 );
 app.use(cookieParser());
+// JSON only, deliberately: every client here sends application/json, and a
+// cross-site <form> can't set that content-type without triggering a CORS
+// preflight (which our origin allowlist rejects). Parsing
+// application/x-www-form-urlencoded too — a "simple" content-type exempt
+// from preflight — would let a plain HTML form on another site submit
+// authenticated requests using the session cookie (SameSite=None is
+// required in prod since frontend/backend are cross-origin). Do not add
+// express.urlencoded() back without a CSRF token to go with it.
 app.use(express.json({ limit: "100kb" }));
-app.use(express.urlencoded({ extended: true, limit: "100kb" }));
 app.use("/api", globalLimiter);
 app.use(optionalAuth);
 
