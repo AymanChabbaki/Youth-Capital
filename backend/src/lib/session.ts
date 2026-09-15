@@ -82,6 +82,6 @@ export function requireAdmin(req: Request, res: Response, next: NextFunction) {
 }
 
 export function safeUser(user: any) {
-  const { passwordHash, ...rest } = user;
+  const { passwordHash, termsAcceptedAt, ...rest } = user;
   return rest;
 }

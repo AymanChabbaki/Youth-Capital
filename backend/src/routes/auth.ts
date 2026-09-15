@@ -18,6 +18,9 @@ const RegisterSchema = z.object({
   languagePreference: z.enum(["en", "ar"]).optional(),
   phone: z.string().trim().max(30).optional(),
   linkedinUrl: optionalLinkedinUrl,
+  agreedToTerms: z.boolean().refine((v) => v === true, {
+    message: "You must agree to the Rules and Privacy Policy to register",
+  }),
 });
 
 const LoginSchema = z.object({
@@ -50,6 +53,7 @@ router.post("/register", authLimiter, validateBody(RegisterSchema), async (req, 
       languagePreference: languagePreference || "en",
       phone: phone || null,
       linkedinUrl: linkedinUrl || null,
+      termsAcceptedAt: new Date(),
     }).returning();
     
     const token = await createSession(user.id);

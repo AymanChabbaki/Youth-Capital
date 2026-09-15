@@ -1,13 +1,14 @@
 import { useState } from "react";
 import { useLanguage } from "@/hooks/use-language";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Button, Input, Select, Label, Card, DiscordIcon } from "@/components/ui-custom";
+import { Checkbox } from "@/components/ui/checkbox";
 import { motion, AnimatePresence } from "framer-motion";
 import { customFetch } from "@workspace/api-client-react";
 import { useToast } from "@/hooks/use-toast";
-import { CheckCircle2, Fingerprint, Eye, EyeOff } from "lucide-react";
+import { CheckCircle2, Fingerprint, Eye, EyeOff, ShieldCheck } from "lucide-react";
 import { Link } from "wouter";
 import { useSeo } from "@/hooks/use-seo";
 
@@ -51,8 +52,12 @@ const getApplySchema = (step: number) => z.object({
   country: step >= 2 ? z.string().min(2, "Country is required") : z.string().optional().or(z.literal('')),
   
   interests: step >= 3 ? z.array(z.string()).min(1, "Select at least 1 interest").max(5, "Select up to 5 interests") : z.array(z.string()).optional(),
-  
+
   preferredRole: step >= 4 ? z.string().min(1, "Role is required") : z.string().optional().or(z.literal('')),
+
+  agreedToTerms: step >= 4
+    ? z.boolean().refine((v) => v === true, "You must agree to the Rules and Privacy Policy")
+    : z.boolean().optional(),
 });
 
 type ApplyFormData = {
@@ -70,6 +75,7 @@ type ApplyFormData = {
   country: string;
   interests: string[];
   preferredRole: string;
+  agreedToTerms: boolean;
 };
 
 export default function Apply() {
@@ -110,6 +116,7 @@ export default function Apply() {
       country: "Morocco",
       interests: [],
       preferredRole: "",
+      agreedToTerms: false,
     }
   });
 
@@ -127,6 +134,7 @@ export default function Apply() {
           languagePreference: "en",
           phone: data.phone || undefined,
           linkedinUrl: data.linkedinUrl || undefined,
+          agreedToTerms: data.agreedToTerms,
         }),
       });
 
@@ -527,11 +535,49 @@ export default function Apply() {
                     <p className="text-sm text-destructive font-medium">{form.formState.errors.preferredRole.message}</p>
                   )}
 
-                  <div className="flex gap-4 mt-8">
+                  <div className="flex items-start gap-3 p-4 rounded-2xl bg-secondary/40 border border-border/50 mt-6">
+                    <ShieldCheck className="w-5 h-5 text-gold shrink-0 mt-0.5" />
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                      {t(
+                        "Your password is encrypted before it's ever stored, and your data is kept in a secured database — never shared or sold.",
+                        "يتم تشفير كلمة مرورك قبل تخزينها، وتُحفظ بياناتك في قاعدة بيانات آمنة — ولا تُشارك أو تُباع أبداً."
+                      )}
+                    </p>
+                  </div>
+
+                  <div className="flex items-start gap-3 pt-2">
+                    <Controller
+                      name="agreedToTerms"
+                      control={form.control}
+                      render={({ field }) => (
+                        <Checkbox
+                          id="agreedToTerms"
+                          checked={field.value}
+                          onCheckedChange={(checked) => field.onChange(checked === true)}
+                          className="mt-0.5"
+                        />
+                      )}
+                    />
+                    <label htmlFor="agreedToTerms" className="text-sm text-foreground leading-relaxed cursor-pointer">
+                      {t("I agree to the", "أوافق على")}{" "}
+                      <a href="/rules" target="_blank" rel="noopener noreferrer" className="text-gold font-bold hover:underline">
+                        {t("Simulation Rules", "قواعد المحاكاة")}
+                      </a>{" "}
+                      {t("and", "و")}{" "}
+                      <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-gold font-bold hover:underline">
+                        {t("Privacy Policy", "سياسة الخصوصية")}
+                      </a>
+                    </label>
+                  </div>
+                  {form.formState.errors.agreedToTerms && (
+                    <p className="text-sm text-destructive font-medium">{form.formState.errors.agreedToTerms.message}</p>
+                  )}
+
+                  <div className="flex gap-4 mt-2">
                     <Button type="button" variant="outline" onClick={() => setStep(3)} className="w-full">{t("Back", "رجوع")}</Button>
-                    <Button 
-                      type="submit" 
-                      variant="gold" 
+                    <Button
+                      type="submit"
+                      variant="gold"
                       className="w-full"
                       isLoading={isSubmitting}
                     >

@@ -23,6 +23,8 @@ export const usersTable = pgTable("users", {
   status: userStatusEnum("status").notNull().default("active"),
   applicationStatus: applicationStatusEnum("application_status").notNull().default("none"),
   avatarUrl: text("avatar_url"),
+  // Consent audit trail — null for accounts created before this was tracked.
+  termsAcceptedAt: timestamp("terms_accepted_at"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
