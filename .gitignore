@@ -44,3 +44,9 @@ artifacts/
 .gemini/
 .cursor/
 tmp_fix_db.js
+
+# Google service account keys — these should live outside the repo entirely
+# (see ~/.config/youthcapital-gsc/), this is defense-in-depth only.
+gen-lang-client-*.json
+*service-account*.json
+*.iam.gserviceaccount.com.json

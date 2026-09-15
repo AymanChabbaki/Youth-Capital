@@ -23,7 +23,7 @@ export default function Press() {
   const { t, isAr } = useLanguage();
   useSeo({
     title: t(
-      "Press & Reports | Youth Capital",
+      "Press & Reports | Youth Capital Morocco",
       "الصحافة والتقارير | يوث كابيتال"
     ),
     description: t(

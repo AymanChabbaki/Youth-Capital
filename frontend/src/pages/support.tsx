@@ -11,7 +11,7 @@ import { useSeo } from "@/hooks/use-seo";
 export default function Support() {
   const { t } = useLanguage();
   useSeo({
-    title: t("Support | Youth Capital", "الدعم | يوث كابيتال"),
+    title: t("Support | Youth Capital Morocco", "الدعم | يوث كابيتال"),
     description: t(
       "Get help with your Youth Capital account, simulation rules, or technical issues on Morocco's youth governance simulation platform.",
       "احصل على المساعدة بخصوص حسابك في يوث كابيتال أو قواعد المحاكاة أو المشاكل التقنية."

@@ -10,7 +10,7 @@ import { useSeo } from "@/hooks/use-seo";
 export default function Polls() {
   const { t, isAr } = useLanguage();
   useSeo({
-    title: t("Civic Polls & Consultations | Youth Capital", "الاستطلاعات المدنية والاستشارات | يوث كابيتال"),
+    title: t("Civic Polls & Consultations | Youth Capital Morocco", "الاستطلاعات المدنية والاستشارات | يوث كابيتال"),
     description: t(
       "Vote on live civic consultations and legislative polls in Youth Capital's simulated Moroccan governance platform.",
       "صوّت في الاستشارات المدنية والاستطلاعات التشريعية المباشرة في منصة يوث كابيتال لمحاكاة الحوكمة المغربية."

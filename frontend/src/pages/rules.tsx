@@ -6,7 +6,7 @@ import { useSeo } from "@/hooks/use-seo";
 export default function Rules() {
   const { t } = useLanguage();
   useSeo({
-    title: t("Simulation Rules | Youth Capital", "قواعد المحاكاة | يوث كابيتال"),
+    title: t("Simulation Rules | Youth Capital Morocco", "قواعد المحاكاة | يوث كابيتال"),
     description: t(
       "The official rulebook for Youth Capital's Moroccan youth governance simulation: membership, roles, conduct, and legislative procedure.",
       "كتاب القواعد الرسمي لمحاكاة يوث كابيتال للحوكمة الشبابية المغربية: العضوية والأدوار والسلوك والإجراءات التشريعية."

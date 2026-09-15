@@ -37,7 +37,7 @@ import { useSeo } from "@/hooks/use-seo";
 export default function Events() {
   const { t, isAr } = useLanguage();
   useSeo({
-    title: t("Events & Sessions | Youth Capital", "الفعاليات والجلسات | يوث كابيتال"),
+    title: t("Events & Sessions | Youth Capital Morocco", "الفعاليات والجلسات | يوث كابيتال"),
     description: t(
       "See upcoming parliamentary sessions, ministry briefings, and regional council meetings in Youth Capital's Moroccan youth governance simulation.",
       "اطّلع على الجلسات البرلمانية وإحاطات الوزارات واجتماعات المجالس الجهوية القادمة في محاكاة يوث كابيتال."

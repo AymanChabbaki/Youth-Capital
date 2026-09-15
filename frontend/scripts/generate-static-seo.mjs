@@ -19,32 +19,32 @@ const PAGES = {
     description: "Learn how Youth Capital simulates the Moroccan Parliament, Ministries, and Regional Councils to give young Moroccans hands-on civic and leadership experience.",
   },
   "/press": {
-    title: "Press & Reports | Youth Capital",
+    title: "Press & Reports | Youth Capital Morocco",
     description: "Read the latest briefings and reports from Youth Capital's simulated Moroccan Parliament, Ministries, and Regional Councils.",
   },
   "/apply": {
-    title: "Apply | Youth Capital",
+    title: "Apply | Youth Capital Morocco",
     description: "Claim your seat in Youth Capital's Moroccan youth governance simulation as a Minister, MP, Regional Councillor, or Diaspora Representative.",
   },
   "/events": {
-    title: "Events & Sessions | Youth Capital",
+    title: "Events & Sessions | Youth Capital Morocco",
     description: "See upcoming parliamentary sessions, ministry briefings, and regional council meetings in Youth Capital's Moroccan youth governance simulation.",
   },
   "/polls": {
-    title: "Civic Polls & Consultations | Youth Capital",
+    title: "Civic Polls & Consultations | Youth Capital Morocco",
     description: "Vote on live civic consultations and legislative polls in Youth Capital's simulated Moroccan governance platform.",
   },
   "/rules": {
-    title: "Simulation Rules | Youth Capital",
+    title: "Simulation Rules | Youth Capital Morocco",
     description: "The official rulebook for Youth Capital's Moroccan youth governance simulation: membership, roles, conduct, and legislative procedure.",
   },
   "/privacy": {
-    title: "Privacy Policy | Youth Capital",
+    title: "Privacy Policy | Youth Capital Morocco",
     description: "How Youth Capital collects, uses, and protects your information on Morocco's youth governance simulation platform.",
     noindex: true,
   },
   "/support": {
-    title: "Support | Youth Capital",
+    title: "Support | Youth Capital Morocco",
     description: "Get help with your Youth Capital account, simulation rules, or technical issues on Morocco's youth governance simulation platform.",
   },
   "/login": {

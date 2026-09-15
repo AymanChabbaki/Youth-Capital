@@ -81,7 +81,7 @@ type ApplyFormData = {
 export default function Apply() {
   const { t } = useLanguage();
   useSeo({
-    title: t("Apply | Youth Capital", "قدّم طلبك | يوث كابيتال"),
+    title: t("Apply | Youth Capital Morocco", "قدّم طلبك | يوث كابيتال"),
     description: t(
       "Claim your seat in Youth Capital's Moroccan youth governance simulation as a Minister, MP, Regional Councillor, or Diaspora Representative.",
       "احجز مقعدك في محاكاة يوث كابيتال للحوكمة الشبابية المغربية كوزير أو برلماني أو مستشار جهوي أو ممثل للجالية."

@@ -6,7 +6,7 @@ import { useSeo } from "@/hooks/use-seo";
 export default function Privacy() {
   const { t } = useLanguage();
   useSeo({
-    title: t("Privacy Policy | Youth Capital", "سياسة الخصوصية | يوث كابيتال"),
+    title: t("Privacy Policy | Youth Capital Morocco", "سياسة الخصوصية | يوث كابيتال"),
     description: t(
       "How Youth Capital collects, uses, and protects your information on Morocco's youth governance simulation platform.",
       "كيف تجمع يوث كابيتال معلوماتك وتستخدمها وتحميها على منصة محاكاة الحوكمة الشبابية المغربية."
