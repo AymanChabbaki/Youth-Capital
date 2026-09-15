@@ -8,6 +8,8 @@
     "seed": "tsx --env-file=../.env ./src/seed.ts",
     "db-setup": "tsx --env-file=../.env ./src/db-setup.ts",
     "backfill-article-slugs": "tsx --env-file=../.env ./src/backfill-article-slugs.ts",
+    "gsc": "tsx ./src/gsc-query.ts",
+    "gsc-audit": "tsx ./src/gsc-audit.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {

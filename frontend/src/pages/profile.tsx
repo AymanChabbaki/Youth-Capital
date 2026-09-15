@@ -343,7 +343,7 @@ export default function Profile() {
                 <div className="flex items-center gap-6 mb-8">
                    <div className="w-16 h-16 rounded-2xl bg-white/10 overflow-hidden border border-white/10 shrink-0">
                       {avatarUrl ? (
-                         <img src={avatarUrl} className="w-full h-full object-cover" />
+                         <img src={avatarUrl} alt={user?.fullName || "Profile"} className="w-full h-full object-cover" />
                       ) : (
                          <div className="w-full h-full bg-navy" />
                       )}

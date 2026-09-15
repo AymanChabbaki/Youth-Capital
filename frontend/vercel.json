@@ -1,5 +1,6 @@
 {
   "version": 2,
+  "cleanUrls": true,
   "rewrites": [
     { "source": "/about", "destination": "/about/index.html" },
     { "source": "/press", "destination": "/press/index.html" },

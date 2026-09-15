@@ -11,7 +11,7 @@
     "glowColor": "rgba(245, 158, 11, 0.25)",
     "missionsEn": ["Strategic Governance", "Institutional Representation", "External Partnerships"],
     "missionsAr": ["الحوكمة الاستراتيجية", "التمثيل المؤسساتي", "الشراكات الخارجية"],
-    "picture": "/images/team/mohamed.png"
+    "picture": "/images/team/mohamed.webp"
   },
   {
     "nameEn": "Ayman CHABBAKI",
@@ -25,7 +25,7 @@
     "glowColor": "rgba(217, 119, 6, 0.2)",
     "missionsEn": ["Operations Oversight", "Organizational Scaling", "Growth Coordination"],
     "missionsAr": ["الإشراف على العمليات", "التوسع التنظيمي", "تنسيق النمو"],
-    "picture": "/images/team/ayman.jpeg"
+    "picture": "/images/team/ayman.webp"
   },
   {
     "nameEn": "Israe EL AYADI",
@@ -39,7 +39,7 @@
     "glowColor": "rgba(217, 119, 6, 0.2)",
     "missionsEn": ["Community Engagement", "Chamber Operations", "Development Policies"],
     "missionsAr": ["المشاركة المجتمعية", "إدارة الغرف", "سياسات التطوير"],
-    "picture": "/images/team/israe.png"
+    "picture": "/images/team/israe.webp"
   },
   {
     "nameEn": "Anwar BENCHEKRON",
@@ -53,7 +53,7 @@
     "glowColor": "rgba(59, 130, 246, 0.2)",
     "missionsEn": ["Legal & Compliance", "Archive Management", "Administrative Cohesion"],
     "missionsAr": ["الامتثال والقانون", "إدارة الأرشيف", "التماسك الإداري"],
-    "picture": "/images/team/anwar.jpeg"
+    "picture": "/images/team/anwar.webp"
   },
   {
     "nameEn": "Yassmin Dalil",
@@ -67,7 +67,7 @@
     "glowColor": "rgba(59, 130, 246, 0.15)",
     "missionsEn": ["Administrative Support", "Session Drafting", "Data Management"],
     "missionsAr": ["الدعم الإداري", "صياغة المحاضر", "إدارة البيانات"],
-    "picture": "/images/team/yassmin.jpg"
+    "picture": "/images/team/yassmin.webp"
   },
   {
     "nameEn": "Oussama",
@@ -95,7 +95,7 @@
     "glowColor": "rgba(59, 130, 246, 0.15)",
     "missionsEn": ["Expense Tracking", "Financial Reporting", "Invoice Verification"],
     "missionsAr": ["تتبع المصاريف", "التقارير المالية", "التحقق من الفواتير"],
-    "picture": "/images/team/yahya.png"
+    "picture": "/images/team/yahya.webp"
   },
   {
     "nameEn": "Nassima SADIK",
@@ -109,7 +109,7 @@
     "glowColor": "rgba(20, 184, 166, 0.2)",
     "missionsEn": ["Media Partnerships", "PR Campaigns", "Institutional Outreach"],
     "missionsAr": ["الشراكات الإعلامية", "حملات العلاقات العامة", "التواصل المؤسساتي"],
-    "picture": "/images/team/nassima.jpeg"
+    "picture": "/images/team/nassima.webp"
   },
   {
     "nameEn": "Aya",
@@ -165,7 +165,7 @@
     "glowColor": "rgba(168, 85, 247, 0.15)",
     "missionsEn": ["Tourism Research", "Community Engagement", "Sustainable Tourism Development", "Educational Programs", "Institutional Partnerships"],
     "missionsAr": ["البحث السياحي", "إشراك المجتمع", "تطوير السياحة المستدامة", "برامج تعليمية", "الشراكات المؤسساتية"],
-    "picture": "/images/team/oumaima.jpeg"
+    "picture": "/images/team/oumaima.webp"
   },
   {
     "nameEn": "Othmane El AABOUDI",
@@ -179,7 +179,7 @@
     "glowColor": "rgba(168, 85, 247, 0.15)",
     "missionsEn": ["Executive Mentorship", "Curriculum Review", "Strategic Advice"],
     "missionsAr": ["الإرشاد التنفيذي", "مراجعة المناهج", "المشورة الاستراتيجية"],
-    "picture": "/images/team/othmane.jpeg"
+    "picture": "/images/team/othmane.webp"
   },
   {
     "nameEn": "Youssouf Gourma",
@@ -193,7 +193,7 @@
     "glowColor": "rgba(168, 85, 247, 0.15)",
     "missionsEn": ["Executive Mentorship", "Curriculum Review", "Strategic Advice"],
     "missionsAr": ["الإرشاد التنفيذي", "مراجعة المناهج", "المشورة الاستراتيجية"],
-    "picture": "/images/team/youssouf.jpeg"
+    "picture": "/images/team/youssouf.webp"
   },
   {
     "nameEn": "Sara",
