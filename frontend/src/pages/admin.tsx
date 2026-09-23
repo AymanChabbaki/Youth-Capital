@@ -19,9 +19,10 @@ import {
   MapPin, Landmark, LogOut, Plus, Edit, Trash2,
   ImagePlus, Loader2, X as XIcon,
   Phone, Linkedin, GraduationCap, Briefcase, Tag, Eye, Ban, ShieldCheck,
+  Gauge, ScrollText, Vote, UserPlus,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, LineChart, Line, Legend, AreaChart, Area,
@@ -228,6 +229,17 @@ export default function Admin() {
   const { data: articlesData } = useGetArticles({ query: { enabled: !isLoading && isAdmin } } as any);
   const { data: eventsData } = useGetEvents({ query: { enabled: !isLoading && isAdmin } } as any);
   const { data: pollsData } = useGetPolls({ query: { enabled: !isLoading && isAdmin } } as any);
+  const { data: kpisData } = useQuery({
+    queryKey: ["/api/admin/kpis"],
+    queryFn: () => customFetch<any>("/api/admin/kpis"),
+    enabled: !isLoading && isAdmin,
+  });
+  const { data: logsData } = useQuery({
+    queryKey: ["/api/admin/logs"],
+    queryFn: () => customFetch<any>("/api/admin/logs?limit=50"),
+    enabled: !isLoading && isAdmin,
+    refetchInterval: 30000,
+  });
 
   const updateAppMutation = useUpdateRoleApplication();
   const triggerCrisisMutation = useTriggerCrisis();
@@ -475,6 +487,7 @@ export default function Admin() {
     { id: "press", icon: Newspaper, label: t("Press Office", "مكتب الصحافة") },
     { id: "events", icon: Calendar, label: t("Events Calendar", "جدول الفعاليات") },
     { id: "polls", icon: BarChart3, label: t("Polls Management", "إدارة الاستطلاعات") },
+    { id: "system", icon: Gauge, label: t("System & Logs", "النظام والسجلات") },
   ];
 
 
@@ -1689,6 +1702,67 @@ export default function Admin() {
                   </div>
                 </div>
               )}
+            </div>
+          )}
+
+          {/* ── SYSTEM & LOGS ── */}
+          {activeTab === "system" && (
+            <div className="space-y-8">
+              <div>
+                <h3 className="text-lg font-bold text-foreground mb-4">{t("Platform KPIs", "مؤشرات الأداء")}</h3>
+                <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4">
+                  <KpiCard icon={Users} label={t("Total Users", "إجمالي المستخدمين")} value={kpisData?.users?.total ?? ":"} sub={`${kpisData?.users?.active ?? 0} ${t("active", "نشط")}`} color="primary" />
+                  <KpiCard icon={UserPlus} label={t("New (7 days)", "جدد (7 أيام)")} value={kpisData?.users?.newLast7Days ?? ":"} sub={`${kpisData?.users?.newLast30Days ?? 0} ${t("in 30 days", "خلال 30 يوماً")}`} color="green" />
+                  <KpiCard icon={Ban} label={t("Banned Users", "مستخدمون محظورون")} value={kpisData?.users?.banned ?? ":"} color="rose" />
+                  <KpiCard icon={AlertTriangle} label={t("Orphaned Signups", "تسجيلات غير مكتملة")} value={kpisData?.users?.orphanedRegistrations ?? ":"} sub={t("Registered, no application", "مسجل بدون طلب")} color="rose" />
+                  <KpiCard icon={Clock} label={t("Pending Apps", "طلبات معلقة")} value={kpisData?.applications?.pending ?? ":"} color="gold" />
+                  <KpiCard icon={CheckCircle} label={t("Approved Apps", "طلبات مقبولة")} value={kpisData?.applications?.approved ?? ":"} color="green" />
+                  <KpiCard icon={Newspaper} label={t("Articles", "المقالات")} value={kpisData?.articles?.total ?? ":"} color="blue" />
+                  <KpiCard icon={Calendar} label={t("Events", "الفعاليات")} value={kpisData?.events?.total ?? ":"} sub={`${kpisData?.events?.upcoming ?? 0} ${t("upcoming", "قادمة")}`} color="blue" />
+                  <KpiCard icon={Vote} label={t("Poll Votes", "أصوات الاستطلاعات")} value={kpisData?.polls?.totalVotes ?? ":"} sub={`${kpisData?.polls?.active ?? 0} ${t("active polls", "استطلاعات نشطة")}`} color="purple" />
+                  <KpiCard icon={Siren} label={t("Active Crises", "الأزمات النشطة")} value={kpisData?.crises?.active ?? ":"} sub={`${kpisData?.crises?.total ?? 0} ${t("total", "الإجمالي")}`} color="rose" />
+                  <KpiCard icon={MessageSquare} label={t("Forum Posts", "منشورات المنتدى")} value={kpisData?.community?.totalForumPosts ?? ":"} color="purple" />
+                  <KpiCard icon={FileCheck} label={t("Open Tickets", "تذاكر مفتوحة")} value={kpisData?.support?.open ?? ":"} sub={`${kpisData?.support?.total ?? 0} ${t("total", "الإجمالي")}`} color="gold" />
+                </div>
+              </div>
+
+              <div className="bg-card border border-border rounded-2xl overflow-hidden">
+                <div className="p-6 border-b border-border flex items-center gap-3">
+                  <ScrollText className="w-5 h-5 text-primary" />
+                  <h3 className="text-lg font-bold text-foreground">{t("Activity Log", "سجل النشاط")}</h3>
+                  <span className="text-xs text-muted-foreground ml-auto">{t("Auto-refreshes every 30s", "يتحدث تلقائياً كل 30 ثانية")}</span>
+                </div>
+                <div className="max-h-[600px] overflow-y-auto">
+                  <table className="w-full text-left text-sm">
+                    <thead className="bg-secondary/40 sticky top-0">
+                      <tr>
+                        <th className="px-6 py-3 font-semibold text-muted-foreground">{t("Action", "الإجراء")}</th>
+                        <th className="px-6 py-3 font-semibold text-muted-foreground">{t("Admin", "المسؤول")}</th>
+                        <th className="px-6 py-3 font-semibold text-muted-foreground">{t("Details", "التفاصيل")}</th>
+                        <th className="px-6 py-3 font-semibold text-muted-foreground">{t("When", "الوقت")}</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-border">
+                      {(logsData?.logs || []).map((log: any) => (
+                        <tr key={log.id} className="hover:bg-secondary/20">
+                          <td className="px-6 py-3">
+                            <Badge className="rounded-lg text-xs whitespace-nowrap">{log.action}</Badge>
+                          </td>
+                          <td className="px-6 py-3 text-foreground/80 whitespace-nowrap">{log.actor?.fullName || t("System", "النظام")}</td>
+                          <td className="px-6 py-3 text-muted-foreground truncate max-w-xs">
+                            {log.targetType ? `${log.targetType} #${log.targetId}` : ""}
+                            {log.metadata ? ` — ${JSON.stringify(log.metadata)}` : ""}
+                          </td>
+                          <td className="px-6 py-3 text-muted-foreground whitespace-nowrap">{new Date(log.createdAt).toLocaleString()}</td>
+                        </tr>
+                      ))}
+                      {(!logsData?.logs || logsData.logs.length === 0) && (
+                        <tr><td colSpan={4} className="px-6 py-8 text-center text-muted-foreground">{t("No activity yet.", "لا يوجد نشاط بعد.")}</td></tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
             </div>
           )}
 

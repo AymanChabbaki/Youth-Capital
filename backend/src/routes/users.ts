@@ -5,6 +5,7 @@ import { z } from "zod";
 import { requireAuth, requireAdmin, safeUser } from "../lib/session.js";
 import { clampPageParams } from "../middlewares/validate.js";
 import { optionalHttpUrl, optionalLinkedinUrl } from "../validation/common.js";
+import { logAudit } from "../lib/audit.js";
 
 const router: IRouter = Router();
 
@@ -113,6 +114,9 @@ router.patch("/:id", requireAuth, async (req, res) => {
       res.status(404).json({ error: "NotFound", message: "User not found" });
       return;
     }
+    if (isAdmin && (body.role !== undefined || body.status !== undefined || body.applicationStatus !== undefined)) {
+      logAudit(currentUser.id, "user.updated", "user", targetId, { fields: Object.keys(updates) });
+    }
     res.json(safeUser(updated));
   } catch (err: any) {
     req.log.error({ err }, "Update user error");
@@ -123,15 +127,17 @@ router.patch("/:id", requireAuth, async (req, res) => {
 router.post("/:id/ban", requireAuth, requireAdmin, async (req, res) => {
   try {
     const targetIdString = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+    const targetId = parseInt(targetIdString);
     const [updated] = await db
       .update(usersTable)
       .set({ status: "banned" })
-      .where(eq(usersTable.id, parseInt(targetIdString)))
+      .where(eq(usersTable.id, targetId))
       .returning();
     if (!updated) {
       res.status(404).json({ error: "NotFound", message: "User not found" });
       return;
     }
+    logAudit((req as any).user.id, "user.banned", "user", targetId, { email: updated.email });
     res.json(safeUser(updated));
   } catch (err: any) {
     req.log.error({ err }, "Ban user error");
@@ -142,15 +148,17 @@ router.post("/:id/ban", requireAuth, requireAdmin, async (req, res) => {
 router.post("/:id/unban", requireAuth, requireAdmin, async (req, res) => {
   try {
     const targetIdString = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+    const targetId = parseInt(targetIdString);
     const [updated] = await db
       .update(usersTable)
       .set({ status: "active" })
-      .where(eq(usersTable.id, parseInt(targetIdString)))
+      .where(eq(usersTable.id, targetId))
       .returning();
     if (!updated) {
       res.status(404).json({ error: "NotFound", message: "User not found" });
       return;
     }
+    logAudit((req as any).user.id, "user.unbanned", "user", targetId, { email: updated.email });
     res.json(safeUser(updated));
   } catch (err: any) {
     req.log.error({ err }, "Unban user error");
@@ -172,6 +180,7 @@ router.delete("/:id", requireAuth, requireAdmin, async (req, res) => {
       res.status(404).json({ error: "NotFound", message: "User not found" });
       return;
     }
+    logAudit(currentUser.id, "user.deleted", "user", targetId, { email: deleted.email });
     res.json({ success: true, message: "User deleted" });
   } catch (err: any) {
     // FK violation: user authored polls/articles/crises, which don't cascade-delete

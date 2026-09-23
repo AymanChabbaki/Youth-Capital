@@ -4,6 +4,7 @@ import { eq, and } from "drizzle-orm";
 import { z } from "zod";
 import { requireAuth, requireAdmin } from "../lib/session.js";
 import { validateBody } from "../middlewares/validate.js";
+import { logAudit } from "../lib/audit.js";
 
 const router: IRouter = Router();
 
@@ -108,6 +109,7 @@ router.post("/", requireAuth, requireAdmin, validateBody(CreatePollSchema), asyn
       });
     }
     const formatted = await formatPoll(poll, currentUser.id);
+    logAudit(currentUser.id, "poll.created", "poll", poll.id, { title });
     res.status(201).json(formatted);
   } catch (err) {
     req.log.error({ err }, "Create poll error");
@@ -169,6 +171,7 @@ router.patch("/:id", requireAuth, requireAdmin, validateBody(UpdatePollSchema), 
       return;
     }
     const formatted = await formatPoll(updated, (req as any).user.id);
+    logAudit((req as any).user.id, "poll.updated", "poll", pollId);
     res.json(formatted);
   } catch (err) {
     req.log.error({ err }, "Update poll error");
@@ -186,6 +189,7 @@ router.delete("/:id", requireAuth, requireAdmin, async (req, res) => {
       res.status(404).json({ error: "NotFound", message: "Poll not found" });
       return;
     }
+    logAudit((req as any).user.id, "poll.deleted", "poll", pollId, { title: deleted.title });
     res.json({ success: true, message: "Poll deleted" });
   } catch (err) {
     req.log.error({ err }, "Delete poll error");

@@ -5,6 +5,7 @@ import { requireAuth, requireAdmin } from "../lib/session.js";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { validateBody } from "../middlewares/validate.js";
+import { logAudit } from "../lib/audit.js";
 
 const router: IRouter = Router();
 
@@ -45,6 +46,7 @@ router.post("/", requireAuth, requireAdmin, validateBody(CreateCrisisSchema), as
       isActive: true,
       createdById: currentUser.id,
     }).returning();
+    logAudit(currentUser.id, "crisis.created", "crisis", crisis.id, { title, severity });
     res.status(201).json({ ...crisis, createdBy: safeUser(currentUser) });
   } catch (err) {
     req.log.error({ err }, "Trigger crisis error");

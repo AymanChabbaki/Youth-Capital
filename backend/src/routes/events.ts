@@ -5,6 +5,7 @@ import { z } from "zod";
 import { requireAuth, requireAdmin } from "../lib/session.js";
 import { validateBody } from "../middlewares/validate.js";
 import { optionalHttpUrl } from "../validation/common.js";
+import { logAudit } from "../lib/audit.js";
 
 const router: IRouter = Router();
 
@@ -49,6 +50,7 @@ router.post("/", requireAuth, requireAdmin, validateBody(CreateEventSchema), asy
       meetingUrl: meetingUrl || null,
       type,
     }).returning();
+    logAudit((req as any).user.id, "event.created", "event", event.id, { title });
     res.status(201).json(event);
   } catch (err) {
     req.log.error({ err }, "Create event error");
@@ -80,6 +82,7 @@ router.patch("/:id", requireAuth, requireAdmin, validateBody(UpdateEventSchema),
       res.status(404).json({ error: "NotFound", message: "Event not found" });
       return;
     }
+    logAudit((req as any).user.id, "event.updated", "event", eventId, { fields: Object.keys(updates) });
     res.json(updated);
   } catch (err) {
     req.log.error({ err }, "Update event error");
@@ -99,6 +102,7 @@ router.delete("/:id", requireAuth, requireAdmin, async (req, res) => {
       res.status(404).json({ error: "NotFound", message: "Event not found" });
       return;
     }
+    logAudit((req as any).user.id, "event.deleted", "event", eventId, { title: deleted.title });
     res.json({ success: true, message: "Event deleted" });
   } catch (err) {
     req.log.error({ err }, "Delete event error");

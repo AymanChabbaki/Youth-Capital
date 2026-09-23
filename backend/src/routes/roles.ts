@@ -4,6 +4,7 @@ import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { requireAuth, requireAdmin, safeUser } from "../lib/session.js";
 import { validateBody } from "../middlewares/validate.js";
+import { logAudit } from "../lib/audit.js";
 
 const router: IRouter = Router();
 
@@ -109,6 +110,7 @@ router.patch("/applications/:id", requireAuth, requireAdmin, validateBody(Update
         .where(eq(usersTable.id, app.userId));
     }
     const [user] = await db.select().from(usersTable).where(eq(usersTable.id, app.userId));
+    logAudit((req as any).user.id, `application.${status}`, "roleApplication", app.id, { applicantEmail: user?.email, assignedRole: updates.assignedRole });
     res.json({ ...app, user: safeUser(user) });
   } catch (err: any) {
     req.log.error({ err }, "Update application error");

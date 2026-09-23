@@ -11,6 +11,7 @@ import supportRouter from "./support.js";
 import crisesRouter from "./crises.js";
 import statsRouter from "./stats.js";
 import chatRouter from "./chat.js";
+import adminRouter from "./admin.js";
 
 const router: IRouter = Router();
 
@@ -26,5 +27,6 @@ router.use("/support", supportRouter);
 router.use("/crises", crisesRouter);
 router.use("/stats", statsRouter);
 router.use("/chat", chatRouter);
+router.use("/admin", adminRouter);
 
 export default router;

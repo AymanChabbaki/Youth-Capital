@@ -6,6 +6,7 @@ import { requireAuth, requireAdmin, safeUser } from "../lib/session.js";
 import { validateBody, clampPageParams } from "../middlewares/validate.js";
 import { optionalHttpUrl } from "../validation/common.js";
 import { slugify, generateUniqueSlug } from "../lib/slug.js";
+import { logAudit } from "../lib/audit.js";
 
 const router: IRouter = Router();
 
@@ -87,6 +88,7 @@ router.post("/", requireAuth, requireAdmin, validateBody(CreateArticleSchema), a
       authorId: currentUser.id,
       thumbnailUrl: thumbnailUrl || null,
     }).returning();
+    logAudit(currentUser.id, "article.created", "article", article.id, { title, slug: finalSlug });
     res.status(201).json({ ...article, author: safeUser(currentUser) });
   } catch (err) {
     req.log.error({ err }, "Create article error");
@@ -129,6 +131,7 @@ router.patch("/:id", requireAuth, requireAdmin, validateBody(UpdateArticleSchema
       res.status(404).json({ error: "NotFound", message: "Article not found" });
       return;
     }
+    logAudit((req as any).user.id, "article.updated", "article", articleId, { fields: Object.keys(updates) });
     res.json(updated);
   } catch (err) {
     req.log.error({ err }, "Update article error");
@@ -148,6 +151,7 @@ router.delete("/:id", requireAuth, requireAdmin, async (req, res) => {
       res.status(404).json({ error: "NotFound", message: "Article not found" });
       return;
     }
+    logAudit((req as any).user.id, "article.deleted", "article", articleId, { title: deleted.title });
     res.json({ success: true, message: "Article deleted" });
   } catch (err) {
     req.log.error({ err }, "Delete article error");
