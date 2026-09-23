@@ -2,7 +2,7 @@ import { Router, type IRouter } from "express";
 import {
   db, usersTable, articlesTable, eventsTable, pollsTable, pollVotesTable,
   crisesTable, postsTable, supportTicketsTable, roleApplicationsTable,
-  auditLogsTable,
+  auditLogsTable, systemLogsTable,
 } from "@workspace/db";
 import { eq, gte, sql, desc } from "drizzle-orm";
 import { requireAuth, requireAdmin, safeUser } from "../lib/session.js";
@@ -85,6 +85,24 @@ router.get("/logs", requireAuth, requireAdmin, async (req, res) => {
     res.json({ logs, total, page, limit });
   } catch (err) {
     req.log.error({ err }, "Get admin logs error");
+    res.status(500).json({ error: "Internal", message: "Server error" });
+  }
+});
+
+router.get("/system-logs", requireAuth, requireAdmin, async (req, res) => {
+  try {
+    const { page, limit, offset } = clampPageParams(req, 50);
+    const levelFilter = req.query.level as string | undefined;
+
+    let query = db.select().from(systemLogsTable).$dynamic();
+    if (levelFilter) {
+      query = query.where(eq(systemLogsTable.level, levelFilter));
+    }
+    const logs = await query.orderBy(desc(systemLogsTable.createdAt)).limit(limit).offset(offset);
+    const total = await count(systemLogsTable, levelFilter ? eq(systemLogsTable.level, levelFilter) : undefined);
+    res.json({ logs, total, page, limit });
+  } catch (err) {
+    req.log.error({ err }, "Get system logs error");
     res.status(500).json({ error: "Internal", message: "Server error" });
   }
 });

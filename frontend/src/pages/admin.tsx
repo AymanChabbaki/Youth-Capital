@@ -240,6 +240,12 @@ export default function Admin() {
     enabled: !isLoading && isAdmin,
     refetchInterval: 30000,
   });
+  const { data: systemLogsData } = useQuery({
+    queryKey: ["/api/admin/system-logs"],
+    queryFn: () => customFetch<any>("/api/admin/system-logs?limit=50"),
+    enabled: !isLoading && isAdmin,
+    refetchInterval: 30000,
+  });
 
   const updateAppMutation = useUpdateRoleApplication();
   const triggerCrisisMutation = useTriggerCrisis();
@@ -1758,6 +1764,47 @@ export default function Admin() {
                       ))}
                       {(!logsData?.logs || logsData.logs.length === 0) && (
                         <tr><td colSpan={4} className="px-6 py-8 text-center text-muted-foreground">{t("No activity yet.", "لا يوجد نشاط بعد.")}</td></tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div className="bg-card border border-border rounded-2xl overflow-hidden">
+                <div className="p-6 border-b border-border flex items-center gap-3">
+                  <AlertTriangle className="w-5 h-5 text-rose" />
+                  <h3 className="text-lg font-bold text-foreground">{t("System Errors & Warnings", "أخطاء وتحذيرات النظام")}</h3>
+                  <span className="text-xs text-muted-foreground ml-auto">
+                    {t("Stored in our own database — not limited by Vercel's log retention", "مخزنة في قاعدتنا الخاصة — غير محدودة بمدة احتفاظ Vercel بالسجلات")}
+                  </span>
+                </div>
+                <div className="max-h-[600px] overflow-y-auto">
+                  <table className="w-full text-left text-sm">
+                    <thead className="bg-secondary/40 sticky top-0">
+                      <tr>
+                        <th className="px-6 py-3 font-semibold text-muted-foreground">{t("Level", "المستوى")}</th>
+                        <th className="px-6 py-3 font-semibold text-muted-foreground">{t("Message", "الرسالة")}</th>
+                        <th className="px-6 py-3 font-semibold text-muted-foreground">{t("Context", "السياق")}</th>
+                        <th className="px-6 py-3 font-semibold text-muted-foreground">{t("When", "الوقت")}</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-border">
+                      {(systemLogsData?.logs || []).map((log: any) => (
+                        <tr key={log.id} className="hover:bg-secondary/20">
+                          <td className="px-6 py-3">
+                            <Badge className={`rounded-lg text-xs whitespace-nowrap ${log.level === "error" ? "bg-rose/10 text-rose border-rose/30" : "bg-gold/10 text-gold border-gold/30"}`}>
+                              {log.level}
+                            </Badge>
+                          </td>
+                          <td className="px-6 py-3 text-foreground/80">{log.message}</td>
+                          <td className="px-6 py-3 text-muted-foreground truncate max-w-sm font-mono text-xs" title={JSON.stringify(log.context)}>
+                            {log.context ? JSON.stringify(log.context) : ""}
+                          </td>
+                          <td className="px-6 py-3 text-muted-foreground whitespace-nowrap">{new Date(log.createdAt).toLocaleString()}</td>
+                        </tr>
+                      ))}
+                      {(!systemLogsData?.logs || systemLogsData.logs.length === 0) && (
+                        <tr><td colSpan={4} className="px-6 py-8 text-center text-muted-foreground">{t("No errors or warnings logged.", "لا توجد أخطاء أو تحذيرات مسجلة.")}</td></tr>
                       )}
                     </tbody>
                   </table>
