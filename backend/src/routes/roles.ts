@@ -11,7 +11,9 @@ const PREFERRED_ROLES = ["minister", "mp", "local_council", "diaspora_rep", "Act
 const PARLIAMENT_HOUSES = ["house_of_representatives", "house_of_councillors"] as const;
 const APPLICATION_STATUSES = ["pending", "approved", "rejected"] as const;
 
-const CreateApplicationSchema = z.object({
+// Exported so /api/auth/register-and-apply (auth.ts) can validate registration
+// and application fields together, for the one-shot atomic signup endpoint.
+export const CreateApplicationSchema = z.object({
   preferredRole: z.enum(PREFERRED_ROLES),
   region: z.string().trim().min(1).max(120),
   ministryPreference: z.string().trim().max(120).optional(),

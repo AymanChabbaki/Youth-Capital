@@ -36,7 +36,7 @@ const INTERESTS_OPTIONS = [
 const getApplySchema = (step: number) => z.object({
   fullName: z.string().min(2, "Full name is required"),
   email: z.string().email("Invalid email address"),
-  phone: z.string().optional(),
+  phone: z.string().trim().min(6, "Phone number is required"),
   linkedinUrl: z.string().optional().refine(
     (v) => !v || /^https?:\/\/([a-z]{2,3}\.)?linkedin\.com\//i.test(v),
     "Must be a linkedin.com URL"
@@ -63,7 +63,7 @@ const getApplySchema = (step: number) => z.object({
 type ApplyFormData = {
   fullName: string;
   email: string;
-  phone?: string;
+  phone: string;
   linkedinUrl?: string;
   gender: string;
   age: number;
@@ -123,8 +123,12 @@ export default function Apply() {
   const onSubmit = async (data: ApplyFormData) => {
     setIsSubmitting(true);
     try {
-      // 1. Create User
-      await customFetch("/api/auth/register", {
+      // One atomic request — account and application are created together in
+      // a single DB transaction on the backend, so a dropped connection or
+      // closed tab mid-submit can never leave a user registered with no
+      // application attached (which used to happen, and also locked people
+      // out of retrying since the email was already taken).
+      await customFetch("/api/auth/register-and-apply", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -132,17 +136,9 @@ export default function Apply() {
           password: data.password,
           fullName: data.fullName,
           languagePreference: "en",
-          phone: data.phone || undefined,
+          phone: data.phone,
           linkedinUrl: data.linkedinUrl || undefined,
           agreedToTerms: data.agreedToTerms,
-        }),
-      });
-
-      // 2. Submit Application
-      await customFetch("/api/roles/applications", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
           preferredRole: data.preferredRole,
           region: data.region,
           motivation: `Interests: ${data.interests.join(", ")}\nStatus: ${data.status}\nEducation: ${data.educationLevel} in ${data.fieldOfStudy}`,
@@ -329,7 +325,7 @@ export default function Apply() {
                       <Input type="email" {...form.register("email")} error={form.formState.errors.email?.message} />
                     </div>
                     <div>
-                      <Label>{t("Phone Number (Optional)", "رقم الهاتف (اختياري)")}</Label>
+                      <Label>{t("Phone Number", "رقم الهاتف")}</Label>
                       <Input type="tel" {...form.register("phone")} error={form.formState.errors.phone?.message} />
                     </div>
                   </div>
