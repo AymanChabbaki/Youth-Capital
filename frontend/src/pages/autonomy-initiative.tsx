@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { useLanguage } from "@/hooks/use-language";
-import { Scale, Landmark, Coins, ShieldCheck, CheckCircle2, FileText } from "lucide-react";
+import { Scale, Landmark, Coins, Info, CheckCircle2, FileText } from "lucide-react";
 import { PageHero, Reveal, Button, Textarea, Select, Label, Card } from "@/components/ui-custom";
+import { Checkbox } from "@/components/ui/checkbox";
 import { customFetch } from "@workspace/api-client-react";
 import { useToast } from "@/hooks/use-toast";
 import { useSeo } from "@/hooks/use-seo";
+import { Link } from "wouter";
 
 const REGIONS: [string, string][] = [
   ["Tanger-Tétouan-Al Hoceïma", "طنجة تطوان الحسيمة"],
@@ -40,6 +42,7 @@ export default function AutonomyInitiative() {
   const { toast } = useToast();
   const [region, setRegion] = useState("");
   const [opinion, setOpinion] = useState("");
+  const [consent, setConsent] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
@@ -104,12 +107,20 @@ export default function AutonomyInitiative() {
       });
       return;
     }
+    if (!consent) {
+      toast({
+        title: t("Consent Required", "الموافقة مطلوبة"),
+        description: t("You must consent to answers collection to submit a response.", "يجب الموافقة على جمع الردود لإرسال ردّك."),
+        variant: "destructive",
+      });
+      return;
+    }
     setIsSubmitting(true);
     try {
       await customFetch("/api/sahara-feedback", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ region, opinion: opinion.trim() }),
+        body: JSON.stringify({ region, opinion: opinion.trim(), consentToDataCollection: consent }),
       });
       setIsSubmitted(true);
     } catch (error: any) {
@@ -194,8 +205,8 @@ export default function AutonomyInitiative() {
               </h2>
               <p className="text-muted-foreground max-w-lg mx-auto leading-relaxed">
                 {t(
-                  "What stands out to you, what concerns you, what questions does this raise? Your response is genuinely anonymous.",
-                  "ما الذي يلفت انتباهك؟ ما الذي يقلقك؟ ما الأسئلة التي يثيرها هذا؟ ردّك مجهول الهوية فعلاً."
+                                    "What stands out to you, what concerns you, what questions does this raise? Your response is genuinely anonymous.",
+                                    "ما الذي يلفت انتباهك؟ ما الذي يقلقك؟ ما الأسئلة التي يثيرها هذا؟ ردّك مجهول الهوية فعلاً."
                 )}
               </p>
             </div>
@@ -212,7 +223,7 @@ export default function AutonomyInitiative() {
                     {t("Thank You", "شكراً لك")}
                   </h3>
                   <p className="text-muted-foreground">
-                    {t("Your anonymous response has been recorded.", "تم تسجيل ردّك المجهول.")}
+                    {t("Your anonymous response has been recorded.", "تم تسجيل ردّك.")}
                   </p>
                 </div>
               ) : (
@@ -238,17 +249,36 @@ export default function AutonomyInitiative() {
                   </div>
 
                   <div className="flex items-start gap-3 p-4 rounded-2xl bg-secondary/40 border border-border/50">
-                    <ShieldCheck className="w-5 h-5 text-gold shrink-0 mt-0.5" />
+                    <Info className="w-5 h-5 text-gold shrink-0 mt-0.5" />
                     <p className="text-xs text-muted-foreground leading-relaxed">
                       {t(
-                        "No login required, no name, no email. We don't record your IP address or location with your response : only your selected region and your text are stored.",
+                                                "No login required, no name, no email. We don't record your IP address or location with your response : only your selected region and your text are stored.",
                         "لا حاجة لتسجيل الدخول، ولا اسم، ولا بريد إلكتروني. لا نسجّل عنوان IP الخاص بك أو موقعك مع ردّك : يُحفظ فقط الجهة التي اخترتها ونص ردّك."
                       )}
+                      <Link href="/privacy" target="_blank" className="text-gold font-bold hover:underline">
+                        {t("Privacy Policy", "سياسة الخصوصية")}
+                      </Link>
+                      {t(" for details.", " لمزيد من التفاصيل.")}
                     </p>
                   </div>
 
-                  <Button type="submit" variant="gold" className="w-full h-14 rounded-2xl" isLoading={isSubmitting}>
-                    {t("Submit Anonymously", "إرسال بشكل مجهول")}
+                  <div className="flex items-start gap-3">
+                    <Checkbox
+                      id="consentToDataCollection"
+                      checked={consent}
+                      onCheckedChange={(checked) => setConsent(checked === true)}
+                      className="mt-0.5"
+                    />
+                    <label htmlFor="consentToDataCollection" className="text-sm text-foreground leading-relaxed cursor-pointer">
+                      {t(
+                        "I understand my answers will be recorded and visible to administrators, and I consent to this.",
+                        "أفهم أن ردودي ستُسجَّل وستكون مرئية للمسؤولين، وأوافق على ذلك."
+                      )}
+                    </label>
+                  </div>
+
+                  <Button type="submit" variant="gold" className="w-full h-14 rounded-2xl" isLoading={isSubmitting} disabled={!consent}>
+                    {t("Submit anonymously", "إرسال بشكل مجهول")}
                   </Button>
                 </form>
               )}

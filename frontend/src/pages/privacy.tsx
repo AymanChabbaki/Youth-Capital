@@ -1,5 +1,5 @@
 import { useLanguage } from "@/hooks/use-language";
-import { Lock, Eye, Database, Mail, Shield, UserCheck, Globe, FileText } from "lucide-react";
+import { Lock, Eye, Database, Mail, Shield, UserCheck, Globe, FileText, Scale } from "lucide-react";
 import { PageHero, Reveal } from "@/components/ui-custom";
 import { useSeo } from "@/hooks/use-seo";
 
@@ -123,9 +123,26 @@ export default function Privacy() {
       ],
     },
     {
+      icon: Scale,
+      titleEn: "7. Sahara Autonomy Initiative Consultation",
+      titleAr: "7. استشارة مبادرة الحكم الذاتي في الصحراء",
+      contentEn: [
+        "The feedback form on the Autonomy Initiative page is not anonymous. Submitting a response requires you to explicitly check a consent box before it is accepted; declining consent means the response is not submitted or stored at all.",
+        "If you consent, we record: the region you select, the text of your response, your IP address, and your browser's user-agent string.",
+        "This data is visible to Youth Capital platform administrators in full, alongside aggregate counts by region.",
+        "We do not use this data for any purpose beyond reviewing consultation responses, and we do not sell or share it with third parties.",
+      ],
+      contentAr: [
+        "نموذج المشاركة في صفحة مبادرة الحكم الذاتي ليس مجهول الهوية. يتطلب إرسال الرد تحديد مربع الموافقة صراحةً قبل قبوله؛ وفي حال رفض الموافقة، لا يُرسَل الرد ولا يُحفظ إطلاقاً.",
+        "في حال الموافقة، نسجّل: الجهة التي تختارها، ونص ردّك، وعنوان IP الخاص بك، ومعرّف المتصفح (user-agent).",
+        "هذه البيانات مرئية بالكامل لمسؤولي منصة يوث كابيتال، إلى جانب إحصاءات إجمالية حسب الجهة.",
+        "لا نستخدم هذه البيانات لأي غرض يتجاوز مراجعة ردود الاستشارة، ولا نبيعها أو نشاركها مع أطراف ثالثة.",
+      ],
+    },
+    {
       icon: Mail,
-      titleEn: "7. Contact & Data Requests",
-      titleAr: "7. التواصل وطلبات البيانات",
+      titleEn: "8. Contact & Data Requests",
+      titleAr: "8. التواصل وطلبات البيانات",
       contentEn: [
         "For any privacy-related requests, including data access, correction, or deletion, please use the Support page and select 'Account Help' as the category.",
         "We aim to respond to all data requests within 30 days as required by applicable law.",

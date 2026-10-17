@@ -1826,8 +1826,8 @@ export default function Admin() {
                 <ShieldCheck className="w-5 h-5 text-gold shrink-0 mt-0.5" />
                 <p className="text-xs text-muted-foreground leading-relaxed">
                   {t(
-                    "Responses are genuinely anonymous — no user, IP, or device info is attached. Only region and text are stored.",
-                    "الردود مجهولة الهوية فعلاً — لا يُرفق بها أي معرّف مستخدم أو IP أو معلومات جهاز. يُحفظ فقط الجهة والنص."
+                    "Not anonymous — respondents explicitly consented to this. Each entry includes region, text, IP address, and browser info, exactly as disclosed on the public form.",
+                    "غير مجهولة الهوية — وافق المشاركون على ذلك صراحةً. يتضمن كل رد الجهة والنص وعنوان IP ومعلومات المتصفح، تماماً كما هو موضّح في النموذج العام."
                   )}
                 </p>
               </div>
@@ -1856,11 +1856,15 @@ export default function Admin() {
                 <div className="max-h-[600px] overflow-y-auto divide-y divide-border">
                   {(saharaFeedbackData?.entries || []).map((entry: any) => (
                     <div key={entry.id} className="p-6">
-                      <div className="flex items-center justify-between mb-2">
-                        <Badge className="rounded-lg text-xs">{entry.region}</Badge>
+                      <div className="flex items-center justify-between mb-2 flex-wrap gap-2">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <Badge className="rounded-lg text-xs">{entry.region}</Badge>
+                          {entry.ipAddress && <span className="text-xs font-mono text-muted-foreground">{entry.ipAddress}</span>}
+                        </div>
                         <span className="text-xs text-muted-foreground">{new Date(entry.createdAt).toLocaleString()}</span>
                       </div>
-                      <p className="text-sm text-foreground/80 leading-relaxed whitespace-pre-wrap">{entry.opinion}</p>
+                      <p className="text-sm text-foreground/80 leading-relaxed whitespace-pre-wrap mb-2">{entry.opinion}</p>
+                      {entry.userAgent && <p className="text-[10px] text-muted-foreground/70 truncate" title={entry.userAgent}>{entry.userAgent}</p>}
                     </div>
                   ))}
                   {(!saharaFeedbackData?.entries || saharaFeedbackData.entries.length === 0) && (

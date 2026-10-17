@@ -18,24 +18,37 @@ const REGIONS = [
 const SubmitFeedbackSchema = z.object({
   region: z.enum(REGIONS),
   opinion: z.string().trim().min(10, "Please share at least a few words").max(4000),
+  // Required and must be explicitly true — this is not a formality. The
+  // page tells respondents their IP and browser info are recorded, and
+  // this field is what makes that an actual choice rather than a claim.
+  // Enforced here too, not just client-side, so the guarantee holds even
+  // if someone calls the API directly.
+  consentToDataCollection: z.boolean().refine((v) => v === true, {
+    message: "You must consent to data collection to submit a response",
+  }),
 });
 
-// Public, anonymous, rate-limited by IP (not logged — see anonFeedbackLimiter).
-// No requireAuth, no user/session/ip ever touches saharaFeedbackTable.
+// Public, rate-limited by IP, but NOT anonymous — consent is required and
+// the exact data disclosed on the page (IP, user agent) is what gets stored.
 router.post("/", anonFeedbackLimiter, validateBody(SubmitFeedbackSchema), async (req, res) => {
   try {
     const { region, opinion } = req.body;
-    await db.insert(saharaFeedbackTable).values({ region, opinion });
-    res.status(201).json({ success: true, message: "Thank you — your response has been recorded anonymously." });
+    await db.insert(saharaFeedbackTable).values({
+      region,
+      opinion,
+      ipAddress: req.ip || null,
+      userAgent: req.headers["user-agent"] || null,
+    });
+    res.status(201).json({ success: true, message: "Thank you — your response has been recorded." });
   } catch (err) {
     req.log.error({ err }, "Submit sahara feedback error");
     res.status(500).json({ error: "Internal", message: "Server error" });
   }
 });
 
-// Admin-only read: aggregate counts by region + the full (still-anonymous)
-// text of every submission. There is nothing more identifying to show —
-// the table simply doesn't have it.
+// Admin-only read: aggregate counts by region, plus the full text, IP, and
+// browser info of every submission — exactly what respondents were told
+// would be visible to administrators.
 router.get("/", requireAuth, requireAdmin, async (req, res) => {
   try {
     const { page, limit, offset } = clampPageParams(req, 50);

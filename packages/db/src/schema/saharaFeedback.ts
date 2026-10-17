@@ -2,16 +2,19 @@ import { pgTable, text, serial, timestamp } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-// Genuinely anonymous civic feedback on the Moroccan Autonomy Initiative for
-// the Sahara. Deliberately has no userId, ip, or any identifying column —
-// the public page tells visitors this is anonymous, so the schema has to
-// make that true, not just claim it. Spam protection is handled at the
-// rate-limiter layer (in-memory, never persisted here), not by logging
-// identity alongside the opinion text.
+// Civic feedback on the Moroccan Autonomy Initiative for the Sahara.
+// NOT anonymous — the submit form explicitly tells respondents their IP
+// address and browser info are recorded, and requires explicit consent
+// before accepting a submission (enforced server-side too, see
+// backend/src/routes/sahara.ts). ipAddress/userAgent are nullable only to
+// keep this migration additive; every row created through the consent-gated
+// endpoint will have both populated.
 export const saharaFeedbackTable = pgTable("sahara_feedback", {
   id: serial("id").primaryKey(),
   region: text("region").notNull(),
   opinion: text("opinion").notNull(),
+  ipAddress: text("ip_address"),
+  userAgent: text("user_agent"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 

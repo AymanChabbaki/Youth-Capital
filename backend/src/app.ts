@@ -11,6 +11,12 @@ import { globalLimiter } from "./middlewares/rateLimit.js";
 
 const app: Express = express();
 
+// Needed for req.ip to reflect the real client address behind Vercel's edge
+// proxy instead of the proxy's own internal address — otherwise every
+// request looks like it comes from the same IP, which breaks both IP-based
+// rate limiting and the consent-based IP capture on /api/sahara-feedback.
+app.set("trust proxy", true);
+
 const isProd = process.env.NODE_ENV === "production";
 const DEV_ORIGINS = ["http://localhost:5173", "http://localhost:5174"];
 const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(",").map((o) => o.trim()).filter(Boolean);
