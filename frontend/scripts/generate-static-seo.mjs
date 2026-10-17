@@ -52,6 +52,12 @@ const PAGES = {
     changefreq: "monthly",
     priority: "0.5",
   },
+  "/autonomy-initiative": {
+    title: "Moroccan Autonomy Initiative for the Sahara | Youth Capital Morocco",
+    description: "Understand the constitutional, institutional, and financial framework of Morocco's Autonomy Initiative for the Sahara, and share your anonymous perspective.",
+    changefreq: "weekly",
+    priority: "0.6",
+  },
   "/privacy": {
     title: "Privacy Policy | Youth Capital Morocco",
     description: "How Youth Capital collects, uses, and protects your information on Morocco's youth governance simulation platform.",

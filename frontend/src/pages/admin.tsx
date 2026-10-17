@@ -19,7 +19,7 @@ import {
   MapPin, Landmark, LogOut, Plus, Edit, Trash2,
   ImagePlus, Loader2, X as XIcon,
   Phone, Linkedin, GraduationCap, Briefcase, Tag, Eye, Ban, ShieldCheck,
-  Gauge, ScrollText, Vote, UserPlus,
+  Gauge, ScrollText, Vote, UserPlus, Scale,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -245,6 +245,11 @@ export default function Admin() {
     queryFn: () => customFetch<any>("/api/admin/system-logs?limit=50"),
     enabled: !isLoading && isAdmin,
     refetchInterval: 30000,
+  });
+  const { data: saharaFeedbackData } = useQuery({
+    queryKey: ["/api/sahara-feedback"],
+    queryFn: () => customFetch<any>("/api/sahara-feedback?limit=100"),
+    enabled: !isLoading && isAdmin,
   });
 
   const updateAppMutation = useUpdateRoleApplication();
@@ -494,6 +499,7 @@ export default function Admin() {
     { id: "events", icon: Calendar, label: t("Events Calendar", "جدول الفعاليات") },
     { id: "polls", icon: BarChart3, label: t("Polls Management", "إدارة الاستطلاعات") },
     { id: "system", icon: Gauge, label: t("System & Logs", "النظام والسجلات") },
+    { id: "sahara", icon: Scale, label: t("Sahara Consultation", "استشارة الصحراء") },
   ];
 
 
@@ -1808,6 +1814,58 @@ export default function Admin() {
                       )}
                     </tbody>
                   </table>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ── SAHARA CONSULTATION ── */}
+          {activeTab === "sahara" && (
+            <div className="space-y-8">
+              <div className="flex items-start gap-3 p-4 rounded-2xl bg-secondary/40 border border-border/50">
+                <ShieldCheck className="w-5 h-5 text-gold shrink-0 mt-0.5" />
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  {t(
+                    "Responses are genuinely anonymous — no user, IP, or device info is attached. Only region and text are stored.",
+                    "الردود مجهولة الهوية فعلاً — لا يُرفق بها أي معرّف مستخدم أو IP أو معلومات جهاز. يُحفظ فقط الجهة والنص."
+                  )}
+                </p>
+              </div>
+
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <KpiCard icon={FileCheck} label={t("Total Responses", "إجمالي الردود")} value={saharaFeedbackData?.total ?? ":"} color="gold" />
+              </div>
+
+              <div className="bg-card border border-border rounded-2xl p-6">
+                <h3 className="text-lg font-bold text-foreground mb-4">{t("Responses by Region", "الردود حسب الجهة")}</h3>
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={saharaFeedbackData?.byRegion || []} layout="vertical" margin={{ left: 40 }}>
+                    <CartesianGrid strokeDasharray="3 3" horizontal={false} />
+                    <XAxis type="number" allowDecimals={false} />
+                    <YAxis type="category" dataKey="region" width={160} tick={{ fontSize: 11 }} />
+                    <Tooltip />
+                    <Bar dataKey="count" fill="#C9A84C" radius={[0, 6, 6, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+
+              <div className="bg-card border border-border rounded-2xl overflow-hidden">
+                <div className="p-6 border-b border-border">
+                  <h3 className="text-lg font-bold text-foreground">{t("All Responses", "جميع الردود")}</h3>
+                </div>
+                <div className="max-h-[600px] overflow-y-auto divide-y divide-border">
+                  {(saharaFeedbackData?.entries || []).map((entry: any) => (
+                    <div key={entry.id} className="p-6">
+                      <div className="flex items-center justify-between mb-2">
+                        <Badge className="rounded-lg text-xs">{entry.region}</Badge>
+                        <span className="text-xs text-muted-foreground">{new Date(entry.createdAt).toLocaleString()}</span>
+                      </div>
+                      <p className="text-sm text-foreground/80 leading-relaxed whitespace-pre-wrap">{entry.opinion}</p>
+                    </div>
+                  ))}
+                  {(!saharaFeedbackData?.entries || saharaFeedbackData.entries.length === 0) && (
+                    <div className="p-8 text-center text-muted-foreground text-sm">{t("No responses yet.", "لا توجد ردود بعد.")}</div>
+                  )}
                 </div>
               </div>
             </div>

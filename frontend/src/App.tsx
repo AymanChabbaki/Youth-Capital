@@ -28,6 +28,7 @@ const Rules = lazy(() => import("@/pages/rules"));
 const Privacy = lazy(() => import("@/pages/privacy"));
 const NotFound = lazy(() => import("@/pages/not-found"));
 const Linktree = lazy(() => import("@/pages/linktree"));
+const AutonomyInitiative = lazy(() => import("@/pages/autonomy-initiative"));
 
 const queryClient = new QueryClient();
 
@@ -76,6 +77,7 @@ function Router() {
               <Route path="/polls/:id" component={PollDetail} />
               <Route path="/about" component={About} />
               <Route path="/rules" component={Rules} />
+              <Route path="/autonomy-initiative" component={AutonomyInitiative} />
               <Route path="/privacy" component={Privacy} />
               <Route component={NotFound} />
             </Switch>

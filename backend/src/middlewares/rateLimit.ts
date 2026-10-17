@@ -36,3 +36,15 @@ export const chatGuestLimiter = rateLimit({
   skip: (req) => !!(req as any).user,
   message: { error: "LoginRequired", message: "Free question limit reached. Log in to keep chatting." },
 });
+
+// Anonymous civic feedback (e.g. Sahara Autonomy Initiative consultation):
+// IP is used only in-memory, only to throttle, and is never written to the
+// feedback row or exposed anywhere — that's what keeps the "this is
+// anonymous" claim on the public page actually true.
+export const anonFeedbackLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  limit: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "TooManyRequests", message: "Too many submissions, please try again later" },
+});

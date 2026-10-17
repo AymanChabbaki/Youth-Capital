@@ -587,6 +587,7 @@ function Footer() {
         { href: "/press", label: t("Press & News", "الأخبار والصحافة") },
         { href: "/events", label: t("Events", "الفعاليات") },
         { href: "/polls", label: t("Civic Polls", "الاستطلاعات المدنية") },
+        { href: "/autonomy-initiative", label: t("Autonomy Initiative", "مبادرة الحكم الذاتي") },
       ],
     },
     {

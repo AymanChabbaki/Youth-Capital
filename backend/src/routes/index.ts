@@ -12,6 +12,7 @@ import crisesRouter from "./crises.js";
 import statsRouter from "./stats.js";
 import chatRouter from "./chat.js";
 import adminRouter from "./admin.js";
+import saharaRouter from "./sahara.js";
 
 const router: IRouter = Router();
 
@@ -28,5 +29,6 @@ router.use("/crises", crisesRouter);
 router.use("/stats", statsRouter);
 router.use("/chat", chatRouter);
 router.use("/admin", adminRouter);
+router.use("/sahara-feedback", saharaRouter);
 
 export default router;
