@@ -25,6 +25,13 @@ const REGIONS: [string, string][] = [
   ["Prefer not to say", "أفضل عدم القول"],
 ];
 
+const AXES: [string, string][] = [
+  ["Constitutional & Legal Framework", "الإطار الدستوري والقانوني"],
+  ["Distribution of Powers & Institutions", "توزيع الاختصاصات والمؤسسات"],
+  ["Financial & Natural Resources", "الموارد المالية والطبيعية"],
+  ["General / Other", "عام / أخرى"],
+];
+
 export default function AutonomyInitiative() {
   const { t } = useLanguage();
   useSeo({
@@ -33,14 +40,15 @@ export default function AutonomyInitiative() {
       "المبادرة المغربية للحكم الذاتي في الصحراء | يوث كابيتال"
     ),
     description: t(
-      "Understand the constitutional, institutional, and financial framework of Morocco's Autonomy Initiative for the Sahara, and share your anonymous perspective.",
-      "تعرّف على الإطار الدستوري والمؤسساتي والمالي للمبادرة المغربية للحكم الذاتي في الصحراء، وشارك رأيك بشكل مجهول."
+      "Understand the constitutional, institutional, and financial framework of Morocco's Autonomy Initiative for the Sahara, and share your perspective.",
+      "تعرّف على الإطار الدستوري والمؤسساتي والمالي للمبادرة المغربية للحكم الذاتي في الصحراء، وشارك رأيك."
     ),
     path: "/autonomy-initiative",
   });
 
   const { toast } = useToast();
   const [region, setRegion] = useState("");
+  const [axis, setAxis] = useState("");
   const [opinion, setOpinion] = useState("");
   const [consent, setConsent] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -99,10 +107,10 @@ export default function AutonomyInitiative() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!region || opinion.trim().length < 10) {
+    if (!region || !axis || opinion.trim().length < 10) {
       toast({
         title: t("Please complete the form", "يرجى إكمال النموذج"),
-        description: t("Select a region and share at least a few words.", "اختر جهة وشارك بضع كلمات على الأقل."),
+        description: t("Select a region, select a section, and share at least a few words.", "اختر جهة ومحوراً وشارك بضع كلمات على الأقل."),
         variant: "destructive",
       });
       return;
@@ -110,7 +118,7 @@ export default function AutonomyInitiative() {
     if (!consent) {
       toast({
         title: t("Consent Required", "الموافقة مطلوبة"),
-        description: t("You must consent to answers collection to submit a response.", "يجب الموافقة على جمع الردود لإرسال ردّك."),
+        description: t("You must consent to answers collection to submit a response.", "يجب الموافقة على جمع الإجابات لإرسال ردّك."),
         variant: "destructive",
       });
       return;
@@ -120,7 +128,7 @@ export default function AutonomyInitiative() {
       await customFetch("/api/sahara-feedback", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ region, opinion: opinion.trim(), consentToDataCollection: consent }),
+        body: JSON.stringify({ region, axis, opinion: opinion.trim(), consentToDataCollection: consent }),
       });
       setIsSubmitted(true);
     } catch (error: any) {
@@ -205,8 +213,8 @@ export default function AutonomyInitiative() {
               </h2>
               <p className="text-muted-foreground max-w-lg mx-auto leading-relaxed">
                 {t(
-                                    "What stands out to you, what concerns you, what questions does this raise? Your response is genuinely anonymous.",
-                                    "ما الذي يلفت انتباهك؟ ما الذي يقلقك؟ ما الأسئلة التي يثيرها هذا؟ ردّك مجهول الهوية فعلاً."
+                  "What stands out to you, what concerns you, what questions does this raise? your response is genuinely anonymous.",
+                  "ما الذي يلفت انتباهك؟ ما الذي يقلقك؟ ما الأسئلة التي يثيرها هذا؟ ردّك مجهول الهوية حقاً."
                 )}
               </p>
             </div>
@@ -223,7 +231,7 @@ export default function AutonomyInitiative() {
                     {t("Thank You", "شكراً لك")}
                   </h3>
                   <p className="text-muted-foreground">
-                    {t("Your anonymous response has been recorded.", "تم تسجيل ردّك.")}
+                    {t("Your anonymous response has been recorded.", "تم تسجيل ردّك المجهول.")}
                   </p>
                 </div>
               ) : (
@@ -233,6 +241,15 @@ export default function AutonomyInitiative() {
                     <Select value={region} onChange={(e) => setRegion(e.target.value)}>
                       <option value="">{t("Select a region", "اختر جهة")}</option>
                       {REGIONS.map(([en, ar]) => (
+                        <option key={en} value={en}>{t(en, ar)}</option>
+                      ))}
+                    </Select>
+                  </div>
+                  <div>
+                    <Label>{t("Which Section", "أي محور")}</Label>
+                    <Select value={axis} onChange={(e) => setAxis(e.target.value)}>
+                      <option value="">{t("Select a section", "اختر محوراً")}</option>
+                      {AXES.map(([en, ar]) => (
                         <option key={en} value={en}>{t(en, ar)}</option>
                       ))}
                     </Select>
@@ -252,9 +269,9 @@ export default function AutonomyInitiative() {
                     <Info className="w-5 h-5 text-gold shrink-0 mt-0.5" />
                     <p className="text-xs text-muted-foreground leading-relaxed">
                       {t(
-                                                "No login required, no name, no email. We don't record your IP address or location with your response : only your selected region and your text are stored.",
+                        "No login required, no name, no email. We don't record your IP address or location with your response : only your selected region and your text are stored.",
                         "لا حاجة لتسجيل الدخول، ولا اسم، ولا بريد إلكتروني. لا نسجّل عنوان IP الخاص بك أو موقعك مع ردّك : يُحفظ فقط الجهة التي اخترتها ونص ردّك."
-                      )}
+                   )}
                       <Link href="/privacy" target="_blank" className="text-gold font-bold hover:underline">
                         {t("Privacy Policy", "سياسة الخصوصية")}
                       </Link>
@@ -273,7 +290,7 @@ export default function AutonomyInitiative() {
                       {t(
                         "I understand my answers will be recorded and visible to administrators, and I consent to this.",
                         "أفهم أن ردودي ستُسجَّل وستكون مرئية للمسؤولين، وأوافق على ذلك."
-                      )}
+                         )}
                     </label>
                   </div>
 

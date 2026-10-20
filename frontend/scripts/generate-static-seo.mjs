@@ -54,7 +54,7 @@ const PAGES = {
   },
   "/autonomy-initiative": {
     title: "Moroccan Autonomy Initiative for the Sahara | Youth Capital Morocco",
-    description: "Understand the constitutional, institutional, and financial framework of Morocco's Autonomy Initiative for the Sahara, and share your anonymous perspective.",
+    description: "Understand the constitutional, institutional, and financial framework of Morocco's Autonomy Initiative for the Sahara, and share your perspective.",
     changefreq: "weekly",
     priority: "0.6",
   },

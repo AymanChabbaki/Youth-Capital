@@ -12,6 +12,10 @@ import { z } from "zod";
 export const saharaFeedbackTable = pgTable("sahara_feedback", {
   id: serial("id").primaryKey(),
   region: text("region").notNull(),
+  // Which of the document's three sections the opinion addresses — see
+  // AXES in backend/src/routes/sahara.ts. Nullable to keep this migration
+  // additive on top of rows submitted before this field existed.
+  axis: text("axis"),
   opinion: text("opinion").notNull(),
   ipAddress: text("ip_address"),
   userAgent: text("user_agent"),

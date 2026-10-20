@@ -126,6 +126,36 @@ export default function Polls() {
         </div>
       </section>
 
+      {/* Sahara Autonomy Initiative Consultation CTA */}
+      <section className="max-w-7xl mx-auto w-full px-4 pb-20">
+        <Link href="/autonomy-initiative">
+          <div className="rounded-[2.5rem] p-10 md:p-14 bg-navy-dark text-white relative overflow-hidden group cursor-pointer hover:shadow-2xl hover:shadow-gold/10 transition-shadow duration-300">
+            <div className="absolute inset-0 bg-grid-gold opacity-20" />
+            <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-110 group-hover:opacity-20 transition-all duration-700">
+              <Scale className="w-32 h-32 text-gold" />
+            </div>
+            <div className="max-w-2xl relative z-10">
+              <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 border border-white/20 text-gold-pale text-[11px] font-bold uppercase tracking-[0.2em] mb-5">
+                {t("Civic Consultation", "استشارة مدنية")}
+              </span>
+              <h3 className="text-2xl md:text-3xl font-display font-black mb-4">
+                {t("The Autonomy", "مبادرة الحكم")} <span className="text-gradient-gold">{t("Initiative", "الذاتي")}</span>
+              </h3>
+              <p className="text-white/60 mb-8 leading-relaxed max-w-xl">
+                {t(
+                  "Understand Morocco's Autonomy Initiative for the Sahara, section by section, and share your perspective by region and topic.",
+                  "تعرّف على المبادرة المغربية للحكم الذاتي في الصحراء محوراً محوراً، وشارك رأيك حسب الجهة والمحور."
+                )}
+              </p>
+              <div className="inline-flex items-center gap-3 font-bold text-gold group-hover:gap-4 transition-all">
+                {t("Read & Share Your Opinion", "اقرأ وشارك رأيك")}
+                <ArrowRight className={`w-5 h-5 ${isAr ? "rotate-180" : ""}`} />
+              </div>
+            </div>
+          </div>
+        </Link>
+      </section>
+
       {/* Constitutional FAQ */}
       <section className="max-w-4xl mx-auto w-full px-4 pb-32">
         <Reveal className="text-center mb-14">

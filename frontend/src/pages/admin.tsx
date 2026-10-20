@@ -8,7 +8,7 @@ import {
   useLogout,
   customFetch
 } from "@workspace/api-client-react";
-import { Badge, Button, Input, Textarea, Select } from "@/components/ui-custom";
+import { Badge, Button, Input, Textarea, Select, Label } from "@/components/ui-custom";
 import { useSeo } from "@/hooks/use-seo";
 import { Redirect, Link, useLocation } from "wouter";
 import {
@@ -159,6 +159,20 @@ function ThumbnailUploader({ name, defaultValue }: { name: string; defaultValue?
   );
 }
 
+// Must match REGIONS/AXES in backend/src/routes/sahara.ts
+const SAHARA_REGIONS = [
+  "Tanger-Tétouan-Al Hoceïma", "L'Oriental", "Fès-Meknès", "Rabat-Salé-Kénitra",
+  "Béni Mellal-Khénifra", "Casablanca-Settat", "Marrakech-Safi", "Drâa-Tafilalet",
+  "Souss-Massa", "Guelmim-Oued Noun", "Laâyoune-Sakia El Hamra", "Dakhla-Oued Ed-Dahab",
+  "Moroccan Diaspora", "Prefer not to say",
+];
+const SAHARA_AXES = [
+  "Constitutional & Legal Framework",
+  "Distribution of Powers & Institutions",
+  "Financial & Natural Resources",
+  "General / Other",
+];
+
 const MONTHLY_ACTIVITY = [
   { month: "Oct", posts: 18, users: 3 },
   { month: "Nov", posts: 34, users: 5 },
@@ -246,9 +260,16 @@ export default function Admin() {
     enabled: !isLoading && isAdmin,
     refetchInterval: 30000,
   });
+  const [saharaAxisFilter, setSaharaAxisFilter] = useState("");
+  const [saharaRegionFilter, setSaharaRegionFilter] = useState("");
   const { data: saharaFeedbackData } = useQuery({
-    queryKey: ["/api/sahara-feedback"],
-    queryFn: () => customFetch<any>("/api/sahara-feedback?limit=100"),
+    queryKey: ["/api/sahara-feedback", saharaAxisFilter, saharaRegionFilter],
+    queryFn: () => {
+      const params = new URLSearchParams({ limit: "100" });
+      if (saharaAxisFilter) params.set("axis", saharaAxisFilter);
+      if (saharaRegionFilter) params.set("region", saharaRegionFilter);
+      return customFetch<any>(`/api/sahara-feedback?${params.toString()}`);
+    },
     enabled: !isLoading && isAdmin,
   });
 
@@ -1832,26 +1853,76 @@ export default function Admin() {
                 </p>
               </div>
 
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <KpiCard icon={FileCheck} label={t("Total Responses", "إجمالي الردود")} value={saharaFeedbackData?.total ?? ":"} color="gold" />
+              {(() => {
+                const topAxis = [...(saharaFeedbackData?.byAxis || [])].sort((a: any, b: any) => b.count - a.count)[0];
+                const topRegion = [...(saharaFeedbackData?.byRegion || [])].sort((a: any, b: any) => b.count - a.count)[0];
+                return (
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <KpiCard icon={FileCheck} label={t("Total Responses", "إجمالي الردود")} value={saharaFeedbackData?.grandTotal ?? ":"} sub={saharaFeedbackData?.total !== saharaFeedbackData?.grandTotal ? `${saharaFeedbackData?.total ?? 0} ${t("matching filters", "مطابقة للفلترة")}` : undefined} color="gold" />
+                    <KpiCard icon={Scale} label={t("Most Discussed Section", "المحور الأكثر نقاشاً")} value={topAxis?.count ?? ":"} sub={topAxis?.axis} color="blue" />
+                    <KpiCard icon={Landmark} label={t("Most Active Region", "الجهة الأكثر مشاركة")} value={topRegion?.count ?? ":"} sub={topRegion?.region} color="purple" />
+                  </div>
+                );
+              })()}
+
+              {/* Filters */}
+              <div className="flex flex-wrap items-end gap-4 bg-card border border-border rounded-2xl p-4">
+                <div className="min-w-[220px]">
+                  <Label>{t("Filter by Section", "تصفية حسب المحور")}</Label>
+                  <Select value={saharaAxisFilter} onChange={(e) => setSaharaAxisFilter(e.target.value)}>
+                    <option value="">{t("All Sections", "جميع المحاور")}</option>
+                    {SAHARA_AXES.map((axis) => (
+                      <option key={axis} value={axis}>{axis}</option>
+                    ))}
+                  </Select>
+                </div>
+                <div className="min-w-[220px]">
+                  <Label>{t("Filter by Region", "تصفية حسب الجهة")}</Label>
+                  <Select value={saharaRegionFilter} onChange={(e) => setSaharaRegionFilter(e.target.value)}>
+                    <option value="">{t("All Regions", "جميع الجهات")}</option>
+                    {SAHARA_REGIONS.map((region) => (
+                      <option key={region} value={region}>{region}</option>
+                    ))}
+                  </Select>
+                </div>
+                {(saharaAxisFilter || saharaRegionFilter) && (
+                  <Button type="button" variant="outline" className="h-11 rounded-xl" onClick={() => { setSaharaAxisFilter(""); setSaharaRegionFilter(""); }}>
+                    {t("Clear Filters", "مسح الفلترة")}
+                  </Button>
+                )}
               </div>
 
-              <div className="bg-card border border-border rounded-2xl p-6">
-                <h3 className="text-lg font-bold text-foreground mb-4">{t("Responses by Region", "الردود حسب الجهة")}</h3>
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={saharaFeedbackData?.byRegion || []} layout="vertical" margin={{ left: 40 }}>
-                    <CartesianGrid strokeDasharray="3 3" horizontal={false} />
-                    <XAxis type="number" allowDecimals={false} />
-                    <YAxis type="category" dataKey="region" width={160} tick={{ fontSize: 11 }} />
-                    <Tooltip />
-                    <Bar dataKey="count" fill="#C9A84C" radius={[0, 6, 6, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="bg-card border border-border rounded-2xl p-6">
+                  <h3 className="text-lg font-bold text-foreground mb-4">{t("Responses by Region", "الردود حسب الجهة")}</h3>
+                  <ResponsiveContainer width="100%" height={340}>
+                    <BarChart data={saharaFeedbackData?.byRegion || []} layout="vertical" margin={{ left: 40 }}>
+                      <CartesianGrid strokeDasharray="3 3" horizontal={false} />
+                      <XAxis type="number" allowDecimals={false} />
+                      <YAxis type="category" dataKey="region" width={160} tick={{ fontSize: 11 }} />
+                      <Tooltip />
+                      <Bar dataKey="count" fill="#C9A84C" radius={[0, 6, 6, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+                <div className="bg-card border border-border rounded-2xl p-6">
+                  <h3 className="text-lg font-bold text-foreground mb-4">{t("Responses by Section", "الردود حسب المحور")}</h3>
+                  <ResponsiveContainer width="100%" height={340}>
+                    <BarChart data={saharaFeedbackData?.byAxis || []} layout="vertical" margin={{ left: 40 }}>
+                      <CartesianGrid strokeDasharray="3 3" horizontal={false} />
+                      <XAxis type="number" allowDecimals={false} />
+                      <YAxis type="category" dataKey="axis" width={160} tick={{ fontSize: 10 }} />
+                      <Tooltip />
+                      <Bar dataKey="count" fill="#1B2A4A" radius={[0, 6, 6, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
               </div>
 
               <div className="bg-card border border-border rounded-2xl overflow-hidden">
-                <div className="p-6 border-b border-border">
-                  <h3 className="text-lg font-bold text-foreground">{t("All Responses", "جميع الردود")}</h3>
+                <div className="p-6 border-b border-border flex items-center justify-between flex-wrap gap-2">
+                  <h3 className="text-lg font-bold text-foreground">{t("Responses", "الردود")}</h3>
+                  <span className="text-xs text-muted-foreground">{saharaFeedbackData?.total ?? 0} {t("shown", "معروضة")}</span>
                 </div>
                 <div className="max-h-[600px] overflow-y-auto divide-y divide-border">
                   {(saharaFeedbackData?.entries || []).map((entry: any) => (
@@ -1859,6 +1930,7 @@ export default function Admin() {
                       <div className="flex items-center justify-between mb-2 flex-wrap gap-2">
                         <div className="flex items-center gap-2 flex-wrap">
                           <Badge className="rounded-lg text-xs">{entry.region}</Badge>
+                          {entry.axis && <Badge className="rounded-lg text-xs bg-primary/10 text-primary border-primary/30">{entry.axis}</Badge>}
                           {entry.ipAddress && <span className="text-xs font-mono text-muted-foreground">{entry.ipAddress}</span>}
                         </div>
                         <span className="text-xs text-muted-foreground">{new Date(entry.createdAt).toLocaleString()}</span>
@@ -1868,7 +1940,7 @@ export default function Admin() {
                     </div>
                   ))}
                   {(!saharaFeedbackData?.entries || saharaFeedbackData.entries.length === 0) && (
-                    <div className="p-8 text-center text-muted-foreground text-sm">{t("No responses yet.", "لا توجد ردود بعد.")}</div>
+                    <div className="p-8 text-center text-muted-foreground text-sm">{t("No responses match these filters.", "لا توجد ردود مطابقة لهذه الفلترة.")}</div>
                   )}
                 </div>
               </div>
