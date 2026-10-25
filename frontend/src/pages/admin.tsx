@@ -562,7 +562,7 @@ export default function Admin() {
       (u.fullName.toLowerCase().includes(search.toLowerCase()) ||
         u.email.toLowerCase().includes(search.toLowerCase())) &&
       (!userFilters.ageRange || ageRangeOf(u.age) === userFilters.ageRange) &&
-      (!userFilters.gender || u.gender === userFilters.gender) &&
+      (!userFilters.gender || (u.gender || "Prefer not to say") === userFilters.gender) &&
       (!userFilters.region || u.region?.trim() === userFilters.region)
     ),
     (u: any) => u.fullName
@@ -574,7 +574,7 @@ export default function Admin() {
   const filteredApps = sortedAZ(
     pendingApps.filter((a: any) =>
       (!appFilters.ageRange || ageRangeOf(a.age) === appFilters.ageRange) &&
-      (!appFilters.gender || a.gender === appFilters.gender) &&
+      (!appFilters.gender || (a.gender || "Prefer not to say") === appFilters.gender) &&
       (!appFilters.region || a.region?.trim() === appFilters.region)
     ),
     (a: any) => a.user?.fullName

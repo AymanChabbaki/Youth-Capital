@@ -24,14 +24,14 @@ export const AXES = [
 ] as const;
 
 // Must match AGE_RANGES / GENDERS in frontend/src/components/admin-table.tsx
-export const AGE_RANGES = ["Under 18", "18-24", "25-34", "35-44", "45+"] as const;
+export const AGE_RANGES = ["Under 18", "18-24", "25-34", "35-44", "45+", "Prefer not to say"] as const;
 export const GENDERS = ["Male", "Female", "Prefer not to say"] as const;
 
 const SubmitFeedbackSchema = z.object({
   region: z.enum(REGIONS),
   axis: z.enum(AXES),
-  ageRange: z.enum(AGE_RANGES).optional(),
-  gender: z.enum(GENDERS).optional(),
+  ageRange: z.enum(AGE_RANGES),
+  gender: z.enum(GENDERS),
   opinion: z.string().trim().min(10, "Please share at least a few words").max(4000),
   // Required and must be explicitly true — this is not a formality. The
   // page tells respondents their IP and browser info are recorded, and
@@ -51,8 +51,8 @@ router.post("/", anonFeedbackLimiter, validateBody(SubmitFeedbackSchema), async 
     await db.insert(saharaFeedbackTable).values({
       region,
       axis,
-      ageRange: ageRange || null,
-      gender: gender || null,
+      ageRange,
+      gender,
       opinion,
       ipAddress: req.ip || null,
       userAgent: req.headers["user-agent"] || null,

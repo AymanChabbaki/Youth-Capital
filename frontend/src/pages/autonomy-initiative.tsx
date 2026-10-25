@@ -39,6 +39,7 @@ const AGE_RANGES: [string, string][] = [
   ["25-34", "25-34"],
   ["35-44", "35-44"],
   ["45+", "45+"],
+  ["Prefer not to say", "أفضل عدم القول"],
 ];
 
 const GENDERS: [string, string][] = [
@@ -124,10 +125,10 @@ export default function AutonomyInitiative() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!region || !axis || opinion.trim().length < 10) {
+    if (!region || !axis || !ageRange || !gender || opinion.trim().length < 10) {
       toast({
         title: t("Please complete the form", "يرجى إكمال النموذج"),
-        description: t("Select a region, select a section, and share at least a few words.", "اختر جهة ومحوراً وشارك بضع كلمات على الأقل."),
+        description: t("Select a region, age range, gender and section, and share at least a few words.", "اختر الجهة والفئة العمرية والجنس والمحور، وشارك بضع كلمات على الأقل."),
         variant: "destructive",
       });
       return;
@@ -148,8 +149,8 @@ export default function AutonomyInitiative() {
         body: JSON.stringify({
           region,
           axis,
-          ageRange: ageRange || undefined,
-          gender: gender || undefined,
+          ageRange,
+          gender,
           opinion: opinion.trim(),
           consentToDataCollection: consent,
         }),
@@ -271,7 +272,7 @@ export default function AutonomyInitiative() {
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <Label>{t("Age Range (optional)", "الفئة العمرية (اختياري)")}</Label>
+                      <Label>{t("Age Range", "الفئة العمرية")}</Label>
                       <Select value={ageRange} onChange={(e) => setAgeRange(e.target.value)}>
                         <option value="">{t("Select an age range", "اختر الفئة العمرية")}</option>
                         {AGE_RANGES.map(([en, ar]) => (
@@ -280,7 +281,7 @@ export default function AutonomyInitiative() {
                       </Select>
                     </div>
                     <div>
-                      <Label>{t("Gender (optional)", "الجنس (اختياري)")}</Label>
+                      <Label>{t("Gender", "الجنس")}</Label>
                       <Select value={gender} onChange={(e) => setGender(e.target.value)}>
                         <option value="">{t("Select gender", "اختر الجنس")}</option>
                         {GENDERS.map(([en, ar]) => (
