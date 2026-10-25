@@ -27,6 +27,7 @@ import {
   Pagination, paginate, sortedAZ, uniqueSorted, ageRangeOf,
   AGE_RANGES, GENDERS, PAGE_SIZE,
 } from "@/components/admin-table";
+import AdminStats from "@/components/admin-stats";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, LineChart, Line, Legend, AreaChart, Area,
@@ -599,6 +600,7 @@ export default function Admin() {
 
   const navItems = [
     { id: "overview", icon: LayoutDashboard, label: t("Overview", "نظرة عامة") },
+    { id: "statistics", icon: TrendingUp, label: t("Statistics", "الإحصائيات") },
     { id: "users", icon: Users, label: t("Users", "المستخدمون") },
     { id: "applications", icon: FileCheck, label: t("Applications", "الطلبات") },
     { id: "crises", icon: AlertTriangle, label: t("Crises", "الأزمات") },
@@ -873,6 +875,9 @@ export default function Admin() {
               </div>
             </>
           )}
+
+          {/* ── STATISTICS ── */}
+          {activeTab === "statistics" && <AdminStats />}
 
           {/* ── USERS ── */}
           {activeTab === "users" && (
