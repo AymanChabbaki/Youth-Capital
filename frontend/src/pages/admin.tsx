@@ -24,6 +24,10 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
+  Pagination, paginate, sortedAZ, uniqueSorted, ageRangeOf,
+  AGE_RANGES, GENDERS, PAGE_SIZE,
+} from "@/components/admin-table";
+import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, LineChart, Line, Legend, AreaChart, Area,
 } from "recharts";
@@ -207,6 +211,51 @@ function KpiCard({ icon: Icon, label, value, sub, color = "primary" }: {
   );
 }
 
+type DemographicFilterValue = { ageRange: string; gender: string; region: string };
+
+function DemographicFilters({ value, regions, genders, onChange }: {
+  value: DemographicFilterValue; regions: string[]; genders: string[]; onChange: (value: DemographicFilterValue) => void;
+}) {
+  const { t } = useLanguage();
+  const active = value.ageRange || value.gender || value.region;
+  return (
+    <div className="flex flex-wrap items-end gap-4 px-6 py-4 border-b border-border">
+      <div className="min-w-[150px]">
+        <Label>{t("Age", "العمر")}</Label>
+        <Select value={value.ageRange} onChange={(e) => onChange({ ...value, ageRange: e.target.value })}>
+          <option value="">{t("All Ages", "جميع الأعمار")}</option>
+          {AGE_RANGES.map((range) => (
+            <option key={range} value={range}>{range}</option>
+          ))}
+        </Select>
+      </div>
+      <div className="min-w-[150px]">
+        <Label>{t("Sex", "الجنس")}</Label>
+        <Select value={value.gender} onChange={(e) => onChange({ ...value, gender: e.target.value })}>
+          <option value="">{t("All", "الكل")}</option>
+          {genders.map((g) => (
+            <option key={g} value={g}>{g}</option>
+          ))}
+        </Select>
+      </div>
+      <div className="min-w-[200px]">
+        <Label>{t("Region", "الجهة")}</Label>
+        <Select value={value.region} onChange={(e) => onChange({ ...value, region: e.target.value })}>
+          <option value="">{t("All Regions", "جميع الجهات")}</option>
+          {regions.map((r) => (
+            <option key={r} value={r}>{r}</option>
+          ))}
+        </Select>
+      </div>
+      {active && (
+        <Button type="button" variant="outline" className="h-11 rounded-xl" onClick={() => onChange({ ageRange: "", gender: "", region: "" })}>
+          {t("Clear Filters", "مسح الفلترة")}
+        </Button>
+      )}
+    </div>
+  );
+}
+
 function SidebarItem({ icon: Icon, label, active, onClick }: { icon: any; label: string; active: boolean; onClick: () => void }) {
   return (
     <button
@@ -233,6 +282,12 @@ export default function Admin() {
   });
   const [activeTab, setActiveTab] = useState("overview");
   const [search, setSearch] = useState("");
+  // Current page per admin table, keyed by table name.
+  const [tablePages, setTablePages] = useState<Record<string, number>>({});
+  const pageOf = (key: string) => tablePages[key] || 1;
+  const setTablePage = (key: string, page: number) => setTablePages((prev) => ({ ...prev, [key]: page }));
+  const [userFilters, setUserFilters] = useState({ ageRange: "", gender: "", region: "" });
+  const [appFilters, setAppFilters] = useState({ ageRange: "", gender: "", region: "" });
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -262,12 +317,17 @@ export default function Admin() {
   });
   const [saharaAxisFilter, setSaharaAxisFilter] = useState("");
   const [saharaRegionFilter, setSaharaRegionFilter] = useState("");
+  const [saharaAgeFilter, setSaharaAgeFilter] = useState("");
+  const [saharaGenderFilter, setSaharaGenderFilter] = useState("");
+  const [saharaPage, setSaharaPage] = useState(1);
   const { data: saharaFeedbackData } = useQuery({
-    queryKey: ["/api/sahara-feedback", saharaAxisFilter, saharaRegionFilter],
+    queryKey: ["/api/sahara-feedback", saharaAxisFilter, saharaRegionFilter, saharaAgeFilter, saharaGenderFilter, saharaPage],
     queryFn: () => {
-      const params = new URLSearchParams({ limit: "100" });
+      const params = new URLSearchParams({ limit: String(PAGE_SIZE), page: String(saharaPage) });
       if (saharaAxisFilter) params.set("axis", saharaAxisFilter);
       if (saharaRegionFilter) params.set("region", saharaRegionFilter);
+      if (saharaAgeFilter) params.set("ageRange", saharaAgeFilter);
+      if (saharaGenderFilter) params.set("gender", saharaGenderFilter);
       return customFetch<any>(`/api/sahara-feedback?${params.toString()}`);
     },
     enabled: !isLoading && isAdmin,
@@ -495,11 +555,37 @@ export default function Admin() {
   };
 
   const users = usersData?.users || [];
-  const filteredUsers = users.filter(u =>
-    u.fullName.toLowerCase().includes(search.toLowerCase()) ||
-    u.email.toLowerCase().includes(search.toLowerCase())
+  const userRegions = uniqueSorted(users.map((u: any) => u.region));
+  const userGenders = uniqueSorted([...GENDERS, ...users.map((u: any) => u.gender)]);
+  const filteredUsers = sortedAZ(
+    users.filter((u: any) =>
+      (u.fullName.toLowerCase().includes(search.toLowerCase()) ||
+        u.email.toLowerCase().includes(search.toLowerCase())) &&
+      (!userFilters.ageRange || ageRangeOf(u.age) === userFilters.ageRange) &&
+      (!userFilters.gender || u.gender === userFilters.gender) &&
+      (!userFilters.region || u.region?.trim() === userFilters.region)
+    ),
+    (u: any) => u.fullName
   );
+  const usersPage = paginate(filteredUsers, pageOf("users"));
   const pendingApps = appsData?.applications || [];
+  const appRegions = uniqueSorted(pendingApps.map((a: any) => a.region));
+  const appGenders = uniqueSorted([...GENDERS, ...pendingApps.map((a: any) => a.gender)]);
+  const filteredApps = sortedAZ(
+    pendingApps.filter((a: any) =>
+      (!appFilters.ageRange || ageRangeOf(a.age) === appFilters.ageRange) &&
+      (!appFilters.gender || a.gender === appFilters.gender) &&
+      (!appFilters.region || a.region?.trim() === appFilters.region)
+    ),
+    (a: any) => a.user?.fullName
+  );
+  const appsPage = paginate(filteredApps, pageOf("applications"));
+  const articlesPage = paginate(sortedAZ((articlesData as any)?.articles, (a: any) => a.title), pageOf("press"));
+  const eventsPage = paginate(sortedAZ((eventsData as any)?.events, (e: any) => e.title), pageOf("events"));
+  const pollsPage = paginate(sortedAZ((pollsData as any)?.polls, (p: any) => t(p.title, p.titleAr)), pageOf("polls"));
+  const logsPage = paginate(sortedAZ(logsData?.logs, (l: any) => l.action), pageOf("logs"));
+  const systemLogsPage = paginate(sortedAZ(systemLogsData?.logs, (l: any) => l.message), pageOf("systemLogs"));
+  const recentUsers = [...users].sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   const activeCrises = (crisesData as any)?.crises?.filter((c: any) => c.isActive) || [];
 
   const roleDistribution = (() => {
@@ -750,7 +836,7 @@ export default function Admin() {
                     </button>
                   </div>
                   <div className="space-y-3">
-                    {users.slice(0, 5).map(u => (
+                    {recentUsers.slice(0, 5).map((u: any) => (
                       <div key={u.id} className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
                           <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center text-white font-bold text-sm">
@@ -793,23 +879,32 @@ export default function Admin() {
             <>
             <div className="bg-card border border-border rounded-2xl overflow-hidden">
               <div className="p-6 border-b border-border flex items-center justify-between gap-4 flex-wrap">
-                <h2 className="font-bold text-lg">{t("All Members", "جميع الأعضاء")} <span className="text-muted-foreground text-sm font-normal">({users.length})</span></h2>
+                <h2 className="font-bold text-lg">{t("All Members", "جميع الأعضاء")} <span className="text-muted-foreground text-sm font-normal">({filteredUsers.length}{filteredUsers.length !== users.length ? ` / ${users.length}` : ""})</span></h2>
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                   <input
                     value={search}
-                    onChange={e => setSearch(e.target.value)}
+                    onChange={e => { setSearch(e.target.value); setTablePage("users", 1); }}
                     placeholder={t("Search users...", "ابحث عن مستخدمين...")}
                     className="pl-9 pr-4 py-2 text-sm border border-border rounded-xl bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 w-64"
                   />
                 </div>
               </div>
+              <DemographicFilters
+                value={userFilters}
+                regions={userRegions}
+                genders={userGenders}
+                onChange={(f) => { setUserFilters(f); setTablePage("users", 1); }}
+              />
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-sm">
                   <thead className="bg-secondary/40">
                     <tr>
                       <th className="px-6 py-3 font-semibold text-muted-foreground">{t("Member", "العضو")}</th>
                       <th className="px-6 py-3 font-semibold text-muted-foreground">{t("Email", "البريد")}</th>
+                      <th className="px-6 py-3 font-semibold text-muted-foreground">{t("Age", "العمر")}</th>
+                      <th className="px-6 py-3 font-semibold text-muted-foreground">{t("Sex", "الجنس")}</th>
+                      <th className="px-6 py-3 font-semibold text-muted-foreground">{t("Region", "الجهة")}</th>
                       <th className="px-6 py-3 font-semibold text-muted-foreground">{t("Role", "الدور")}</th>
                       <th className="px-6 py-3 font-semibold text-muted-foreground">{t("Status", "الحالة")}</th>
                       <th className="px-6 py-3 font-semibold text-muted-foreground">{t("Type", "النوع")}</th>
@@ -817,7 +912,7 @@ export default function Admin() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border">
-                    {filteredUsers.map(u => (
+                    {usersPage.items.map((u: any) => (
                       <tr key={u.id} className="hover:bg-secondary/20 transition-colors">
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-3">
@@ -828,6 +923,9 @@ export default function Admin() {
                           </div>
                         </td>
                         <td className="px-6 py-4 text-muted-foreground">{u.email}</td>
+                        <td className="px-6 py-4 text-muted-foreground">{u.age ?? "—"}</td>
+                        <td className="px-6 py-4 text-muted-foreground">{u.gender || "—"}</td>
+                        <td className="px-6 py-4 text-muted-foreground">{u.region || "—"}</td>
                         <td className="px-6 py-4">
                           <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-primary/10 text-primary capitalize">
                             {u.simulationRole || ":"}
@@ -885,6 +983,7 @@ export default function Admin() {
                   </div>
                 )}
               </div>
+              <Pagination {...usersPage} onChange={(p) => setTablePage("users", p)} />
             </div>
 
             {/* View User Modal */}
@@ -1048,9 +1147,24 @@ export default function Admin() {
               <div className="flex items-center justify-between mb-2">
                 <h2 className="font-bold text-lg">
                   {t("Pending Applications", "الطلبات المعلقة")}
-                  <span className="ml-2 text-sm font-normal text-muted-foreground">({pendingApps.length})</span>
+                  <span className="ml-2 text-sm font-normal text-muted-foreground">({filteredApps.length}{filteredApps.length !== pendingApps.length ? ` / ${pendingApps.length}` : ""})</span>
                 </h2>
               </div>
+              {pendingApps.length > 0 && (
+                <div className="bg-card border border-border rounded-2xl">
+                  <DemographicFilters
+                    value={appFilters}
+                    regions={appRegions}
+                    genders={appGenders}
+                    onChange={(f) => { setAppFilters(f); setTablePage("applications", 1); }}
+                  />
+                </div>
+              )}
+              {pendingApps.length > 0 && filteredApps.length === 0 && (
+                <div className="bg-card border border-border rounded-2xl p-10 text-center text-muted-foreground text-sm">
+                  {t("No applications match these filters.", "لا توجد طلبات مطابقة لهذه الفلترة.")}
+                </div>
+              )}
               {pendingApps.length === 0 ? (
                 <div className="bg-card border border-border rounded-2xl p-16 text-center">
                   <CheckCircle className="w-12 h-12 mx-auto mb-4 text-green-400" />
@@ -1058,7 +1172,7 @@ export default function Admin() {
                   <p className="text-muted-foreground text-sm mt-1">{t("No pending applications to review.", "لا توجد طلبات معلقة للمراجعة.")}</p>
                 </div>
               ) : (
-                pendingApps.map(app => (
+                appsPage.items.map((app: any) => (
                   <div key={app.id} className="bg-card border border-border rounded-2xl p-6 hover:shadow-md transition-shadow">
                     <div className="flex items-start justify-between mb-4 flex-wrap gap-3">
                       <div className="flex items-center gap-4">
@@ -1196,6 +1310,11 @@ export default function Admin() {
                   </div>
                 ))
               )}
+              {filteredApps.length > 0 && (
+                <div className="bg-card border border-border rounded-2xl overflow-hidden">
+                  <Pagination {...appsPage} onChange={(p) => setTablePage("applications", p)} />
+                </div>
+              )}
             </div>
           )}
 
@@ -1296,7 +1415,7 @@ export default function Admin() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border">
-                    {((articlesData as any)?.articles || []).map((a: any) => (
+                    {articlesPage.items.map((a: any) => (
                       <tr key={a.id} className="hover:bg-secondary/20 transition-colors group">
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-3">
@@ -1332,6 +1451,7 @@ export default function Admin() {
                     ))}
                   </tbody>
                 </table>
+                <Pagination {...articlesPage} onChange={(p) => setTablePage("press", p)} />
               </div>
 
               {/* Article Modal */}
@@ -1430,7 +1550,7 @@ export default function Admin() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border">
-                    {((eventsData as any)?.events || []).map((e: any) => (
+                    {eventsPage.items.map((e: any) => (
                       <tr key={e.id} className="hover:bg-secondary/20 transition-colors group">
                         <td className="px-6 py-4">
                           <div>
@@ -1469,6 +1589,7 @@ export default function Admin() {
                     ))}
                   </tbody>
                 </table>
+                <Pagination {...eventsPage} onChange={(p) => setTablePage("events", p)} />
               </div>
 
               {/* Event Modal */}
@@ -1579,7 +1700,7 @@ export default function Admin() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border">
-                    {((pollsData as any)?.polls || []).map((p: any) => (
+                    {pollsPage.items.map((p: any) => (
                       <tr key={p.id} className="hover:bg-secondary/20 transition-colors group">
                         <td className="px-6 py-4">
                           <div>
@@ -1632,6 +1753,7 @@ export default function Admin() {
                     ))}
                   </tbody>
                 </table>
+                <Pagination {...pollsPage} onChange={(p) => setTablePage("polls", p)} />
               </div>
 
               {/* Poll Modal */}
@@ -1776,7 +1898,7 @@ export default function Admin() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-border">
-                      {(logsData?.logs || []).map((log: any) => (
+                      {logsPage.items.map((log: any) => (
                         <tr key={log.id} className="hover:bg-secondary/20">
                           <td className="px-6 py-3">
                             <Badge className="rounded-lg text-xs whitespace-nowrap">{log.action}</Badge>
@@ -1795,6 +1917,7 @@ export default function Admin() {
                     </tbody>
                   </table>
                 </div>
+                <Pagination {...logsPage} onChange={(p) => setTablePage("logs", p)} />
               </div>
 
               <div className="bg-card border border-border rounded-2xl overflow-hidden">
@@ -1816,7 +1939,7 @@ export default function Admin() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-border">
-                      {(systemLogsData?.logs || []).map((log: any) => (
+                      {systemLogsPage.items.map((log: any) => (
                         <tr key={log.id} className="hover:bg-secondary/20">
                           <td className="px-6 py-3">
                             <Badge className={`rounded-lg text-xs whitespace-nowrap ${log.level === "error" ? "bg-rose/10 text-rose border-rose/30" : "bg-gold/10 text-gold border-gold/30"}`}>
@@ -1836,6 +1959,7 @@ export default function Admin() {
                     </tbody>
                   </table>
                 </div>
+                <Pagination {...systemLogsPage} onChange={(p) => setTablePage("systemLogs", p)} />
               </div>
             </div>
           )}
@@ -1869,7 +1993,7 @@ export default function Admin() {
               <div className="flex flex-wrap items-end gap-4 bg-card border border-border rounded-2xl p-4">
                 <div className="min-w-[220px]">
                   <Label>{t("Filter by Section", "تصفية حسب المحور")}</Label>
-                  <Select value={saharaAxisFilter} onChange={(e) => setSaharaAxisFilter(e.target.value)}>
+                  <Select value={saharaAxisFilter} onChange={(e) => { setSaharaAxisFilter(e.target.value); setSaharaPage(1); }}>
                     <option value="">{t("All Sections", "جميع المحاور")}</option>
                     {SAHARA_AXES.map((axis) => (
                       <option key={axis} value={axis}>{axis}</option>
@@ -1878,15 +2002,33 @@ export default function Admin() {
                 </div>
                 <div className="min-w-[220px]">
                   <Label>{t("Filter by Region", "تصفية حسب الجهة")}</Label>
-                  <Select value={saharaRegionFilter} onChange={(e) => setSaharaRegionFilter(e.target.value)}>
+                  <Select value={saharaRegionFilter} onChange={(e) => { setSaharaRegionFilter(e.target.value); setSaharaPage(1); }}>
                     <option value="">{t("All Regions", "جميع الجهات")}</option>
-                    {SAHARA_REGIONS.map((region) => (
+                    {sortedAZ(SAHARA_REGIONS, (r) => r).map((region) => (
                       <option key={region} value={region}>{region}</option>
                     ))}
                   </Select>
                 </div>
-                {(saharaAxisFilter || saharaRegionFilter) && (
-                  <Button type="button" variant="outline" className="h-11 rounded-xl" onClick={() => { setSaharaAxisFilter(""); setSaharaRegionFilter(""); }}>
+                <div className="min-w-[160px]">
+                  <Label>{t("Filter by Age", "تصفية حسب العمر")}</Label>
+                  <Select value={saharaAgeFilter} onChange={(e) => { setSaharaAgeFilter(e.target.value); setSaharaPage(1); }}>
+                    <option value="">{t("All Ages", "جميع الأعمار")}</option>
+                    {AGE_RANGES.map((range) => (
+                      <option key={range} value={range}>{range}</option>
+                    ))}
+                  </Select>
+                </div>
+                <div className="min-w-[160px]">
+                  <Label>{t("Filter by Sex", "تصفية حسب الجنس")}</Label>
+                  <Select value={saharaGenderFilter} onChange={(e) => { setSaharaGenderFilter(e.target.value); setSaharaPage(1); }}>
+                    <option value="">{t("All", "الكل")}</option>
+                    {GENDERS.map((g) => (
+                      <option key={g} value={g}>{g}</option>
+                    ))}
+                  </Select>
+                </div>
+                {(saharaAxisFilter || saharaRegionFilter || saharaAgeFilter || saharaGenderFilter) && (
+                  <Button type="button" variant="outline" className="h-11 rounded-xl" onClick={() => { setSaharaAxisFilter(""); setSaharaRegionFilter(""); setSaharaAgeFilter(""); setSaharaGenderFilter(""); setSaharaPage(1); }}>
                     {t("Clear Filters", "مسح الفلترة")}
                   </Button>
                 )}
@@ -1922,7 +2064,7 @@ export default function Admin() {
               <div className="bg-card border border-border rounded-2xl overflow-hidden">
                 <div className="p-6 border-b border-border flex items-center justify-between flex-wrap gap-2">
                   <h3 className="text-lg font-bold text-foreground">{t("Responses", "الردود")}</h3>
-                  <span className="text-xs text-muted-foreground">{saharaFeedbackData?.total ?? 0} {t("shown", "معروضة")}</span>
+                  <span className="text-xs text-muted-foreground">{saharaFeedbackData?.total ?? 0} {t("matching", "مطابقة")} · {t("sorted by region A–Z", "مرتبة حسب الجهة أ–ي")}</span>
                 </div>
                 <div className="max-h-[600px] overflow-y-auto divide-y divide-border">
                   {(saharaFeedbackData?.entries || []).map((entry: any) => (
@@ -1931,6 +2073,8 @@ export default function Admin() {
                         <div className="flex items-center gap-2 flex-wrap">
                           <Badge className="rounded-lg text-xs">{entry.region}</Badge>
                           {entry.axis && <Badge className="rounded-lg text-xs bg-primary/10 text-primary border-primary/30">{entry.axis}</Badge>}
+                          {entry.ageRange && <Badge variant="outline" className="rounded-lg text-xs">{entry.ageRange}</Badge>}
+                          {entry.gender && <Badge variant="outline" className="rounded-lg text-xs">{entry.gender}</Badge>}
                           {entry.ipAddress && <span className="text-xs font-mono text-muted-foreground">{entry.ipAddress}</span>}
                         </div>
                         <span className="text-xs text-muted-foreground">{new Date(entry.createdAt).toLocaleString()}</span>
@@ -1943,6 +2087,12 @@ export default function Admin() {
                     <div className="p-8 text-center text-muted-foreground text-sm">{t("No responses match these filters.", "لا توجد ردود مطابقة لهذه الفلترة.")}</div>
                   )}
                 </div>
+                <Pagination
+                  page={saharaFeedbackData?.page ?? saharaPage}
+                  totalPages={Math.max(1, Math.ceil((saharaFeedbackData?.total ?? 0) / PAGE_SIZE))}
+                  total={saharaFeedbackData?.total ?? 0}
+                  onChange={setSaharaPage}
+                />
               </div>
             </div>
           )}
