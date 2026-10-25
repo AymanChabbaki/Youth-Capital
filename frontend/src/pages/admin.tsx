@@ -237,7 +237,7 @@ export default function Admin() {
   const queryClient = useQueryClient();
 
   const { data: appsData, refetch: refetchApps } = useGetRoleApplications({ status: "pending" }, { query: { enabled: !isLoading && isAdmin } } as any);
-  const { data: usersData } = useGetUsers({ query: { enabled: !isLoading && isAdmin } } as any);
+  const { data: usersData } = useGetUsers({ limit: 5000 }, { query: { enabled: !isLoading && isAdmin } } as any);
   const { data: statsData } = useGetPlatformStats({ query: { enabled: !isLoading && isAdmin } } as any);
   const { data: crisesData } = useGetCrises({ query: { enabled: !isLoading && isAdmin } } as any);
   const { data: articlesData } = useGetArticles({ query: { enabled: !isLoading && isAdmin } } as any);
@@ -628,7 +628,7 @@ export default function Admin() {
             <>
               {/* KPI Grid */}
               <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4">
-                <KpiCard icon={Users} label={t("Total Members", "إجمالي الأعضاء")} value={users.length} color="primary" />
+                <KpiCard icon={Users} label={t("Total Members", "إجمالي الأعضاء")} value={usersData?.total ?? users.length} color="primary" />
                 <KpiCard icon={UserCheck} label={t("Active Members", "الأعضاء النشطون")} value={statsData?.activeMembers ?? ":"} color="green" />
                 <KpiCard icon={FileCheck} label={t("Pending Apps", "طلبات معلقة")} value={pendingApps.length} sub={t("Awaiting review", "في انتظار المراجعة")} color="gold" />
                 <KpiCard icon={MessageSquare} label={t("Forum Posts", "منشورات المنتدى")} value={statsData?.totalForumPosts ?? ":"} color="blue" />
