@@ -27,6 +27,21 @@ export const AXES = [
 export const AGE_RANGES = ["Under 18", "18-24", "25-34", "35-44", "45+", "Prefer not to say"] as const;
 export const GENDERS = ["Male", "Female", "Prefer not to say"] as const;
 
+// The age_range / gender columns were added after this table went live. Add
+// them on first use so a deploy works even if `drizzle-kit push` wasn't run;
+// rows from before get "Prefer not to say". Idempotent and additive only.
+let schemaReady: Promise<void> | null = null;
+function ensureDemographicColumns(): Promise<void> {
+  schemaReady ??= (async () => {
+    await db.execute(sql`ALTER TABLE sahara_feedback ADD COLUMN IF NOT EXISTS age_range text NOT NULL DEFAULT 'Prefer not to say'`);
+    await db.execute(sql`ALTER TABLE sahara_feedback ADD COLUMN IF NOT EXISTS gender text NOT NULL DEFAULT 'Prefer not to say'`);
+  })().catch((err) => {
+    schemaReady = null; // retry on the next request
+    throw err;
+  });
+  return schemaReady;
+}
+
 const SubmitFeedbackSchema = z.object({
   region: z.enum(REGIONS),
   axis: z.enum(AXES),
@@ -48,6 +63,7 @@ const SubmitFeedbackSchema = z.object({
 router.post("/", anonFeedbackLimiter, validateBody(SubmitFeedbackSchema), async (req, res) => {
   try {
     const { region, axis, ageRange, gender, opinion } = req.body;
+    await ensureDemographicColumns();
     await db.insert(saharaFeedbackTable).values({
       region,
       axis,
@@ -70,6 +86,7 @@ router.post("/", anonFeedbackLimiter, validateBody(SubmitFeedbackSchema), async 
 // by axis, region, age range and/or gender for focused review.
 router.get("/", requireAuth, requireAdmin, async (req, res) => {
   try {
+    await ensureDemographicColumns();
     const { page, limit, offset } = clampPageParams(req, 50);
     const axisFilter = req.query.axis as string | undefined;
     const regionFilter = req.query.region as string | undefined;
