@@ -6,6 +6,7 @@ import { requireAuth, requireAdmin } from "../lib/session.js";
 import { validateBody } from "../middlewares/validate.js";
 import { emailLimiter } from "../middlewares/rateLimit.js";
 import { sendEmailToMany, isMailerConfigured } from "../lib/mailer.js";
+import { wrapEmailHtml } from "../lib/email-template.js";
 import { logAudit } from "../lib/audit.js";
 
 const router: IRouter = Router();
@@ -21,6 +22,7 @@ const SendEmailSchema = z.object({
   customEmails: z.array(z.string().email()).max(500).optional(),
   subject: z.string().trim().min(1).max(200),
   message: z.string().trim().min(1).max(20000),
+  lang: z.enum(["en", "ar"]).optional().default("en"),
 });
 
 async function resolveRecipients(segment: (typeof SEGMENTS)[number], customEmails?: string[]): Promise<{ email: string; fullName: string }[]> {
@@ -69,7 +71,7 @@ router.post("/send", requireAuth, requireAdmin, emailLimiter, validateBody(SendE
       res.status(503).json({ error: "NotConfigured", message: "SMTP is not configured on the server yet" });
       return;
     }
-    const { segment, customEmails, subject, message } = req.body;
+    const { segment, customEmails, subject, message, lang } = req.body;
     const recipients = await resolveRecipients(segment, customEmails);
 
     if (recipients.length === 0) {
@@ -83,10 +85,11 @@ router.post("/send", requireAuth, requireAdmin, emailLimiter, validateBody(SendE
 
     // Simple paragraph-per-line HTML so plain text typed in the admin UI
     // renders with actual line breaks instead of collapsing.
-    const html = message
+    const bodyHtml = message
       .split(/\n{2,}/)
       .map((para: string) => `<p style="margin:0 0 1em;white-space:pre-wrap;">${para.replace(/</g, "&lt;")}</p>`)
       .join("");
+    const html = wrapEmailHtml(bodyHtml, lang);
 
     const results = await sendEmailToMany(recipients.map((r) => r.email), subject, html);
     const sentCount = results.filter((r) => r.success).length;

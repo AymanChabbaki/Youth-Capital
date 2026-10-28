@@ -6,6 +6,7 @@ import { requireAuth, requireAdmin, safeUser } from "../lib/session.js";
 import { validateBody } from "../middlewares/validate.js";
 import { logAudit } from "../lib/audit.js";
 import { sendEmailToMany, isMailerConfigured } from "../lib/mailer.js";
+import { wrapEmailHtml } from "../lib/email-template.js";
 
 const router: IRouter = Router();
 
@@ -122,15 +123,16 @@ router.patch("/applications/:id", requireAuth, requireAdmin, validateBody(Update
       const subject = status === "approved"
         ? (isAr ? "تم قبول طلبك في يوث كابيتال" : "Your Youth Capital application has been approved")
         : (isAr ? "بخصوص طلبك في يوث كابيتال" : "An update on your Youth Capital application");
-      const html = status === "approved"
+      const ctaButton = `<table role="presentation" cellpadding="0" cellspacing="0" style="margin-top:24px;"><tr><td style="background-color:#C9A84C;border-radius:10px;"><a href="https://www.youthcapital.org/dashboard" style="display:inline-block;padding:14px 28px;color:#1B2A4A;font-weight:bold;font-size:14px;text-decoration:none;">${isAr ? "الذهاب إلى لوحتك" : "Go to Your Dashboard"}</a></td></tr></table>`;
+      const bodyHtml = status === "approved"
         ? (isAr
-            ? `<p>مرحباً ${user.fullName}،</p><p>يسعدنا إبلاغك بأنه تم قبول طلبك! تم تعيينك في دور <strong>${role}</strong>.</p><p>سجّل الدخول إلى لوحتك لمتابعة المحاكاة.</p>`
-            : `<p>Hi ${user.fullName},</p><p>Great news — your application has been approved! You've been assigned the role of <strong>${role}</strong>.</p><p>Log in to your dashboard to get started.</p>`)
+            ? `<p>مرحباً ${user.fullName}،</p><p>يسعدنا إبلاغك بأنه تم قبول طلبك! تم تعيينك في دور <strong>${role}</strong>.</p>${ctaButton}`
+            : `<p>Hi ${user.fullName},</p><p>Great news — your application has been approved! You've been assigned the role of <strong>${role}</strong>.</p>${ctaButton}`)
         : (isAr
             ? `<p>مرحباً ${user.fullName}،</p><p>شكراً لاهتمامك بيوث كابيتال. بعد المراجعة، لم نتمكن من قبول طلبك في الوقت الحالي. نرحب بإعادة التقديم مستقبلاً.</p>`
             : `<p>Hi ${user.fullName},</p><p>Thank you for your interest in Youth Capital. After review, we're unable to move forward with your application at this time. You're welcome to apply again in the future.</p>`);
       try {
-        await sendEmailToMany([user.email], subject, html);
+        await sendEmailToMany([user.email], subject, wrapEmailHtml(bodyHtml, isAr ? "ar" : "en"));
       } catch (err) {
         req.log.error({ err, userId: user.id }, "Failed to send application decision email");
       }

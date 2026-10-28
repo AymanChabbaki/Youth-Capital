@@ -339,6 +339,7 @@ export default function Admin() {
   const [emailCustomList, setEmailCustomList] = useState("");
   const [emailSubject, setEmailSubject] = useState("");
   const [emailMessage, setEmailMessage] = useState("");
+  const [emailLang, setEmailLang] = useState<"en" | "ar">("en");
   const [isSendingEmail, setIsSendingEmail] = useState(false);
   const [emailSendResult, setEmailSendResult] = useState<{ sent: number; failed: number } | null>(null);
 
@@ -380,7 +381,7 @@ export default function Admin() {
       const result = await customFetch<any>("/api/admin/email/send", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ segment: emailSegment, customEmails, subject: emailSubject, message: emailMessage }),
+        body: JSON.stringify({ segment: emailSegment, customEmails, subject: emailSubject, message: emailMessage, lang: emailLang }),
       });
       setEmailSendResult(result);
       toast({ title: t(`Sent to ${result.sent} recipient(s)`, `تم الإرسال إلى ${result.sent} مستلم`), variant: result.failed > 0 ? "destructive" : "default" });
@@ -2227,9 +2228,18 @@ export default function Admin() {
                   </div>
                 )}
 
-                <div>
-                  <Label>{t("Subject", "العنوان")}</Label>
-                  <Input value={emailSubject} onChange={(e) => setEmailSubject(e.target.value)} maxLength={200} />
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="col-span-2">
+                    <Label>{t("Subject", "العنوان")}</Label>
+                    <Input value={emailSubject} onChange={(e) => setEmailSubject(e.target.value)} maxLength={200} />
+                  </div>
+                  <div>
+                    <Label>{t("Template Language", "لغة القالب")}</Label>
+                    <Select value={emailLang} onChange={(e) => setEmailLang(e.target.value as "en" | "ar")}>
+                      <option value="en">English</option>
+                      <option value="ar">العربية</option>
+                    </Select>
+                  </div>
                 </div>
 
                 <div>

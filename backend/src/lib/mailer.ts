@@ -2,12 +2,11 @@ import nodemailer from "nodemailer";
 import { logger } from "./logger.js";
 
 // SMTP config lives entirely in env vars — never hardcode credentials here.
-// For Spaceship-hosted email (Titan-powered), typical values are:
-//   SMTP_HOST=smtp.titan.email
-//   SMTP_PORT=465
+// Spaceship Email's documented outgoing server is:
+//   SMTP_HOST=mail.spacemail.com
+//   SMTP_PORT=465 (or 587)
 //   SMTP_SECURE=true
-// but confirm the exact host/port in your Spaceship email control panel —
-// this is written to work with whatever values you set, not just Titan's.
+// but this works with whatever values you set, not just Spaceship's.
 const {
   SMTP_HOST,
   SMTP_PORT,
