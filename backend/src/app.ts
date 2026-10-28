@@ -15,7 +15,12 @@ const app: Express = express();
 // proxy instead of the proxy's own internal address — otherwise every
 // request looks like it comes from the same IP, which breaks both IP-based
 // rate limiting and the consent-based IP capture on /api/sahara-feedback.
-app.set("trust proxy", true);
+// Trust exactly one hop (Vercel's own edge in front of the function), not
+// `true` — trusting the whole X-Forwarded-For chain lets a client spoof
+// their own IP by prepending a fake one, which silently defeats IP-based
+// rate limiting. express-rate-limit refuses to start with `true` for
+// exactly this reason (ERR_ERL_PERMISSIVE_TRUST_PROXY).
+app.set("trust proxy", 1);
 
 const isProd = process.env.NODE_ENV === "production";
 const DEV_ORIGINS = ["http://localhost:5173", "http://localhost:5174"];
