@@ -1,6 +1,6 @@
 import { Router, type IRouter } from "express";
 import { db, saharaFeedbackTable } from "@workspace/db";
-import { sql, desc, eq, and } from "drizzle-orm";
+import { sql, asc, desc, eq, and, type SQL } from "drizzle-orm";
 import { z } from "zod";
 import { requireAuth, requireAdmin } from "../lib/session.js";
 import { validateBody, clampPageParams } from "../middlewares/validate.js";
@@ -23,9 +23,30 @@ export const AXES = [
   "General / Other",
 ] as const;
 
+// Must match AGE_RANGES / GENDERS in frontend/src/components/admin-table.tsx
+export const AGE_RANGES = ["Under 18", "18-24", "25-34", "35-44", "45+", "Prefer not to say"] as const;
+export const GENDERS = ["Male", "Female", "Prefer not to say"] as const;
+
+// The age_range / gender columns were added after this table went live. Add
+// them on first use so a deploy works even if `drizzle-kit push` wasn't run;
+// rows from before get "Prefer not to say". Idempotent and additive only.
+let schemaReady: Promise<void> | null = null;
+function ensureDemographicColumns(): Promise<void> {
+  schemaReady ??= (async () => {
+    await db.execute(sql`ALTER TABLE sahara_feedback ADD COLUMN IF NOT EXISTS age_range text NOT NULL DEFAULT 'Prefer not to say'`);
+    await db.execute(sql`ALTER TABLE sahara_feedback ADD COLUMN IF NOT EXISTS gender text NOT NULL DEFAULT 'Prefer not to say'`);
+  })().catch((err) => {
+    schemaReady = null; // retry on the next request
+    throw err;
+  });
+  return schemaReady;
+}
+
 const SubmitFeedbackSchema = z.object({
   region: z.enum(REGIONS),
   axis: z.enum(AXES),
+  ageRange: z.enum(AGE_RANGES),
+  gender: z.enum(GENDERS),
   opinion: z.string().trim().min(10, "Please share at least a few words").max(4000),
   // Required and must be explicitly true — this is not a formality. The
   // page tells respondents their IP and browser info are recorded, and
@@ -41,10 +62,13 @@ const SubmitFeedbackSchema = z.object({
 // the exact data disclosed on the page (IP, user agent) is what gets stored.
 router.post("/", anonFeedbackLimiter, validateBody(SubmitFeedbackSchema), async (req, res) => {
   try {
-    const { region, axis, opinion } = req.body;
+    const { region, axis, ageRange, gender, opinion } = req.body;
+    await ensureDemographicColumns();
     await db.insert(saharaFeedbackTable).values({
       region,
       axis,
+      ageRange,
+      gender,
       opinion,
       ipAddress: req.ip || null,
       userAgent: req.headers["user-agent"] || null,
@@ -59,22 +83,33 @@ router.post("/", anonFeedbackLimiter, validateBody(SubmitFeedbackSchema), async 
 // Admin-only read: aggregate counts by region and by axis, plus the full
 // text, IP, and browser info of every submission — exactly what respondents
 // were told would be visible to administrators. Supports filtering the list
-// by axis and/or region for focused review.
+// by axis, region, age range and/or gender for focused review.
 router.get("/", requireAuth, requireAdmin, async (req, res) => {
   try {
+    await ensureDemographicColumns();
     const { page, limit, offset } = clampPageParams(req, 50);
     const axisFilter = req.query.axis as string | undefined;
     const regionFilter = req.query.region as string | undefined;
+    const ageRangeFilter = req.query.ageRange as string | undefined;
+    const genderFilter = req.query.gender as string | undefined;
 
-    const conditions = [
-      axisFilter ? eq(saharaFeedbackTable.axis, axisFilter) : undefined,
-      regionFilter ? eq(saharaFeedbackTable.region, regionFilter) : undefined,
-    ].filter(Boolean);
-    const whereClause = conditions.length ? and(...conditions) : undefined;
+    const where = (...conds: (SQL | undefined)[]) => {
+      const present = conds.filter(Boolean) as SQL[];
+      return present.length ? and(...present) : undefined;
+    };
+    const axisCond = axisFilter ? eq(saharaFeedbackTable.axis, axisFilter) : undefined;
+    const regionCond = regionFilter ? eq(saharaFeedbackTable.region, regionFilter) : undefined;
+    // Demographic filters narrow every view, including the charts.
+    const ageCond = ageRangeFilter ? eq(saharaFeedbackTable.ageRange, ageRangeFilter) : undefined;
+    const genderCond = genderFilter ? eq(saharaFeedbackTable.gender, genderFilter) : undefined;
+    const whereClause = where(axisCond, regionCond, ageCond, genderCond);
 
     let entriesQuery = db.select().from(saharaFeedbackTable).$dynamic();
     if (whereClause) entriesQuery = entriesQuery.where(whereClause);
-    const entries = await entriesQuery.orderBy(desc(saharaFeedbackTable.createdAt)).limit(limit).offset(offset);
+    const entries = await entriesQuery
+      .orderBy(asc(saharaFeedbackTable.region), desc(saharaFeedbackTable.createdAt))
+      .limit(limit)
+      .offset(offset);
 
     // Each chart drills down by the *other* dimension's filter only — e.g.
     // picking an axis narrows "by region" to that axis, without collapsing
@@ -83,15 +118,17 @@ router.get("/", requireAuth, requireAdmin, async (req, res) => {
       .select({ region: saharaFeedbackTable.region, count: sql<number>`count(*)::int` })
       .from(saharaFeedbackTable)
       .$dynamic();
-    if (axisFilter) byRegionQuery = byRegionQuery.where(eq(saharaFeedbackTable.axis, axisFilter));
-    const byRegion = await byRegionQuery.groupBy(saharaFeedbackTable.region);
+    const byRegionWhere = where(axisCond, ageCond, genderCond);
+    if (byRegionWhere) byRegionQuery = byRegionQuery.where(byRegionWhere);
+    const byRegion = await byRegionQuery.groupBy(saharaFeedbackTable.region).orderBy(asc(saharaFeedbackTable.region));
 
     let byAxisQuery = db
       .select({ axis: saharaFeedbackTable.axis, count: sql<number>`count(*)::int` })
       .from(saharaFeedbackTable)
       .$dynamic();
-    if (regionFilter) byAxisQuery = byAxisQuery.where(eq(saharaFeedbackTable.region, regionFilter));
-    const byAxis = await byAxisQuery.groupBy(saharaFeedbackTable.axis);
+    const byAxisWhere = where(regionCond, ageCond, genderCond);
+    if (byAxisWhere) byAxisQuery = byAxisQuery.where(byAxisWhere);
+    const byAxis = await byAxisQuery.groupBy(saharaFeedbackTable.axis).orderBy(asc(saharaFeedbackTable.axis));
 
     // Region x axis cross-tab — e.g. "how does Laâyoune-Sakia El Hamra feel
     // about financial resources specifically", not just totals of each.

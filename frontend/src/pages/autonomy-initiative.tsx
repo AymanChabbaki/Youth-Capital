@@ -32,6 +32,22 @@ const AXES: [string, string][] = [
   ["General / Other", "عام / أخرى"],
 ];
 
+// Must match AGE_RANGES / GENDERS in backend/src/routes/sahara.ts
+const AGE_RANGES: [string, string][] = [
+  ["Under 18", "أقل من 18"],
+  ["18-24", "18-24"],
+  ["25-34", "25-34"],
+  ["35-44", "35-44"],
+  ["45+", "45+"],
+  ["Prefer not to say", "أفضل عدم القول"],
+];
+
+const GENDERS: [string, string][] = [
+  ["Male", "ذكر"],
+  ["Female", "أنثى"],
+  ["Prefer not to say", "أفضل عدم القول"],
+];
+
 export default function AutonomyInitiative() {
   const { t } = useLanguage();
   useSeo({
@@ -49,6 +65,8 @@ export default function AutonomyInitiative() {
   const { toast } = useToast();
   const [region, setRegion] = useState("");
   const [axis, setAxis] = useState("");
+  const [ageRange, setAgeRange] = useState("");
+  const [gender, setGender] = useState("");
   const [opinion, setOpinion] = useState("");
   const [consent, setConsent] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -107,10 +125,10 @@ export default function AutonomyInitiative() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!region || !axis || opinion.trim().length < 10) {
+    if (!region || !axis || !ageRange || !gender || opinion.trim().length < 10) {
       toast({
         title: t("Please complete the form", "يرجى إكمال النموذج"),
-        description: t("Select a region, select a section, and share at least a few words.", "اختر جهة ومحوراً وشارك بضع كلمات على الأقل."),
+        description: t("Select a region, age range, gender and section, and share at least a few words.", "اختر الجهة والفئة العمرية والجنس والمحور، وشارك بضع كلمات على الأقل."),
         variant: "destructive",
       });
       return;
@@ -128,7 +146,14 @@ export default function AutonomyInitiative() {
       await customFetch("/api/sahara-feedback", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ region, axis, opinion: opinion.trim(), consentToDataCollection: consent }),
+        body: JSON.stringify({
+          region,
+          axis,
+          ageRange,
+          gender,
+          opinion: opinion.trim(),
+          consentToDataCollection: consent,
+        }),
       });
       setIsSubmitted(true);
     } catch (error: any) {
@@ -244,6 +269,26 @@ export default function AutonomyInitiative() {
                         <option key={en} value={en}>{t(en, ar)}</option>
                       ))}
                     </Select>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <Label>{t("Age Range", "الفئة العمرية")}</Label>
+                      <Select value={ageRange} onChange={(e) => setAgeRange(e.target.value)}>
+                        <option value="">{t("Select an age range", "اختر الفئة العمرية")}</option>
+                        {AGE_RANGES.map(([en, ar]) => (
+                          <option key={en} value={en}>{t(en, ar)}</option>
+                        ))}
+                      </Select>
+                    </div>
+                    <div>
+                      <Label>{t("Gender", "الجنس")}</Label>
+                      <Select value={gender} onChange={(e) => setGender(e.target.value)}>
+                        <option value="">{t("Select gender", "اختر الجنس")}</option>
+                        {GENDERS.map(([en, ar]) => (
+                          <option key={en} value={en}>{t(en, ar)}</option>
+                        ))}
+                      </Select>
+                    </div>
                   </div>
                   <div>
                     <Label>{t("Which Section", "أي محور")}</Label>

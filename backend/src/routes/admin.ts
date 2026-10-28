@@ -2,6 +2,7 @@ import { Router, type IRouter } from "express";
 import {
   db, usersTable, articlesTable, eventsTable, pollsTable, pollVotesTable,
   crisesTable, postsTable, supportTicketsTable, roleApplicationsTable,
+  forumsTable, postLikesTable,
   auditLogsTable, systemLogsTable,
 } from "@workspace/db";
 import { eq, gte, sql, desc } from "drizzle-orm";
@@ -65,6 +66,48 @@ router.get("/kpis", requireAuth, requireAdmin, async (req, res) => {
     });
   } catch (err) {
     req.log.error({ err }, "Get admin KPIs error");
+    res.status(500).json({ error: "Internal", message: "Server error" });
+  }
+});
+
+// Raw-but-lightweight activity rows for the admin statistics page. The page
+// joins userId/authorId to member demographics client-side so the same
+// age/sex/region/date filters apply across every part of the site.
+// No message bodies or post content — just what the charts need.
+router.get("/site-activity", requireAuth, requireAdmin, async (req, res) => {
+  try {
+    const CAP = 100000;
+    const [forums, posts, likes, pollVotes, tickets, events, articles, crises] = await Promise.all([
+      db.select({ id: forumsTable.id, name: forumsTable.name, nameAr: forumsTable.nameAr, category: forumsTable.category }).from(forumsTable),
+      db.select({
+        id: postsTable.id, forumId: postsTable.forumId, parentId: postsTable.parentId,
+        authorId: postsTable.authorId, createdAt: postsTable.createdAt,
+      }).from(postsTable).limit(CAP),
+      db.select({ postId: postLikesTable.postId, userId: postLikesTable.userId, createdAt: postLikesTable.createdAt }).from(postLikesTable).limit(CAP),
+      db.select({
+        pollId: pollVotesTable.pollId, userId: pollVotesTable.userId,
+        optionKey: pollVotesTable.optionKey, createdAt: pollVotesTable.createdAt,
+      }).from(pollVotesTable).limit(CAP),
+      db.select({
+        id: supportTicketsTable.id, userId: supportTicketsTable.userId, category: supportTicketsTable.category,
+        status: supportTicketsTable.status, createdAt: supportTicketsTable.createdAt,
+      }).from(supportTicketsTable).limit(CAP),
+      db.select({
+        id: eventsTable.id, title: eventsTable.title, titleAr: eventsTable.titleAr, type: eventsTable.type,
+        startAt: eventsTable.startAt, createdAt: eventsTable.createdAt,
+      }).from(eventsTable),
+      db.select({
+        id: articlesTable.id, title: articlesTable.title, titleAr: articlesTable.titleAr,
+        type: articlesTable.type, publishedAt: articlesTable.publishedAt,
+      }).from(articlesTable),
+      db.select({
+        id: crisesTable.id, title: crisesTable.title, severity: crisesTable.severity,
+        isActive: crisesTable.isActive, createdAt: crisesTable.createdAt,
+      }).from(crisesTable),
+    ]);
+    res.json({ forums, posts, likes, pollVotes, tickets, events, articles, crises });
+  } catch (err) {
+    req.log.error({ err }, "Get site activity error");
     res.status(500).json({ error: "Internal", message: "Server error" });
   }
 });

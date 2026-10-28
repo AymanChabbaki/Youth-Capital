@@ -1,6 +1,6 @@
 import { Router, type IRouter } from "express";
-import { db, usersTable } from "@workspace/db";
-import { eq } from "drizzle-orm";
+import { db, usersTable, roleApplicationsTable } from "@workspace/db";
+import { eq, sql, desc, inArray } from "drizzle-orm";
 import { z } from "zod";
 import { requireAuth, requireAdmin, safeUser } from "../lib/session.js";
 import { clampPageParams } from "../middlewares/validate.js";
@@ -29,10 +29,43 @@ const AdminUpdateSchema = SelfUpdateSchema.extend({
 
 router.get("/", requireAuth, requireAdmin, async (req, res) => {
   try {
-    const { page, limit, offset } = clampPageParams(req);
-    const users = await db.select().from(usersTable).limit(limit).offset(offset);
-    const total = await db.select().from(usersTable);
-    res.json({ users: users.map(safeUser), total: total.length, page, limit });
+    // Admin dashboard filters/searches members client-side, so allow fetching the full list.
+    const { page, limit, offset } = clampPageParams(req, 20, 5000);
+    const users = await db.select().from(usersTable).orderBy(usersTable.fullName).limit(limit).offset(offset);
+    const [{ total }] = await db.select({ total: sql<number>`count(*)::int` }).from(usersTable);
+
+    // Age and gender are only collected on the role application, and region is
+    // usually only there too — attach them from each user's latest application
+    // so the admin table can filter by them.
+    const apps = users.length
+      ? await db
+          .select({
+            userId: roleApplicationsTable.userId,
+            age: roleApplicationsTable.age,
+            gender: roleApplicationsTable.gender,
+            region: roleApplicationsTable.region,
+          })
+          .from(roleApplicationsTable)
+          .where(inArray(roleApplicationsTable.userId, users.map((u) => u.id)))
+          .orderBy(desc(roleApplicationsTable.createdAt))
+      : [];
+    const latestApp = new Map<number, (typeof apps)[number]>();
+    for (const app of apps) if (!latestApp.has(app.userId)) latestApp.set(app.userId, app);
+
+    res.json({
+      users: users.map((u) => {
+        const app = latestApp.get(u.id);
+        return {
+          ...safeUser(u),
+          region: u.region || app?.region || null,
+          age: app?.age ?? null,
+          gender: app?.gender ?? null,
+        };
+      }),
+      total,
+      page,
+      limit,
+    });
   } catch (err: any) {
     req.log.error({ err }, "Get users error");
     res.status(500).json({ error: "Internal", message: "Server error" });

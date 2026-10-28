@@ -16,6 +16,11 @@ export const saharaFeedbackTable = pgTable("sahara_feedback", {
   // AXES in backend/src/routes/sahara.ts. Nullable to keep this migration
   // additive on top of rows submitted before this field existed.
   axis: text("axis"),
+  // Demographics for admin filtering — see AGE_RANGES / GENDERS in
+  // backend/src/routes/sahara.ts. Rows submitted before these existed are
+  // backfilled with the default "Prefer not to say".
+  ageRange: text("age_range").notNull().default("Prefer not to say"),
+  gender: text("gender").notNull().default("Prefer not to say"),
   opinion: text("opinion").notNull(),
   ipAddress: text("ip_address"),
   userAgent: text("user_agent"),
