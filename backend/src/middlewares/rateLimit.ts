@@ -37,14 +37,24 @@ export const chatGuestLimiter = rateLimit({
   message: { error: "LoginRequired", message: "Free question limit reached. Log in to keep chatting." },
 });
 
-// Anonymous civic feedback (e.g. Sahara Autonomy Initiative consultation):
-// IP is used only in-memory, only to throttle, and is never written to the
-// feedback row or exposed anywhere — that's what keeps the "this is
-// anonymous" claim on the public page actually true.
+// Sahara Autonomy Initiative consultation: this limiter's IP tracking is
+// separate from the IP address stored on the feedback row itself (that one
+// is recorded deliberately, with consent — see saharaFeedbackTable). This
+// just throttles submission rate.
 export const anonFeedbackLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,
   limit: 5,
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: "TooManyRequests", message: "Too many submissions, please try again later" },
+});
+
+// Bulk admin email sends — low limit since one accidental double-click
+// shouldn't be able to fire off a broadcast to every user twice.
+export const emailLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  limit: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "TooManyRequests", message: "Too many email sends this hour, please wait before sending more" },
 });

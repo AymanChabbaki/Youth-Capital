@@ -19,7 +19,7 @@ import {
   MapPin, Landmark, LogOut, Plus, Edit, Trash2,
   ImagePlus, Loader2, X as XIcon,
   Phone, Linkedin, GraduationCap, Briefcase, Tag, Eye, Ban, ShieldCheck,
-  Gauge, ScrollText, Vote, UserPlus, Scale,
+  Gauge, ScrollText, Vote, UserPlus, Scale, Mail, Send,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -273,6 +273,67 @@ export default function Admin() {
     enabled: !isLoading && isAdmin,
   });
 
+  // Email compose state
+  const [emailSegment, setEmailSegment] = useState("active_users");
+  const [emailCustomList, setEmailCustomList] = useState("");
+  const [emailSubject, setEmailSubject] = useState("");
+  const [emailMessage, setEmailMessage] = useState("");
+  const [isSendingEmail, setIsSendingEmail] = useState(false);
+  const [emailSendResult, setEmailSendResult] = useState<{ sent: number; failed: number } | null>(null);
+
+  const { data: mailerStatus } = useQuery({
+    queryKey: ["/api/admin/email/status"],
+    queryFn: () => customFetch<any>("/api/admin/email/status"),
+    enabled: !isLoading && isAdmin,
+  });
+  const { data: recipientPreview } = useQuery({
+    queryKey: ["/api/admin/email/recipients", emailSegment],
+    queryFn: () => customFetch<any>(`/api/admin/email/recipients?segment=${emailSegment}`),
+    enabled: !isLoading && isAdmin && emailSegment !== "custom",
+  });
+
+  const customEmailCount = emailCustomList.split(/[\n,;]+/).map((e) => e.trim()).filter(Boolean).length;
+  const recipientCount = emailSegment === "custom" ? customEmailCount : (recipientPreview?.count ?? null);
+
+  const handleSendEmail = async () => {
+    if (!emailSubject.trim() || !emailMessage.trim()) {
+      toast({ title: t("Subject and message are required", "العنوان والرسالة مطلوبان"), variant: "destructive" });
+      return;
+    }
+    const customEmails = emailSegment === "custom"
+      ? emailCustomList.split(/[\n,;]+/).map((e) => e.trim()).filter(Boolean)
+      : undefined;
+    if (emailSegment === "custom" && (!customEmails || customEmails.length === 0)) {
+      toast({ title: t("Add at least one email address", "أضف عنوان بريد إلكتروني واحداً على الأقل"), variant: "destructive" });
+      return;
+    }
+    const confirmMsg = t(
+      `Send this email to ${recipientCount ?? "?"} recipient(s)? This cannot be undone.`,
+      `إرسال هذا البريد إلى ${recipientCount ?? "?"} مستلم؟ لا يمكن التراجع عن هذا.`
+    );
+    if (!window.confirm(confirmMsg)) return;
+
+    setIsSendingEmail(true);
+    setEmailSendResult(null);
+    try {
+      const result = await customFetch<any>("/api/admin/email/send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ segment: emailSegment, customEmails, subject: emailSubject, message: emailMessage }),
+      });
+      setEmailSendResult(result);
+      toast({ title: t(`Sent to ${result.sent} recipient(s)`, `تم الإرسال إلى ${result.sent} مستلم`), variant: result.failed > 0 ? "destructive" : "default" });
+      if (result.failed === 0) {
+        setEmailSubject("");
+        setEmailMessage("");
+      }
+    } catch (error: any) {
+      toast({ title: t("Send Failed", "فشل الإرسال"), description: error?.message, variant: "destructive" });
+    } finally {
+      setIsSendingEmail(false);
+    }
+  };
+
   const updateAppMutation = useUpdateRoleApplication();
   const triggerCrisisMutation = useTriggerCrisis();
   const [crisisForm, setCrisisForm] = useState({ title: "", titleAr: "", description: "", descriptionAr: "", severity: "high" });
@@ -521,6 +582,7 @@ export default function Admin() {
     { id: "polls", icon: BarChart3, label: t("Polls Management", "إدارة الاستطلاعات") },
     { id: "system", icon: Gauge, label: t("System & Logs", "النظام والسجلات") },
     { id: "sahara", icon: Scale, label: t("Sahara Consultation", "استشارة الصحراء") },
+    { id: "emails", icon: Mail, label: t("Emails", "البريد الإلكتروني") },
   ];
 
 
@@ -1078,6 +1140,19 @@ export default function Admin() {
                               <a href={(app.user as any).linkedinUrl} target="_blank" rel="noopener noreferrer" className="text-xs text-muted-foreground hover:text-primary flex items-center gap-1">
                                 <Linkedin className="w-3 h-3" /> {t("LinkedIn", "لينكدإن")}
                               </a>
+                            )}
+                            {app.user?.email && (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setEmailSegment("custom");
+                                  setEmailCustomList(app.user!.email);
+                                  setActiveTab("emails");
+                                }}
+                                className="text-xs text-muted-foreground hover:text-primary flex items-center gap-1"
+                              >
+                                <Mail className="w-3 h-3" /> {t("Email", "بريد")}
+                              </button>
                             )}
                           </div>
                         </div>
@@ -1944,6 +2019,103 @@ export default function Admin() {
                   )}
                 </div>
               </div>
+            </div>
+          )}
+
+          {/* ── EMAILS ── */}
+          {activeTab === "emails" && (
+            <div className="max-w-2xl space-y-6">
+              {mailerStatus && !mailerStatus.configured && (
+                <div className="flex items-start gap-3 p-4 rounded-2xl bg-rose/10 border border-rose/30">
+                  <AlertTriangle className="w-5 h-5 text-rose shrink-0 mt-0.5" />
+                  <p className="text-xs text-rose leading-relaxed">
+                    {t(
+                      "SMTP is not configured yet. Set SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASSWORD (and optionally SMTP_FROM_NAME / SMTP_FROM_EMAIL) in the backend environment, then redeploy.",
+                      "لم يتم إعداد SMTP بعد. عيّن SMTP_HOST وSMTP_PORT وSMTP_USER وSMTP_PASSWORD (واختيارياً SMTP_FROM_NAME / SMTP_FROM_EMAIL) في بيئة الخادم، ثم أعد النشر."
+                    )}
+                  </p>
+                </div>
+              )}
+
+              <div className="bg-card border border-border rounded-2xl p-6 md:p-8 space-y-6">
+                <div>
+                  <Label>{t("Send To", "إرسال إلى")}</Label>
+                  <Select value={emailSegment} onChange={(e) => setEmailSegment(e.target.value)}>
+                    <option value="active_users">{t("Active Users", "المستخدمون النشطون")}</option>
+                    <option value="all_users">{t("All Users", "جميع المستخدمين")}</option>
+                    <option value="banned_users">{t("Banned Users", "المستخدمون المحظورون")}</option>
+                    <option value="pending_applicants">{t("Pending Applicants", "المتقدمون المعلّقون")}</option>
+                    <option value="approved_applicants">{t("Approved Applicants", "المتقدمون المقبولون")}</option>
+                    <option value="rejected_applicants">{t("Rejected Applicants", "المتقدمون المرفوضون")}</option>
+                    <option value="custom">{t("Custom List", "قائمة مخصصة")}</option>
+                  </Select>
+                  {emailSegment === "custom" ? (
+                    <p className="text-xs text-muted-foreground mt-2">{customEmailCount} {t("address(es) entered", "عنوان تم إدخاله")}</p>
+                  ) : (
+                    <p className="text-xs text-muted-foreground mt-2">
+                      {recipientPreview
+                        ? t(`${recipientPreview.count} recipient(s) match this segment`, `${recipientPreview.count} مستلم يطابق هذه الفئة`)
+                        : t("Loading recipient count...", "جارٍ تحميل عدد المستلمين...")}
+                    </p>
+                  )}
+                </div>
+
+                {emailSegment === "custom" && (
+                  <div>
+                    <Label>{t("Email Addresses (one per line, or comma-separated)", "عناوين البريد (واحد في كل سطر، أو مفصولة بفواصل)")}</Label>
+                    <Textarea
+                      value={emailCustomList}
+                      onChange={(e) => setEmailCustomList(e.target.value)}
+                      placeholder="ahmed@example.com, sara@example.com"
+                      className="h-24 rounded-2xl font-mono text-sm"
+                    />
+                  </div>
+                )}
+
+                <div>
+                  <Label>{t("Subject", "العنوان")}</Label>
+                  <Input value={emailSubject} onChange={(e) => setEmailSubject(e.target.value)} maxLength={200} />
+                </div>
+
+                <div>
+                  <Label>{t("Message", "الرسالة")}</Label>
+                  <Textarea
+                    value={emailMessage}
+                    onChange={(e) => setEmailMessage(e.target.value)}
+                    placeholder={t("Write your message... (blank lines separate paragraphs)", "اكتب رسالتك... (الأسطر الفارغة تفصل الفقرات)")}
+                    className="h-56 rounded-2xl"
+                    maxLength={20000}
+                  />
+                </div>
+
+                <Button
+                  type="button"
+                  variant="gold"
+                  className="w-full h-14 rounded-2xl gap-2"
+                  isLoading={isSendingEmail}
+                  disabled={!mailerStatus?.configured || (recipientCount ?? 0) === 0}
+                  onClick={handleSendEmail}
+                >
+                  <Send className="w-5 h-5" />
+                  {t(`Send to ${recipientCount ?? "..."} Recipient(s)`, `إرسال إلى ${recipientCount ?? "..."} مستلم`)}
+                </Button>
+
+                {emailSendResult && (
+                  <div className={`p-4 rounded-2xl text-sm ${emailSendResult.failed > 0 ? "bg-rose/10 text-rose" : "bg-green-500/10 text-green-600"}`}>
+                    {t(
+                      `Sent: ${emailSendResult.sent} · Failed: ${emailSendResult.failed}`,
+                      `تم الإرسال: ${emailSendResult.sent} · فشل: ${emailSendResult.failed}`
+                    )}
+                  </div>
+                )}
+              </div>
+
+              <p className="text-xs text-muted-foreground">
+                {t(
+                  "Applicants are also emailed automatically — with zero extra clicks — the moment you approve or reject their application from the Applications tab.",
+                  "يتم أيضاً إرسال بريد تلقائي للمتقدمين — دون أي نقرات إضافية — بمجرد قبول أو رفض طلبهم من تبويب الطلبات."
+                )}
+              </p>
             </div>
           )}
 

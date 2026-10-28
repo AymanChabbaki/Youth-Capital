@@ -13,6 +13,7 @@ import statsRouter from "./stats.js";
 import chatRouter from "./chat.js";
 import adminRouter from "./admin.js";
 import saharaRouter from "./sahara.js";
+import emailRouter from "./email.js";
 
 const router: IRouter = Router();
 
@@ -30,5 +31,6 @@ router.use("/stats", statsRouter);
 router.use("/chat", chatRouter);
 router.use("/admin", adminRouter);
 router.use("/sahara-feedback", saharaRouter);
+router.use("/admin/email", emailRouter);
 
 export default router;

@@ -5,6 +5,7 @@ import { z } from "zod";
 import { requireAuth, requireAdmin, safeUser } from "../lib/session.js";
 import { validateBody } from "../middlewares/validate.js";
 import { logAudit } from "../lib/audit.js";
+import { sendEmailToMany, isMailerConfigured } from "../lib/mailer.js";
 
 const router: IRouter = Router();
 
@@ -111,6 +112,30 @@ router.patch("/applications/:id", requireAuth, requireAdmin, validateBody(Update
     }
     const [user] = await db.select().from(usersTable).where(eq(usersTable.id, app.userId));
     logAudit((req as any).user.id, `application.${status}`, "roleApplication", app.id, { applicantEmail: user?.email, assignedRole: updates.assignedRole });
+
+    // Automated notification — the applicant hears back the moment an admin
+    // decides, with zero extra clicks. Never lets an email failure affect
+    // the approve/reject action itself.
+    if (user && isMailerConfigured && (status === "approved" || status === "rejected")) {
+      const isAr = user.languagePreference === "ar";
+      const role = updates.assignedRole || app.preferredRole;
+      const subject = status === "approved"
+        ? (isAr ? "تم قبول طلبك في يوث كابيتال" : "Your Youth Capital application has been approved")
+        : (isAr ? "بخصوص طلبك في يوث كابيتال" : "An update on your Youth Capital application");
+      const html = status === "approved"
+        ? (isAr
+            ? `<p>مرحباً ${user.fullName}،</p><p>يسعدنا إبلاغك بأنه تم قبول طلبك! تم تعيينك في دور <strong>${role}</strong>.</p><p>سجّل الدخول إلى لوحتك لمتابعة المحاكاة.</p>`
+            : `<p>Hi ${user.fullName},</p><p>Great news — your application has been approved! You've been assigned the role of <strong>${role}</strong>.</p><p>Log in to your dashboard to get started.</p>`)
+        : (isAr
+            ? `<p>مرحباً ${user.fullName}،</p><p>شكراً لاهتمامك بيوث كابيتال. بعد المراجعة، لم نتمكن من قبول طلبك في الوقت الحالي. نرحب بإعادة التقديم مستقبلاً.</p>`
+            : `<p>Hi ${user.fullName},</p><p>Thank you for your interest in Youth Capital. After review, we're unable to move forward with your application at this time. You're welcome to apply again in the future.</p>`);
+      try {
+        await sendEmailToMany([user.email], subject, html);
+      } catch (err) {
+        req.log.error({ err, userId: user.id }, "Failed to send application decision email");
+      }
+    }
+
     res.json({ ...app, user: safeUser(user) });
   } catch (err: any) {
     req.log.error({ err }, "Update application error");
