@@ -26,6 +26,40 @@
   --muted-foreground: hsl(240 21% 15%);
   --border: hsl(216 20% 85%);
   --ring: hsl(44 55% 54%);
+
+  /* Tokens the shadcn/ui primitives expect. They reference the tokens above,
+     so they follow the .dark overrides automatically. */
+  --popover: var(--card);
+  --popover-foreground: var(--card-foreground);
+  --input: var(--border);
+  --button-outline: var(--border);
+  --badge-outline: var(--border);
+  --primary-border: transparent;
+  --secondary-border: var(--border);
+  --destructive-border: transparent;
+}
+
+/* Admin dashboard: cooler canvas and a genuinely muted secondary text color.
+   Scoped with :has() so portaled sheets/dialogs/popovers pick it up too. */
+:root:has(.admin-root) {
+  --background: hsl(220 23% 97%);
+  --secondary: hsl(220 20% 95%);
+  --muted-foreground: hsl(225 12% 40%);
+  /* Menu/command highlight: neutral instead of the site's gold accent */
+  --accent: hsl(220 20% 93%);
+  --accent-foreground: var(--foreground);
+  /* Validated categorical chart palette (dataviz skill), light steps */
+  --viz-1: #2a78d6; --viz-2: #eb6834; --viz-3: #1baf7a; --viz-4: #eda100;
+}
+.dark:has(.admin-root) {
+  --background: hsl(222 47% 7%);
+  --card: hsl(224 33% 11%);
+  --secondary: hsl(223 30% 16%);
+  --border: hsl(223 25% 20%);
+  --muted-foreground: hsl(225 14% 64%);
+  --accent: hsl(223 30% 19%);
+  --accent-foreground: var(--foreground);
+  --viz-1: #3987e5; --viz-2: #d95926; --viz-3: #199e70; --viz-4: #c98500;
 }
 
 .dark {
@@ -82,6 +116,9 @@
   --color-muted-foreground: var(--muted-foreground);
   --color-border: var(--border);
   --color-ring: var(--ring);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-input: var(--input);
 }
 
 @layer base {
@@ -159,6 +196,15 @@
   html[dir="rtl"] h4,
   html[dir="rtl"] .font-display {
     font-family: var(--font-display-ar);
+  }
+
+  /* Admin dashboard: data-dense UI reads better with the body font everywhere,
+     including headings in portaled sheets and dialogs. */
+  html:has(.admin-root)[dir="ltr"] :is(h1, h2, h3, h4) {
+    font-family: var(--font-body-en);
+  }
+  html:has(.admin-root)[dir="rtl"] :is(h1, h2, h3, h4) {
+    font-family: var(--font-body-ar);
   }
 }
 

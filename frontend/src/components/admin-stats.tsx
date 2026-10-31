@@ -13,7 +13,12 @@ import {
   Calendar, Siren, Activity, Heart,
 } from "lucide-react";
 import { useLanguage } from "@/hooks/use-language";
-import { Button, Select, Label, Input } from "@/components/ui-custom";
+import {
+  Btn, Field, NativeSelect, PageHeader, Pill, StatCard, TextInput,
+} from "@/components/admin/primitives";
+import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { AGE_RANGES, GENDERS, ageRangeOf, uniqueSorted } from "@/components/admin-table";
 
 // Must match AXES in backend/src/routes/sahara.ts
@@ -27,13 +32,8 @@ const SAHARA_AXES = [
 const NOT_SAID = "Prefer not to say";
 const UNKNOWN = "Unknown";
 
-// Categorical slots 1–3 of the validated dataviz palette, stepped per theme
-// (validated all-pairs against the white card and the dark navy card).
+// Chart colors come from the validated --viz-* palette defined for the admin scope in index.css.
 // Slot order is fixed per entity: Male → 1, Female → 2, Prefer not to say → 3.
-const VIZ_STYLE = `
-.viz-root { --viz-1: #2a78d6; --viz-2: #eb6834; --viz-3: #1baf7a; --viz-4: #eda100; }
-.dark .viz-root { --viz-1: #3987e5; --viz-2: #d95926; --viz-3: #199e70; --viz-4: #c98500; }
-`;
 const GENDER_COLORS: Record<string, string> = {
   Male: "var(--viz-1)",
   Female: "var(--viz-2)",
@@ -170,27 +170,17 @@ function downloadCsv(filename: string, rows: Record<string, unknown>[], columns?
 
 // ── presentational pieces ───────────────────────────────────────────────────
 
-function Stat({ icon: Icon, label, value, sub }: { icon: any; label: string; value: ReactNode; sub?: string }) {
-  return (
-    <div className="bg-card border border-border rounded-2xl p-5 flex items-start gap-4">
-      <div className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 bg-primary/10 text-primary">
-        <Icon className="w-5 h-5" />
-      </div>
-      <div className="min-w-0">
-        <div className="text-2xl font-display font-bold text-foreground tabular-nums">{value}</div>
-        <div className="text-sm font-semibold text-foreground/80">{label}</div>
-        {sub && <div className="text-xs text-muted-foreground mt-0.5">{sub}</div>}
-      </div>
-    </div>
-  );
+function Stat({ icon, label, value, sub }: { icon: any; label: string; value: ReactNode; sub?: string }) {
+  return <StatCard icon={icon} label={label} value={value} hint={sub} />;
 }
 
 function SectionTitle({ icon: Icon, children, count }: { icon: any; children: ReactNode; count?: number }) {
   return (
-    <h2 className="text-lg font-bold text-foreground flex items-center gap-2 pt-2">
-      <Icon className="w-5 h-5 text-primary" /> {children}
-      {count != null && <span className="text-sm font-normal text-muted-foreground">({count})</span>}
-    </h2>
+    <div className="flex items-center gap-3 border-t border-border pt-6">
+      <span className="flex size-8 items-center justify-center rounded-lg border border-border bg-card"><Icon className="size-4 text-muted-foreground" /></span>
+      <h2 className="text-base font-semibold text-foreground">{children}</h2>
+      {count != null && <Pill className="tabular-nums">{count}</Pill>}
+    </div>
   );
 }
 
@@ -203,9 +193,9 @@ function ChartCard({ title, rows, csvName, children, className = "" }: {
   const columns = rows.length ? Object.keys(rows[0]) : [];
   const isEmpty = rows.length === 0 || rows.every((r) => Object.entries(r).every(([k, v]) => k === "name" || !v));
   return (
-    <div className={`bg-card border border-border rounded-2xl p-5 flex flex-col ${className}`}>
+    <div className={`bg-card border border-border rounded-xl shadow-xs p-5 flex flex-col ${className}`}>
       <div className="flex items-start justify-between gap-2 mb-4">
-        <h3 className="font-bold text-foreground text-sm leading-snug">{title}</h3>
+        <h3 className="font-semibold text-foreground text-sm leading-snug">{title}</h3>
         <div className="flex items-center gap-1 shrink-0">
           <button
             type="button"
@@ -655,87 +645,72 @@ export default function AdminStats() {
   const genderRows = (rows: Record<string, string | number>[]) => rows.filter((r) => GENDERS.some((g) => Number(r[g]) > 0));
 
   return (
-    <div className="viz-root space-y-8">
-      <style>{VIZ_STYLE}</style>
+    <div className="space-y-6">
+      <PageHeader
+        title={t("Statistics", "الإحصائيات")}
+        description={t("Every number on the platform, sliced by date, age, sex and region. Each chart can switch to a table and export its own CSV.", "كل أرقام المنصة مقسّمة حسب التاريخ والعمر والجنس والجهة. يمكن تحويل كل رسم إلى جدول وتصدير بياناته.")}
+        actions={
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Btn><Download /> {t("Export", "تصدير")}{activeFilters.length > 0 && <span className="rounded bg-white/20 px-1.5 text-[11px]">{t("filtered", "مفلتر")}</span>}</Btn>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-64">
+              <DropdownMenuLabel className="text-xs text-muted-foreground">{t("CSV — opens in Excel", "CSV — يفتح في Excel")}</DropdownMenuLabel>
+              <DropdownMenuItem onClick={exportSummary} className="font-medium">{t("Summary statistics (all charts)", "ملخص الإحصائيات (كل الرسوم)")}</DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuLabel className="text-xs text-muted-foreground">{t("Raw data", "البيانات الخام")}</DropdownMenuLabel>
+              {exportButtons.map((b) => (
+                <DropdownMenuItem key={b.label} disabled={!b.count} onClick={b.run}>
+                  {b.label}<span className="ms-auto text-xs text-muted-foreground tabular-nums">{b.count}</span>
+                </DropdownMenuItem>
+              ))}
+              <DropdownMenuSeparator />
+              <p className="px-2 py-1.5 text-[11px] leading-snug text-muted-foreground">
+                {t("Raw exports contain personal data (names, emails, phones, IPs).", "تحتوي البيانات الخام على معلومات شخصية (أسماء، بريد، هواتف، IP).")}
+              </p>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        }
+      />
 
       {/* Filters — apply to every chart and export below */}
-      <div className="bg-card border border-border rounded-2xl p-5 space-y-4 sticky top-[73px] z-10 shadow-sm">
-        <div className="flex items-center gap-2 text-sm font-bold text-foreground">
-          <Filter className="w-4 h-4 text-primary" /> {t("Filters", "الفلترة")}
-          <span className="text-xs font-normal text-muted-foreground">
-            {t("Apply to every chart and export on this page", "تُطبَّق على جميع الرسوم والتصديرات في هذه الصفحة")}
-          </span>
-          {loading && <Loader2 className="w-4 h-4 animate-spin text-muted-foreground ml-auto" />}
-        </div>
-        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-7 gap-3 items-end">
-          <div>
-            <Label>{t("From", "من")}</Label>
-            <Input type="date" value={f.from} max={f.to || undefined} onChange={(e) => set({ from: e.target.value })} />
-          </div>
-          <div>
-            <Label>{t("To", "إلى")}</Label>
-            <Input type="date" value={f.to} min={f.from || undefined} onChange={(e) => set({ to: e.target.value })} />
-          </div>
-          <div>
-            <Label>{t("Age", "العمر")}</Label>
-            <Select value={f.ageRange} onChange={(e) => set({ ageRange: e.target.value })}>
-              <option value="">{t("All Ages", "جميع الأعمار")}</option>
+      <div className="sticky top-[57px] z-20 -mx-1 rounded-xl border border-border bg-card/95 p-3 shadow-sm backdrop-blur">
+        <div className="grid grid-cols-2 items-end gap-3 md:grid-cols-4 xl:grid-cols-[repeat(6,minmax(0,1fr))_auto]">
+          <Field label={t("From", "من")}>
+            <TextInput type="date" value={f.from} max={f.to || undefined} onChange={(e) => set({ from: e.target.value })} />
+          </Field>
+          <Field label={t("To", "إلى")}>
+            <TextInput type="date" value={f.to} min={f.from || undefined} onChange={(e) => set({ to: e.target.value })} />
+          </Field>
+          <Field label={t("Age", "العمر")}>
+            <NativeSelect value={f.ageRange} onChange={(e) => set({ ageRange: e.target.value })}>
+              <option value="">{t("All ages", "جميع الأعمار")}</option>
               {AGE_RANGES.map((a) => <option key={a} value={a}>{a}</option>)}
-            </Select>
-          </div>
-          <div>
-            <Label>{t("Sex", "الجنس")}</Label>
-            <Select value={f.gender} onChange={(e) => set({ gender: e.target.value })}>
+            </NativeSelect>
+          </Field>
+          <Field label={t("Sex", "الجنس")}>
+            <NativeSelect value={f.gender} onChange={(e) => set({ gender: e.target.value })}>
               <option value="">{t("All", "الكل")}</option>
               {GENDERS.map((g) => <option key={g} value={g}>{g}</option>)}
-            </Select>
-          </div>
-          <div>
-            <Label>{t("Region", "الجهة")}</Label>
-            <Select value={f.region} onChange={(e) => set({ region: e.target.value })}>
-              <option value="">{t("All Regions", "جميع الجهات")}</option>
+            </NativeSelect>
+          </Field>
+          <Field label={t("Region", "الجهة")}>
+            <NativeSelect value={f.region} onChange={(e) => set({ region: e.target.value })}>
+              <option value="">{t("All regions", "جميع الجهات")}</option>
               {regions.map((r) => <option key={r} value={r}>{r}</option>)}
-            </Select>
-          </div>
-          <div>
-            <Label>{t("Sahara Section", "محور الصحراء")}</Label>
-            <Select value={f.axis} onChange={(e) => set({ axis: e.target.value })}>
-              <option value="">{t("All Sections", "جميع المحاور")}</option>
+            </NativeSelect>
+          </Field>
+          <Field label={t("Sahara section", "محور الصحراء")}>
+            <NativeSelect value={f.axis} onChange={(e) => set({ axis: e.target.value })}>
+              <option value="">{t("All sections", "جميع المحاور")}</option>
               {SAHARA_AXES.map((a) => <option key={a} value={a}>{a}</option>)}
-            </Select>
+            </NativeSelect>
+          </Field>
+          <div className="flex items-center gap-2">
+            <Btn variant="outline" disabled={!activeFilters.length} onClick={() => setFilters(EMPTY_FILTERS)}>{t("Reset", "إعادة ضبط")}</Btn>
+            {loading && <Loader2 className="size-4 animate-spin text-muted-foreground" />}
           </div>
-          <Button type="button" variant="outline" className="h-11 rounded-xl" disabled={!activeFilters.length} onClick={() => setFilters(EMPTY_FILTERS)}>
-            {t("Clear Filters", "مسح الفلترة")}
-          </Button>
         </div>
-      </div>
-
-      {/* Exports */}
-      <div className="bg-card border border-border rounded-2xl p-5">
-        <div className="flex items-center gap-2 mb-4">
-          <Download className="w-4 h-4 text-primary" />
-          <h3 className="text-sm font-bold text-foreground">{t("Export (CSV, opens in Excel)", "تصدير (CSV، يفتح في Excel)")}</h3>
-          {activeFilters.length > 0 && (
-            <span className="text-xs text-muted-foreground">· {t("filtered", "مع الفلترة")}</span>
-          )}
-        </div>
-        <div className="flex flex-wrap gap-3">
-          <Button type="button" className="rounded-xl" onClick={exportSummary}>
-            <Download className="w-4 h-4 mr-2" /> {t("Summary Statistics", "ملخص الإحصائيات")}
-          </Button>
-          {exportButtons.map((b) => (
-            <Button key={b.label} type="button" variant="outline" className="rounded-xl" onClick={b.run} disabled={!b.count}>
-              <Download className="w-4 h-4 mr-2" /> {b.label}
-              <span className="ml-2 text-xs text-muted-foreground tabular-nums">{b.count}</span>
-            </Button>
-          ))}
-        </div>
-        <p className="text-xs text-muted-foreground mt-3">
-          {t(
-            "Exports contain personal data (names, emails, phones, IP addresses). Store and share them accordingly.",
-            "تحتوي التصديرات على بيانات شخصية (الأسماء، البريد، الهاتف، عناوين IP). احفظها وشاركها بحذر."
-          )}
-        </p>
       </div>
 
       {/* ── Website overview ── */}
