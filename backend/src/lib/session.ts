@@ -85,3 +85,18 @@ export function safeUser(user: any) {
   const { passwordHash, termsAcceptedAt, ...rest } = user;
   return rest;
 }
+
+const isProd = process.env.NODE_ENV === "production";
+// Frontend and API live on different domains in production, so the session
+// cookie must be SameSite=None (+ Secure) to be sent on credentialed fetches.
+export const SESSION_COOKIE_OPTIONS = {
+  httpOnly: true,
+  maxAge: 7 * 24 * 60 * 60 * 1000,
+  sameSite: isProd ? ("none" as const) : ("lax" as const),
+  secure: isProd,
+};
+
+// Signs the user out everywhere — used after a password reset.
+export async function destroyAllSessions(userId: number): Promise<void> {
+  await db.delete(sessionsTable).where(eq(sessionsTable.userId, userId));
+}

@@ -11,3 +11,4 @@ export * from "./audit.js";
 export * from "./systemLogs.js";
 export * from "./saharaFeedback.js";
 export * from "./emailCampaigns.js";
+export * from "./passwordResets.js";

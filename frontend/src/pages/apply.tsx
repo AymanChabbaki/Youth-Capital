@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLanguage } from "@/hooks/use-language";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -11,6 +11,11 @@ import { useToast } from "@/hooks/use-toast";
 import { CheckCircle2, Fingerprint, Eye, EyeOff, ShieldCheck } from "lucide-react";
 import { Link } from "wouter";
 import { useSeo } from "@/hooks/use-seo";
+import { useAuth } from "@/hooks/use-auth";
+import { useQueryClient } from "@tanstack/react-query";
+import { SocialAuthButtons } from "@/components/social-auth";
+import { FcGoogle } from "react-icons/fc";
+import { FaLinkedin } from "react-icons/fa";
 
 function passwordStrength(pw: string): number {
   let score = 0;
@@ -33,9 +38,11 @@ const INTERESTS_OPTIONS = [
   "Culture & Cultural Dialogue"
 ];
 
-const getApplySchema = (step: number) => z.object({
+// `completing` = already signed in through Google/LinkedIn, so the account
+// (email + login) exists and only the application details are collected.
+const getApplySchema = (step: number, completing = false) => z.object({
   fullName: z.string().min(2, "Full name is required"),
-  email: z.string().email("Invalid email address"),
+  email: completing ? z.string().optional().or(z.literal("")) : z.string().email("Invalid email address"),
   phone: z.string().trim().min(6, "Phone number is required"),
   linkedinUrl: z.string().optional().refine(
     (v) => !v || /^https?:\/\/([a-z]{2,3}\.)?linkedin\.com\//i.test(v),
@@ -43,7 +50,7 @@ const getApplySchema = (step: number) => z.object({
   ),
   gender: z.string().min(1, "Gender is required"),
   age: z.coerce.number().min(12, "Invalid age").max(100, "Invalid age"),
-  password: z.string().min(8, "Password must be at least 8 characters"),
+  password: completing ? z.string().optional().or(z.literal("")) : z.string().min(8, "Password must be at least 8 characters"),
 
   status: step >= 2 ? z.string().min(1, "Status is required") : z.string().optional().or(z.literal('')),
   fieldOfStudy: step >= 2 ? z.string().min(2, "Field of study is required") : z.string().optional().or(z.literal('')),
@@ -88,6 +95,11 @@ export default function Apply() {
     ),
     path: "/apply",
   });
+  const { user, isLoading: authLoading } = useAuth();
+  const queryClient = useQueryClient();
+  // Signed in (via Google/LinkedIn) but no application yet: finish signing up.
+  const completing = !!user && (user as any).applicationStatus === "none";
+  const oauthProvider = new URLSearchParams(window.location.search).get("oauth");
   const [step, setStep] = useState(1);
   const [isSuccess, setIsSuccess] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -99,7 +111,7 @@ export default function Apply() {
 
   const form = useForm<ApplyFormData>({
     resolver: (data, context, options) => {
-      return zodResolver(getApplySchema(step))(data, context, options);
+      return zodResolver(getApplySchema(step, completing))(data, context, options);
     },
     defaultValues: {
       fullName: "",
@@ -120,9 +132,42 @@ export default function Apply() {
     }
   });
 
+  useEffect(() => {
+    if (completing && user) {
+      form.setValue("fullName", form.getValues("fullName") || user.fullName || "");
+      form.setValue("email", user.email || "");
+      if ((user as any).phone) form.setValue("phone", (user as any).phone);
+    }
+  }, [completing, user?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const onSubmit = async (data: ApplyFormData) => {
     setIsSubmitting(true);
     try {
+      if (completing) {
+        await customFetch("/api/auth/complete-application", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            fullName: data.fullName,
+            phone: data.phone,
+            linkedinUrl: data.linkedinUrl || undefined,
+            agreedToTerms: data.agreedToTerms,
+            preferredRole: data.preferredRole,
+            region: data.region,
+            motivation: `Interests: ${data.interests.join(", ")}\nStatus: ${data.status}\nEducation: ${data.educationLevel} in ${data.fieldOfStudy}`,
+            gender: data.gender,
+            age: data.age,
+            country: data.country,
+            occupationStatus: data.status,
+            fieldOfStudy: data.fieldOfStudy,
+            educationLevel: data.educationLevel,
+            interests: data.interests,
+          }),
+        });
+        await queryClient.invalidateQueries();
+        setIsSuccess(true);
+        return;
+      }
       // One atomic request — account and application are created together in
       // a single DB transaction on the backend, so a dropped connection or
       // closed tab mid-submit can never leave a user registered with no
@@ -166,7 +211,9 @@ export default function Apply() {
 
   const nextStep = async () => {
     let fieldsToValidate: any[] = [];
-    if (step === 1) fieldsToValidate = ["fullName", "email", "phone", "linkedinUrl", "gender", "age", "password"];
+    if (step === 1) fieldsToValidate = completing
+      ? ["fullName", "phone", "linkedinUrl", "gender", "age"]
+      : ["fullName", "email", "phone", "linkedinUrl", "gender", "age", "password"];
     if (step === 2) fieldsToValidate = ["status", "fieldOfStudy", "educationLevel", "region", "country"];
     if (step === 3) fieldsToValidate = ["interests"];
       
@@ -229,8 +276,10 @@ export default function Apply() {
             </a>
           </motion.div>
 
-          <Link href="/login">
-            <Button variant="ghost" className="w-full font-bold text-muted-foreground hover:text-gold transition-colors">{t("Proceed to Login", "المتابعة لتسجيل الدخول")}</Button>
+          <Link href={completing || user ? "/dashboard" : "/login"}>
+            <Button variant="ghost" className="w-full font-bold text-muted-foreground hover:text-gold transition-colors">
+              {completing || user ? t("Go to my dashboard", "الانتقال إلى لوحتي") : t("Proceed to Login", "المتابعة لتسجيل الدخول")}
+            </Button>
           </Link>
         </Card>
       </div>
@@ -313,6 +362,20 @@ export default function Apply() {
               {step === 1 && (
                 <motion.div key="step1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
                   <h3 className="text-xl font-bold mb-4 border-b border-border pb-2">{t("Step 1 — Identity", "الخطوة 1 — الهوية")}</h3>
+
+                  {completing ? (
+                    <div className="flex items-center gap-3 rounded-2xl border border-gold/25 bg-gold/5 p-4">
+                      {oauthProvider === "linkedin" ? <FaLinkedin className="size-6 shrink-0 text-[#0A66C2]" /> : oauthProvider === "google" ? <FcGoogle className="size-6 shrink-0" /> : <CheckCircle2 className="size-6 shrink-0 text-gold" />}
+                      <div className="min-w-0 text-sm">
+                        <p className="font-bold text-foreground">{t("You're signed in", "تم تسجيل دخولك")}</p>
+                        <p className="truncate text-muted-foreground">
+                          {user?.email} · {t("finish your application to join the simulation.", "أكمل طلبك للانضمام إلى المحاكاة.")}
+                        </p>
+                      </div>
+                    </div>
+                  ) : !authLoading && !user ? (
+                    <SocialAuthButtons mode="signup" divider={t("or fill in the form", "أو املأ النموذج")} />
+                  ) : null}
                   
                   <div>
                     <Label>{t("Full Name", "الاسم الكامل")}</Label>
@@ -322,7 +385,7 @@ export default function Apply() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <Label>{t("Email", "البريد الإلكتروني")}</Label>
-                      <Input type="email" {...form.register("email")} error={form.formState.errors.email?.message} />
+                      <Input type="email" {...form.register("email")} readOnly={completing} className={completing ? "opacity-70" : undefined} error={form.formState.errors.email?.message} />
                     </div>
                     <div>
                       <Label>{t("Phone Number", "رقم الهاتف")}</Label>
@@ -356,7 +419,7 @@ export default function Apply() {
                     </div>
                   </div>
 
-                  <div>
+                  {!completing && <div>
                     <Label>{t("Password", "كلمة المرور")}</Label>
                     <div className="relative">
                       <Input
@@ -387,7 +450,7 @@ export default function Apply() {
                         </div>
                       ) : null;
                     })()}
-                  </div>
+                  </div>}
 
                   <Button type="button" onClick={nextStep} className="w-full mt-6">{t("Next Step", "الخطوة التالية")}</Button>
                 </motion.div>

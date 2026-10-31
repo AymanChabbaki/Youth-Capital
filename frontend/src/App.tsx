@@ -13,6 +13,8 @@ import { ErrorBoundary } from "@/components/error-boundary";
 import Home from "@/pages/home";
 const Apply = lazy(() => import("@/pages/apply"));
 const Login = lazy(() => import("@/pages/login"));
+const ForgotPassword = lazy(() => import("@/pages/forgot-password"));
+const ResetPassword = lazy(() => import("@/pages/reset-password"));
 const Dashboard = lazy(() => import("@/pages/dashboard"));
 const Community = lazy(() => import("@/pages/community"));
 const Press = lazy(() => import("@/pages/press"));
@@ -66,6 +68,8 @@ function Router() {
               <Route path="/" component={Home} />
               <Route path="/apply" component={Apply} />
               <Route path="/login" component={Login} />
+              <Route path="/forgot-password" component={ForgotPassword} />
+              <Route path="/reset-password" component={ResetPassword} />
               <Route path="/dashboard" component={Dashboard} />
               <Route path="/community" component={Community} />
               <Route path="/profile" component={Profile} />

@@ -2,7 +2,7 @@ import { Router, type IRouter } from "express";
 import { db, usersTable, roleApplicationsTable } from "@workspace/db";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
-import { createSession, destroySession, requireAuth, safeUser } from "../lib/session.js";
+import { createSession, destroySession, requireAuth, safeUser, SESSION_COOKIE_OPTIONS } from "../lib/session.js";
 import { hashPassword, verifyPassword, isLegacyHash } from "../lib/password.js";
 import { validateBody } from "../middlewares/validate.js";
 import { authLimiter } from "../middlewares/rateLimit.js";
@@ -38,13 +38,7 @@ const LoginSchema = z.object({
   password: z.string().min(1).max(72),
 });
 
-const isProd = process.env.NODE_ENV === "production";
-const COOKIE_OPTIONS = {
-  httpOnly: true,
-  maxAge: 7 * 24 * 60 * 60 * 1000,
-  sameSite: isProd ? ("none" as const) : ("lax" as const),
-  secure: isProd,
-};
+const COOKIE_OPTIONS = SESSION_COOKIE_OPTIONS;
 
 router.post("/register", authLimiter, validateBody(RegisterSchema), async (req, res) => {
   try {
@@ -129,6 +123,62 @@ router.post("/register-and-apply", authLimiter, validateBody(RegisterAndApplySch
     res.status(201).json({ user: safeUser(user), application });
   } catch (err) {
     req.log.error({ err }, "Register and apply error");
+    res.status(500).json({ error: "Internal", message: "Server error" });
+  }
+});
+
+// For accounts created through Google/LinkedIn sign-in: they already have a
+// session but no application yet. Collects the same details as
+// /register-and-apply (minus email/password) and creates the application,
+// in one transaction so a half-finished signup can't happen here either.
+const CompleteApplicationSchema = RegisterSchema.pick({ phone: true, linkedinUrl: true, agreedToTerms: true })
+  .extend({ fullName: z.string().trim().min(1).max(120).optional() })
+  .merge(CreateApplicationSchema);
+
+router.post("/complete-application", requireAuth, validateBody(CompleteApplicationSchema), async (req, res) => {
+  try {
+    const current = (req as any).user;
+    if (current.applicationStatus !== "none") {
+      res.status(409).json({ error: "Conflict", message: "You have already applied" });
+      return;
+    }
+    const {
+      fullName, phone, linkedinUrl,
+      preferredRole, region, ministryPreference, parliamentHouse, motivation, languagePreference,
+      gender, age, country, occupationStatus, fieldOfStudy, educationLevel, interests,
+    } = req.body;
+
+    const user = await db.transaction(async (tx) => {
+      const [user] = await tx.update(usersTable).set({
+        ...(fullName ? { fullName } : {}),
+        phone,
+        linkedinUrl: linkedinUrl || current.linkedinUrl || null,
+        termsAcceptedAt: new Date(),
+        applicationStatus: "pending",
+      }).where(eq(usersTable.id, current.id)).returning();
+
+      await tx.insert(roleApplicationsTable).values({
+        userId: current.id,
+        preferredRole,
+        region,
+        ministryPreference: ministryPreference || null,
+        parliamentHouse: parliamentHouse || null,
+        motivation,
+        languagePreference: languagePreference || current.languagePreference || "en",
+        gender: gender || null,
+        age: age ?? null,
+        country: country || null,
+        occupationStatus: occupationStatus || null,
+        fieldOfStudy: fieldOfStudy || null,
+        educationLevel: educationLevel || null,
+        interests: interests?.length ? interests.join(", ") : null,
+      });
+      return user;
+    });
+
+    res.status(201).json({ user: safeUser(user) });
+  } catch (err) {
+    req.log.error({ err }, "Complete application error");
     res.status(500).json({ error: "Internal", message: "Server error" });
   }
 });
