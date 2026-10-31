@@ -2,7 +2,7 @@ import { useLanguage } from "@/hooks/use-language";
 import { useGetPolls, Poll } from "@workspace/api-client-react";
 import { Badge, PageHero, HeroStat, Reveal, PageSkeleton } from "@/components/ui-custom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, Info, ChevronDown, Scale } from "lucide-react";
+import { ArrowRight, Info, ChevronDown, Scale, Pin, MessageSquareText } from "lucide-react";
 import { Link } from "wouter";
 import { useState } from "react";
 import { useSeo } from "@/hooks/use-seo";
@@ -19,13 +19,17 @@ export default function Polls() {
   });
   const { data, isLoading } = useGetPolls();
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
+  const [filter, setFilter] = useState<"all" | "active" | "closed">("all");
 
   if (isLoading) {
     return <PageSkeleton rows={3} />;
   }
 
   const polls = data?.polls || [];
-  const activePollsCount = polls.filter((p: Poll) => p.status === "active").length;
+  // +1: the Sahara consultation is always open and pinned to the agenda.
+  const activePollsCount = polls.filter((p: Poll) => p.status === "active").length + 1;
+  const shownPolls = polls.filter((p: Poll) => filter === "all" || (filter === "active" ? p.status === "active" : p.status !== "active"));
+  const showSahara = filter !== "closed";
   const totalVotesAcrossAll = polls.reduce((sum: number, p: Poll) => sum + (p.totalVotes || 0), 0);
 
   const faqs = [
@@ -74,25 +78,42 @@ export default function Polls() {
       {/* Consultation Agenda */}
       <section className="max-w-7xl mx-auto w-full px-4 -mt-20 relative z-20 pb-24">
         <div className="glass-panel rounded-[2.5rem] overflow-hidden">
-          <div className="p-8 md:p-12 border-b border-border/50 flex flex-wrap items-center justify-between gap-6">
+          <div className="p-6 md:p-12 border-b border-border/50 flex flex-wrap items-center justify-between gap-4 md:gap-6">
             <div>
-              <h2 className="text-3xl font-display font-black text-foreground">{t("Consultation Agenda", "أجندة الاستشارات")}</h2>
+              <h2 className="text-2xl md:text-3xl font-display font-black text-foreground">{t("Consultation Agenda", "أجندة الاستشارات")}</h2>
               <p className="text-muted-foreground mt-1">{t("Formal legislative requests for community decision-making.", "طلبات تشريعية رسمية لاتخاذ القرار المجتمعي.")}</p>
             </div>
-            <div className="flex gap-2">
-              <Badge variant="outline" className="px-4 py-1.5">{t("All Categories", "جميع الفئات")}</Badge>
-              <Badge variant="gold" className="px-4 py-1.5">{t("High Priority", "أولوية عالية")}</Badge>
+            <div className="flex w-full sm:w-auto items-center gap-1 rounded-2xl border border-border/50 bg-secondary/40 p-1">
+              {([
+                ["all", t("All", "الكل"), polls.length + 1],
+                ["active", t("Open", "مفتوحة"), activePollsCount],
+                ["closed", t("Closed", "مغلقة"), polls.length + 1 - activePollsCount],
+              ] as const).map(([value, label, count]) => (
+                <button
+                  key={value}
+                  type="button"
+                  onClick={() => setFilter(value)}
+                  aria-pressed={filter === value}
+                  className={`flex-1 sm:flex-none inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2 text-xs font-black uppercase tracking-widest transition-all ${
+                    filter === value ? "bg-navy-dark text-white shadow-md dark:bg-gold dark:text-navy-dark" : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {label}
+                  <span className={`rounded-md px-1.5 py-0.5 text-[10px] tabular-nums ${filter === value ? "bg-white/15 dark:bg-navy-dark/15" : "bg-secondary"}`}>{count}</span>
+                </button>
+              ))}
             </div>
           </div>
 
           <div className="divide-y divide-border/40">
-            {polls.length === 0 ? (
+            {showSahara && <SaharaAgendaItem t={t} isAr={isAr} />}
+            {shownPolls.length === 0 && !showSahara ? (
               <div className="p-20 text-center text-muted-foreground italic">
-                {t("The legislative floor is currently clear.", "قاعة التشريع خالية حالياً.")}
+                {t("No closed consultations yet.", "لا توجد استشارات مغلقة بعد.")}
               </div>
             ) : (
-              polls.map((poll: Poll, idx: number) => (
-                <AgendaItem key={poll.id} poll={poll} idx={idx} t={t} isAr={isAr} />
+              shownPolls.map((poll: Poll, idx: number) => (
+                <AgendaItem key={poll.id} poll={poll} idx={idx + (showSahara ? 1 : 0)} t={t} isAr={isAr} />
               ))
             )}
           </div>
@@ -124,36 +145,6 @@ export default function Polls() {
             </div>
           </div>
         </div>
-      </section>
-
-      {/* Sahara Autonomy Initiative Consultation CTA */}
-      <section className="max-w-7xl mx-auto w-full px-4 pb-20">
-        <Link href="/autonomy-initiative">
-          <div className="rounded-[2.5rem] p-10 md:p-14 bg-navy-dark text-white relative overflow-hidden group cursor-pointer hover:shadow-2xl hover:shadow-gold/10 transition-shadow duration-300">
-            <div className="absolute inset-0 bg-grid-gold opacity-20" />
-            <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-110 group-hover:opacity-20 transition-all duration-700">
-              <Scale className="w-32 h-32 text-gold" />
-            </div>
-            <div className="max-w-2xl relative z-10">
-              <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 border border-white/20 text-gold-pale text-[11px] font-bold uppercase tracking-[0.2em] mb-5">
-                {t("Civic Consultation", "استشارة مدنية")}
-              </span>
-              <h3 className="text-2xl md:text-3xl font-display font-black mb-4">
-                {t("The Autonomy", "مبادرة الحكم")} <span className="text-gradient-gold">{t("Initiative", "الذاتي")}</span>
-              </h3>
-              <p className="text-white/60 mb-8 leading-relaxed max-w-xl">
-                {t(
-                  "Understand Morocco's Autonomy Initiative for the Sahara, section by section, and share your perspective by region and topic.",
-                  "تعرّف على المبادرة المغربية للحكم الذاتي في الصحراء محوراً محوراً، وشارك رأيك حسب الجهة والمحور."
-                )}
-              </p>
-              <div className="inline-flex items-center gap-3 font-bold text-gold group-hover:gap-4 transition-all">
-                {t("Read & Share Your Opinion", "اقرأ وشارك رأيك")}
-                <ArrowRight className={`w-5 h-5 ${isAr ? "rotate-180" : ""}`} />
-              </div>
-            </div>
-          </div>
-        </Link>
       </section>
 
       {/* Constitutional FAQ */}
@@ -205,6 +196,62 @@ export default function Polls() {
   );
 }
 
+// Pinned first row of the agenda: the public Sahara Autonomy consultation.
+// It isn't a poll (free-text answers by region/section), so it links to its own page.
+function SaharaAgendaItem({ t, isAr }: { t: (en: string, ar: string) => string; isAr: boolean }) {
+  return (
+    <motion.div initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="group">
+      <Link href="/autonomy-initiative">
+        <div className="relative overflow-hidden p-6 md:p-12 flex flex-col md:flex-row items-start md:items-center gap-6 md:gap-8 cursor-pointer bg-gradient-to-r from-gold/[0.08] via-gold/[0.03] to-transparent hover:from-gold/[0.12] transition-colors">
+          <span className="absolute inset-y-0 start-0 w-1 bg-gold" />
+          <Scale className="pointer-events-none absolute -end-6 -top-6 size-40 text-gold/[0.07] transition-transform duration-700 group-hover:scale-110 group-hover:rotate-6" />
+
+          <span className="hidden md:flex size-14 shrink-0 items-center justify-center rounded-2xl bg-gold/15 text-gold ring-1 ring-gold/30">
+            <Scale className="size-7" />
+          </span>
+
+          <div className="relative flex-1 space-y-3">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-gold px-3 py-1 text-[10px] font-black uppercase tracking-widest text-navy-dark">
+                <Pin className="size-3" /> {t("Featured", "مميّزة")}
+              </span>
+              <span className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-muted-foreground">
+                <span className="size-2.5 rounded-full bg-gold animate-pulse" />
+                {t("Open to everyone · no account needed", "مفتوحة للجميع · بدون حساب")}
+              </span>
+            </div>
+            <h3 className="text-2xl md:text-3xl font-display font-black text-foreground group-hover:text-gold transition-colors duration-300">
+              {t("The Autonomy Initiative for the Sahara", "المبادرة المغربية للحكم الذاتي في الصحراء")}
+            </h3>
+            <p className="text-muted-foreground text-base md:text-lg max-w-3xl leading-relaxed">
+              {t(
+                "Read the framework section by section — constitutional, institutional and financial — and share your perspective by region and topic.",
+                "اطّلع على الإطار محوراً محوراً — الدستوري والمؤسساتي والمالي — وشارك رأيك حسب الجهة والمحور."
+              )}
+            </p>
+            <div className="flex flex-wrap gap-2 pt-1">
+              {[t("Constitutional", "دستوري"), t("Institutions", "المؤسسات"), t("Resources", "الموارد")].map((tag) => (
+                <span key={tag} className="rounded-lg border border-border/60 bg-card/60 px-2.5 py-1 text-[11px] font-bold text-foreground/70">{tag}</span>
+              ))}
+            </div>
+          </div>
+
+          <div className="relative flex md:flex-col items-center gap-4 md:gap-2 min-w-[120px]">
+            <div className="text-center">
+              <MessageSquareText className="mx-auto size-6 text-gold" />
+              <p className="mt-1 text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t("Share opinion", "شارك رأيك")}</p>
+            </div>
+            <div className="h-10 w-px bg-border hidden md:block" />
+            <div className="p-4 rounded-full bg-gold text-navy-dark shadow-lg shadow-gold/25 transition-transform duration-300 group-hover:scale-110">
+              <ArrowRight className={`w-6 h-6 ${isAr ? "rotate-180" : ""}`} />
+            </div>
+          </div>
+        </div>
+      </Link>
+    </motion.div>
+  );
+}
+
 function AgendaItem({ poll, idx, t, isAr }: any) {
   return (
     <motion.div
@@ -215,7 +262,7 @@ function AgendaItem({ poll, idx, t, isAr }: any) {
       className="group"
     >
       <Link href={`/polls/${poll.id}`}>
-        <div className="p-8 md:p-12 flex flex-col md:flex-row items-start md:items-center gap-8 cursor-pointer hover:bg-gold/[0.04] transition-colors relative">
+        <div className="p-6 md:p-12 flex flex-col md:flex-row items-start md:items-center gap-6 md:gap-8 cursor-pointer hover:bg-gold/[0.04] transition-colors relative">
           {/* Gold accent bar on hover */}
           <span className="absolute inset-y-0 start-0 w-1 bg-gold scale-y-0 group-hover:scale-y-100 origin-center transition-transform duration-300" />
 

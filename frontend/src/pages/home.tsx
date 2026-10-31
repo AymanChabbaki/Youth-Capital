@@ -473,30 +473,37 @@ export default function Home() {
                 <motion.div
                   key={feature.id}
                   layout
+                  role="button"
+                  tabIndex={0}
+                  aria-expanded={isActive}
                   onClick={() => setActiveFeature(feature.id)}
-                  className={`relative cursor-pointer overflow-hidden rounded-[2rem] transition-all duration-700 ease-in-out border border-white/10 group ${
-                    isActive ? 'flex-[4] lg:flex-[3] shadow-2xl shadow-primary/10' : 'flex-1 hover:bg-white/5'
+                  onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setActiveFeature(feature.id); } }}
+                  className={`relative cursor-pointer overflow-hidden rounded-[2rem] transition-all duration-700 ease-in-out border border-white/10 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold ${
+                    isActive ? 'flex-[4] lg:flex-[3] min-h-[400px] lg:min-h-0 shadow-2xl shadow-navy/20' : 'flex-1 min-h-[92px] lg:min-h-0'
                   }`}
                 >
-                  <div className="absolute inset-0 z-0">
-                    <img 
-                      src={`${import.meta.env.BASE_URL}images/${feature.img}`} 
-                      alt={feature.title} 
-                      className="w-full h-full object-cover opacity-60"
+                  <div className="absolute inset-0 z-0 bg-navy-dark">
+                    <img
+                      src={`${import.meta.env.BASE_URL}images/${feature.img}`}
+                      alt=""
+                      className={`w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 ${isActive ? "opacity-90" : "opacity-50"}`}
                     />
-                    <div className={`absolute inset-0 bg-gradient-to-t ${feature.color} via-background/90 to-transparent`} />
+                    {/* Always-dark scrim: the old one faded into the (white) page background in light mode and washed out the text. */}
+                    <div className={`absolute inset-0 bg-gradient-to-t from-navy-dark via-navy-dark/70 to-navy-dark/15 ${isActive ? "" : "lg:via-navy-dark/80 lg:to-navy-dark/50"}`} />
+                    <div className={`absolute inset-0 bg-gradient-to-br ${feature.color} opacity-60 mix-blend-soft-light`} />
                   </div>
 
-                  <div className={`relative z-10 h-full p-8 flex flex-col ${isActive ? 'justify-end' : 'items-center justify-center'}`}>
-                    <div className={`mb-4 p-4 rounded-2xl transition-all duration-500 ${isActive ? 'bg-gold/20' : 'bg-white/5 opacity-50'}`}>
-                      <Icon className={`w-8 h-8 ${isActive ? 'text-gold' : 'text-white'}`} />
+                  <div className={`relative z-10 h-full p-6 md:p-8 flex ${isActive ? 'flex-col justify-end' : 'flex-row lg:flex-col items-center justify-start lg:justify-center gap-4'}`}>
+                    <div className={`${isActive ? 'mb-4' : ''} p-3.5 md:p-4 rounded-2xl backdrop-blur-sm transition-all duration-500 shrink-0 ${isActive ? 'bg-gold/20 ring-1 ring-gold/30' : 'bg-white/10 group-hover:bg-white/15'}`}>
+                      <Icon className={`w-7 h-7 md:w-8 md:h-8 ${isActive ? 'text-gold' : 'text-white/90'}`} />
                     </div>
 
-                    <h3 className={`font-display font-black text-white transition-all duration-700 ${
-                      isActive ? 'text-3xl mb-4' : 'text-xl lg:-rotate-90 lg:whitespace-nowrap'
+                    <h3 className={`font-display font-black text-white transition-all duration-700 [text-shadow:0_2px_16px_rgba(0,0,0,0.45)] ${
+                      isActive ? 'text-3xl mb-4' : 'text-lg md:text-xl lg:-rotate-90 lg:whitespace-nowrap'
                     }`}>
                       {feature.title}
                     </h3>
+                    {!isActive && <ArrowRight className={`ms-auto size-5 text-white/60 lg:hidden ${isAr ? "rotate-180" : ""}`} />}
 
                     <AnimatePresence>
                       {isActive && (
@@ -506,10 +513,10 @@ export default function Home() {
                           exit={{ opacity: 0, y: 10 }}
                           className="space-y-4"
                         >
-                          <p className="text-gold-pale/80 font-bold uppercase tracking-widest text-[10px]">
+                          <p className="text-gold-pale font-bold uppercase tracking-widest text-[10px]">
                             {feature.shortDesc}
                           </p>
-                          <p className="text-white/80 leading-relaxed max-w-sm text-sm md:text-base">
+                          <p className="text-white/90 leading-relaxed max-w-sm text-sm md:text-base [text-shadow:0_1px_10px_rgba(0,0,0,0.4)]">
                             {feature.fullDesc}
                           </p>
                           <Link href="/about">

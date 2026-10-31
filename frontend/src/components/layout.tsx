@@ -224,6 +224,19 @@ function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // The header's height changes as it shrinks on scroll; expose it as
+  // --header-h so sticky page toolbars sit exactly underneath it.
+  const headerRef = useRef<HTMLElement>(null);
+  useEffect(() => {
+    const el = headerRef.current;
+    if (!el) return;
+    const sync = () => document.documentElement.style.setProperty("--header-h", `${Math.round(el.getBoundingClientRect().height)}px`);
+    sync();
+    const ro = new ResizeObserver(sync);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
   const toggleLang = () => setLang(lang === "en" ? "ar" : "en");
 
   const navLinks = [
@@ -249,6 +262,7 @@ function Navbar() {
 
   return (
     <header
+      ref={headerRef}
       className={`sticky top-0 z-50 w-full transition-all duration-500 ${
         isScrolled
           ? "bg-background/75 backdrop-blur-2xl border-b border-gold/15 shadow-lg shadow-navy/10 py-1.5"

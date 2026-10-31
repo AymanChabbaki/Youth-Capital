@@ -43,14 +43,25 @@ export default function Press() {
     });
   };
 
-  const { data: articlesData, isLoading } = useGetArticles();
+  const { data: articlesData, isLoading } = useGetArticles({ limit: 50 } as any);
   const articles = articlesData?.articles || [];
 
   const filteredArticles = articles.filter((article: any) => {
     const matchesCategory = activeCategory === "all" || article.type === activeCategory;
-    const matchesSearch = (isAr ? article.titleAr : article.title).toLowerCase().includes(searchQuery.toLowerCase());
+    const q = searchQuery.trim().toLowerCase();
+    const matchesSearch = !q || [article.title, article.titleAr, article.content, article.contentAr]
+      .some((v) => String(v || "").toLowerCase().includes(q));
     return matchesCategory && matchesSearch;
   });
+
+  const categoryLabel = (cat: string) => ({
+    all: t("Whole Feed", "الكل"),
+    simulation: t("Simulation News", "أخبار المحاكاة"),
+    platform: t("Announcements", "الإعلانات"),
+  } as Record<string, string>)[cat] || cat;
+  const countFor = (cat: string) => (cat === "all" ? articles.length : articles.filter((a: any) => a.type === cat).length);
+  // ~200 words per minute; content may be either language.
+  const readingTime = (a: any) => Math.max(1, Math.round(String((isAr ? a.contentAr : a.content) || a.content || "").split(/\s+/).length / 200));
 
   const heroArticle = filteredArticles[0];
   const secondaryArticles = filteredArticles.slice(1, 3);
@@ -104,20 +115,22 @@ export default function Press() {
       />
 
       {/* Control Bar */}
-      <div className="sticky top-[81px] z-40 bg-background/80 backdrop-blur-2xl border-b border-border/50 py-5">
-        <div className="max-w-7xl mx-auto px-4 md:px-6 flex flex-col md:flex-row items-center justify-between gap-5">
+      <div className="relative md:sticky md:top-[var(--header-h,76px)] z-40 bg-background/85 backdrop-blur-2xl border-b border-border/50 py-4 md:py-5">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 md:gap-5">
           <div className="flex items-center gap-2 bg-secondary/40 p-1.5 rounded-2xl border border-border/50 w-full md:w-auto overflow-x-auto no-scrollbar">
             {["all", "simulation", "platform"].map((cat) => (
               <button
                 key={cat}
                 onClick={() => setActiveCategory(cat)}
-                className={`px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap ${
+                aria-pressed={activeCategory === cat}
+                className={`flex-1 md:flex-none inline-flex items-center justify-center gap-2 px-4 md:px-6 py-2.5 rounded-xl text-[11px] md:text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap ${
                   activeCategory === cat
-                    ? "bg-navy-dark text-white shadow-lg shadow-navy-dark/20"
+                    ? "bg-navy-dark text-white shadow-lg shadow-navy-dark/20 dark:bg-gold dark:text-navy-dark"
                     : "text-muted-foreground hover:text-foreground"
                 }`}
               >
-                {t(cat === "all" ? "Whole Feed" : cat, cat === "all" ? "الكل" : cat)}
+                {categoryLabel(cat)}
+                <span className={`rounded-md px-1.5 py-0.5 text-[10px] tabular-nums ${activeCategory === cat ? "bg-white/15 dark:bg-navy-dark/15" : "bg-secondary"}`}>{countFor(cat)}</span>
               </button>
             ))}
           </div>
@@ -134,33 +147,37 @@ export default function Press() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 md:px-6 mt-12">
+      <div className="max-w-7xl mx-auto px-4 md:px-6 mt-8 md:mt-12">
         {heroArticle ? (
           <>
             {/* Hero Article */}
             <Link href={`/press/${heroArticle.slug}`}>
               <motion.div
                 whileHover={{ y: -8 }}
-                className="relative h-[60vh] md:h-[65vh] w-full rounded-[2.5rem] md:rounded-[3rem] overflow-hidden mb-12 cursor-pointer group shadow-2xl shadow-navy/10 border border-border/30"
+                className="relative flex min-h-[420px] md:min-h-0 md:h-[65vh] w-full flex-col justify-end rounded-[2rem] md:rounded-[3rem] overflow-hidden mb-10 md:mb-12 cursor-pointer group shadow-2xl shadow-navy/10 border border-border/30"
               >
-                {heroArticle.thumbnailUrl ? (
-                  <img src={heroArticle.thumbnailUrl} alt={heroArticle.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" title={heroArticle.title} />
-                ) : (
-                  <div className="w-full h-full bg-navy-dark bg-grid-gold p-20 flex items-center justify-center text-gold/10 font-display font-black text-[10vw]">PRESS</div>
-                )}
-                <div className="absolute inset-0 bg-gradient-to-t from-navy-dark via-navy-dark/40 to-transparent" />
-                <div className="absolute bottom-0 start-0 p-8 md:p-16 w-full">
+                <div className="absolute inset-0">
+                  {heroArticle.thumbnailUrl ? (
+                    <img src={heroArticle.thumbnailUrl} alt={heroArticle.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" title={heroArticle.title} />
+                  ) : (
+                    <div className="w-full h-full bg-navy-dark bg-grid-gold p-20 flex items-center justify-center text-gold/10 font-display font-black text-[10vw]">PRESS</div>
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-navy-dark via-navy-dark/70 to-navy-dark/10" />
+                </div>
+                {/* In normal flow (not absolute) so the card grows with long headlines instead of clipping them. */}
+                <div className="relative p-6 pt-24 md:p-16 w-full">
                   <div className="max-w-4xl">
-                    <Badge className="bg-gold border-none text-navy-dark rounded-lg px-4 py-1.5 mb-6 text-xs font-black tracking-widest uppercase shadow-xl shadow-gold/20">
-                      {heroArticle.type}
+                    <Badge className="bg-gold border-none text-navy-dark rounded-lg px-3 md:px-4 py-1 md:py-1.5 mb-4 md:mb-6 text-[10px] md:text-xs font-black tracking-widest uppercase shadow-xl shadow-gold/20">
+                      {categoryLabel(heroArticle.type)}
                     </Badge>
-                    <h2 className="text-3xl md:text-5xl lg:text-6xl font-display font-black text-white mb-8 group-hover:text-gold-pale transition-colors leading-[1.08] tracking-tight">
+                    <h2 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-display font-black text-white mb-5 md:mb-8 group-hover:text-gold-pale transition-colors leading-[1.12] md:leading-[1.08] tracking-tight [text-shadow:0_2px_24px_rgba(0,0,0,0.35)]">
                       {isAr ? heroArticle.titleAr : heroArticle.title}
                     </h2>
-                    <div className="flex flex-wrap items-center gap-6 text-white/70 text-sm font-bold border-t border-white/20 pt-6">
-                      <span className="flex items-center gap-2"><User className="w-4 h-4 text-gold" /> {heroArticle.author.fullName}</span>
+                    <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-white/75 text-xs md:text-sm font-bold border-t border-white/20 pt-4 md:pt-6">
+                      {heroArticle.author?.fullName && <span className="flex items-center gap-2"><User className="w-4 h-4 text-gold" /> {heroArticle.author.fullName}</span>}
                       <span className="flex items-center gap-2"><Calendar className="w-4 h-4 text-gold" /> {format(new Date(heroArticle.publishedAt), 'MMMM dd, yyyy')}</span>
-                      <span className="flex items-center gap-2"><TrendingUp className="w-4 h-4 text-gold" /> {t("Headline Story", "القصة الرئيسية")}</span>
+                      <span className="flex items-center gap-2"><Clock className="w-4 h-4 text-gold" /> {readingTime(heroArticle)} {t("min read", "د قراءة")}</span>
+                      <span className="hidden sm:flex items-center gap-2"><TrendingUp className="w-4 h-4 text-gold" /> {t("Headline Story", "القصة الرئيسية")}</span>
                     </div>
                   </div>
                 </div>
@@ -168,9 +185,9 @@ export default function Press() {
             </Link>
 
             {/* Secondary & Feed Layout */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 mt-16">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 mt-10 md:mt-16">
               {/* Feed */}
-              <div className="lg:col-span-8 space-y-10">
+              <div className="lg:col-span-8 space-y-6 md:space-y-10">
                 <div className="flex items-center gap-4 mb-4">
                   <div className="h-px flex-1 bg-border/60" />
                   <h3 className="text-xs uppercase font-black tracking-[0.3em] text-muted-foreground">{t("Recent Briefings", "إيجازات حديثة")}</h3>
@@ -184,31 +201,35 @@ export default function Press() {
                         initial={{ opacity: 0, y: 24 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
-                        className="flex flex-col md:flex-row gap-8 p-6 md:p-8 bg-card border border-border/50 rounded-[2rem] hover:border-gold/40 hover:shadow-xl hover:shadow-gold/5 hover:-translate-y-1 transition-all duration-300 cursor-pointer group"
+                        className="flex flex-col md:flex-row gap-5 md:gap-8 p-4 md:p-8 bg-card border border-border/50 rounded-[1.75rem] md:rounded-[2rem] hover:border-gold/40 hover:shadow-xl hover:shadow-gold/5 hover:-translate-y-1 transition-all duration-300 cursor-pointer group"
                       >
-                        <div className="w-full md:w-64 h-48 rounded-3xl overflow-hidden shrink-0 border border-border/50 relative">
+                        <div className="w-full md:w-64 h-44 md:h-48 rounded-2xl md:rounded-3xl overflow-hidden shrink-0 border border-border/50 relative">
                           {article.thumbnailUrl ? (
                             <img src={article.thumbnailUrl} alt={article.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" title={article.title} />
                           ) : (
                             <div className="w-full h-full bg-secondary/40 flex items-center justify-center text-muted-foreground/40 font-display font-black">PRESS</div>
                           )}
                           <div className="absolute top-4 start-4 bg-card/95 backdrop-blur-md px-3 py-1 rounded-lg text-foreground text-[10px] font-black uppercase tracking-widest shadow-sm">
-                            {article.type}
+                            {categoryLabel(article.type)}
                           </div>
                         </div>
-                        <div className="flex-1 flex flex-col justify-center">
-                          <h4 className="text-xl md:text-2xl font-display font-bold text-foreground group-hover:text-gold transition-colors mb-4 leading-tight tracking-tight">
+                        <div className="flex-1 flex flex-col justify-center px-1 md:px-0 pb-1 md:pb-0">
+                          <h4 className="text-lg md:text-2xl font-display font-bold text-foreground group-hover:text-gold transition-colors mb-3 md:mb-4 leading-tight tracking-tight">
                             {isAr ? article.titleAr : article.title}
                           </h4>
                           <p className="text-muted-foreground line-clamp-2 mb-6 leading-relaxed">
                             {isAr ? article.contentAr : article.content}
                           </p>
-                          <div className="flex items-center gap-6 mt-auto">
+                          <div className="flex flex-wrap items-center gap-x-5 gap-y-2 mt-auto">
                             <span className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground">
-                              <Clock className="w-3 h-3" />
+                              <Calendar className="w-3 h-3" />
                               {format(new Date(article.publishedAt), 'MMM dd, yyyy')}
                             </span>
-                            <span className="flex items-center text-xs font-black text-gold gap-1.5 uppercase tracking-widest group-hover:gap-3 transition-all">
+                            <span className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+                              <Clock className="w-3 h-3" />
+                              {readingTime(article)} {t("min", "د")}
+                            </span>
+                            <span className="ms-auto flex items-center text-xs font-black text-gold gap-1.5 uppercase tracking-widest group-hover:gap-3 transition-all">
                               {t("Full Report", "التقرير الكامل")} <ArrowRight className={`w-3.5 h-3.5 ${isAr ? "rotate-180" : ""}`} />
                             </span>
                           </div>
@@ -226,7 +247,7 @@ export default function Press() {
 
               {/* Sidebar */}
               <aside className="lg:col-span-4 space-y-10">
-                <div className="p-8 md:p-10 rounded-[2.5rem] bg-card border border-border/50 shadow-sm">
+                {secondaryArticles.length > 0 && <div className="p-6 md:p-10 rounded-[2rem] md:rounded-[2.5rem] bg-card border border-border/50 shadow-sm">
                   <h3 className="text-2xl font-display font-black text-foreground mb-8 tracking-tight">{t("Featured Stories", "قصص مميزة")}</h3>
                   <div className="space-y-10">
                     {secondaryArticles.map((article: any) => (
@@ -239,7 +260,7 @@ export default function Press() {
                               <div className="w-full h-full bg-secondary/50 flex items-center justify-center text-muted-foreground/40 font-display font-black">IMAGE</div>
                             )}
                             <Badge className="absolute bottom-4 start-4 bg-gold text-navy-dark border-none rounded-lg text-xs font-black shadow-lg">
-                              {article.type}
+                              {categoryLabel(article.type)}
                             </Badge>
                           </div>
                           <h4 className="text-xl font-display font-bold text-foreground group-hover:text-gold transition-colors leading-tight tracking-tight mb-2">
@@ -253,7 +274,7 @@ export default function Press() {
                       </Link>
                     ))}
                   </div>
-                </div>
+                </div>}
 
                 <Card className="p-8 md:p-10 rounded-[2.5rem] bg-navy-dark text-white border-none shadow-2xl shadow-navy/20 relative overflow-hidden group">
                   <div className="absolute inset-0 bg-grid-gold opacity-20" />
