@@ -1,6 +1,6 @@
 import { Router, type IRouter } from "express";
-import { db, usersTable } from "@workspace/db";
-import { eq } from "drizzle-orm";
+import { db, usersTable, auditLogsTable, emailCampaignsTable } from "@workspace/db";
+import { eq, desc, inArray, sql } from "drizzle-orm";
 import { z } from "zod";
 import { requireAuth, requireAdmin } from "../lib/session.js";
 import { validateBody } from "../middlewares/validate.js";
@@ -14,12 +14,13 @@ const router: IRouter = Router();
 const SEGMENTS = [
   "all_users", "active_users", "banned_users",
   "pending_applicants", "approved_applicants", "rejected_applicants",
-  "custom",
+  "selected", "custom",
 ] as const;
 
 const SendEmailSchema = z.object({
   segment: z.enum(SEGMENTS),
-  customEmails: z.array(z.string().email()).max(500).optional(),
+  // Used by both "selected" (picked members) and "custom" (pasted addresses).
+  customEmails: z.array(z.string().email()).max(1000).optional(),
   subject: z.string().trim().min(1).max(200),
   message: z.string().trim().min(1).max(20000),
   lang: z.enum(["en", "ar"]).optional().default("en"),
@@ -39,9 +40,43 @@ async function resolveRecipients(segment: (typeof SEGMENTS)[number], customEmail
       return db.select({ email: usersTable.email, fullName: usersTable.fullName }).from(usersTable).where(eq(usersTable.applicationStatus, "approved"));
     case "rejected_applicants":
       return db.select({ email: usersTable.email, fullName: usersTable.fullName }).from(usersTable).where(eq(usersTable.applicationStatus, "rejected"));
+    case "selected": {
+      // Specific members picked in the admin UI — only real accounts, with names.
+      const emails = [...new Set((customEmails || []).map((e) => e.toLowerCase()))];
+      if (!emails.length) return [];
+      return db
+        .select({ email: usersTable.email, fullName: usersTable.fullName })
+        .from(usersTable)
+        .where(inArray(sql`lower(${usersTable.email})`, emails));
+    }
     case "custom":
-      return (customEmails || []).map((email) => ({ email, fullName: "" }));
+      return [...new Set(customEmails || [])].map((email) => ({ email, fullName: "" }));
   }
+}
+
+// email_campaigns was added after launch: create it on first use so a deploy
+// works even if `drizzle-kit push` wasn't run. Idempotent and additive only.
+let historyReady: Promise<void> | null = null;
+function ensureHistoryTable(): Promise<void> {
+  historyReady ??= db.execute(sql`
+    CREATE TABLE IF NOT EXISTS email_campaigns (
+      id serial PRIMARY KEY,
+      sender_id integer REFERENCES users(id) ON DELETE SET NULL,
+      segment text NOT NULL,
+      subject text NOT NULL,
+      message text NOT NULL,
+      lang text NOT NULL DEFAULT 'en',
+      recipients jsonb NOT NULL,
+      sent_count integer NOT NULL DEFAULT 0,
+      failed_count integer NOT NULL DEFAULT 0,
+      failures jsonb,
+      created_at timestamp NOT NULL DEFAULT now()
+    )
+  `).then(() => undefined).catch((err) => {
+    historyReady = null; // retry on the next request
+    throw err;
+  });
+  return historyReady;
 }
 
 // Preview only — no sending, no audit log. Lets the admin UI show an
@@ -53,7 +88,8 @@ router.get("/recipients", requireAuth, requireAdmin, async (req, res) => {
       res.status(400).json({ error: "BadRequest", message: "Invalid segment" });
       return;
     }
-    const recipients = await resolveRecipients(segment);
+    const customEmails = typeof req.query.emails === "string" ? req.query.emails.split(",").filter(Boolean) : undefined;
+    const recipients = await resolveRecipients(segment, customEmails);
     res.json({ count: recipients.length, sample: recipients.slice(0, 5).map((r) => r.email) });
   } catch (err) {
     req.log.error({ err }, "Preview recipients error");
@@ -94,6 +130,26 @@ router.post("/send", requireAuth, requireAdmin, emailLimiter, validateBody(SendE
     const results = await sendEmailToMany(recipients.map((r) => r.email), subject, html);
     const sentCount = results.filter((r) => r.success).length;
     const failedCount = results.length - sentCount;
+    const failures = results.filter((r) => !r.success);
+
+    // History is best-effort: a failure to record it must not turn a
+    // successful send into an error response (the emails already went out).
+    try {
+      await ensureHistoryTable();
+      await db.insert(emailCampaignsTable).values({
+        senderId: (req as any).user.id,
+        segment,
+        subject,
+        message,
+        lang,
+        recipients: recipients.map((r) => r.email),
+        sentCount,
+        failedCount,
+        failures: failures.map((f: any) => ({ email: f.to, error: f.error })),
+      });
+    } catch (err) {
+      req.log.error({ err }, "Failed to record email history");
+    }
 
     logAudit((req as any).user.id, "email.sent", "email", undefined, {
       segment,
@@ -106,10 +162,58 @@ router.post("/send", requireAuth, requireAdmin, emailLimiter, validateBody(SendE
     res.json({
       sent: sentCount,
       failed: failedCount,
-      failures: results.filter((r) => !r.success),
+      failures,
     });
   } catch (err) {
     req.log.error({ err }, "Send email error");
+    res.status(500).json({ error: "Internal", message: "Server error" });
+  }
+});
+
+// Sent-email history for the admin Emails page. Sends from before the
+// email_campaigns table existed only live in the audit log (subject, segment
+// and counts, no body), so those are merged in as "legacy" entries.
+router.get("/history", requireAuth, requireAdmin, async (req, res) => {
+  try {
+    await ensureHistoryTable();
+    const rows = await db
+      .select({ campaign: emailCampaignsTable, sender: { id: usersTable.id, fullName: usersTable.fullName, email: usersTable.email } })
+      .from(emailCampaignsTable)
+      .leftJoin(usersTable, eq(emailCampaignsTable.senderId, usersTable.id))
+      .orderBy(desc(emailCampaignsTable.createdAt))
+      .limit(500);
+    const campaigns = rows.map(({ campaign, sender }) => ({ ...campaign, sender: sender?.id ? sender : null, legacy: false }));
+
+    const firstTracked = campaigns.length ? campaigns[campaigns.length - 1].createdAt : new Date();
+    const legacyRows = await db
+      .select({ log: auditLogsTable, sender: { id: usersTable.id, fullName: usersTable.fullName, email: usersTable.email } })
+      .from(auditLogsTable)
+      .leftJoin(usersTable, eq(auditLogsTable.actorId, usersTable.id))
+      .where(sql`${auditLogsTable.action} = 'email.sent' AND ${auditLogsTable.createdAt} < ${firstTracked}`)
+      .orderBy(desc(auditLogsTable.createdAt))
+      .limit(500);
+    const legacy = legacyRows.map(({ log, sender }) => {
+      const m = (log.metadata || {}) as any;
+      return {
+        id: `legacy-${log.id}`,
+        segment: m.segment || "unknown",
+        subject: m.subject || "",
+        message: null,
+        lang: null,
+        recipients: null,
+        recipientCount: m.recipientCount ?? null,
+        sentCount: m.sentCount ?? 0,
+        failedCount: m.failedCount ?? 0,
+        failures: null,
+        createdAt: log.createdAt,
+        sender: sender?.id ? sender : null,
+        legacy: true,
+      };
+    });
+
+    res.json({ campaigns: [...campaigns, ...legacy] });
+  } catch (err) {
+    req.log.error({ err }, "Get email history error");
     res.status(500).json({ error: "Internal", message: "Server error" });
   }
 });

@@ -16,7 +16,8 @@ import MembersPage from "@/components/admin/pages/members";
 import ApplicationsPage from "@/components/admin/pages/applications";
 import { PressPage, EventsPage, PollsPage } from "@/components/admin/pages/content";
 import { CrisesPage, SupportPage, SaharaPage } from "@/components/admin/pages/operations";
-import { SystemPage, EmailsPage } from "@/components/admin/pages/system-emails";
+import { SystemPage } from "@/components/admin/pages/system-emails";
+import { EmailsPage } from "@/components/admin/pages/emails";
 
 // The statistics page pulls in every chart; load it only when opened.
 const StatisticsPage = lazy(() => import("@/components/admin-stats"));

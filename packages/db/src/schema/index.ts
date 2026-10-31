@@ -10,3 +10,4 @@ export * from "./sessions.js";
 export * from "./audit.js";
 export * from "./systemLogs.js";
 export * from "./saharaFeedback.js";
+export * from "./emailCampaigns.js";

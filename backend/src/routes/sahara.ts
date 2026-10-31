@@ -153,4 +153,21 @@ router.get("/", requireAuth, requireAdmin, async (req, res) => {
   }
 });
 
+// Admin-only: every response (no pagination) for the dashboard table and the
+// statistics page. Capped so a runaway table can't exhaust memory.
+router.get("/export", requireAuth, requireAdmin, async (req, res) => {
+  try {
+    await ensureDemographicColumns();
+    const entries = await db
+      .select()
+      .from(saharaFeedbackTable)
+      .orderBy(asc(saharaFeedbackTable.region), desc(saharaFeedbackTable.createdAt))
+      .limit(50000);
+    res.json({ entries, total: entries.length });
+  } catch (err) {
+    req.log.error({ err }, "Export sahara feedback error");
+    res.status(500).json({ error: "Internal", message: "Server error" });
+  }
+});
+
 export default router;
